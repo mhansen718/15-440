@@ -20,7 +20,7 @@ public class TransactionalFileOutputStream extends OutputStream implements Seria
 				this.filePointer = (new File(this.fileName)).length();
 			}
 			catch (Exception excp) {
-				System.out.print("Error Creating TransactionalFileOutputStream: " + excp)
+				System.out.print("Error Creating TransactionalFileOutputStream: " + excp);
 			}
 		}
 		else {
