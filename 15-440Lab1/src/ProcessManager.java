@@ -1,21 +1,37 @@
 
 public class ProcessManager {
-
-	private volatile boolean suspendMe;
-	
+    
+    private final String hostname;
+    
+    private void ProcessManager(String h) {
+        if (!h) {
+            masterManager();
+        } else {
+            this.hostname = h;
+            slaveManager();
+        }
+    }
+    
+    private void masterManager() {
+        
+    }
+    
+    private void slaveManager() {
+        
+    }
+    
 	public static void main(String[] args) {
-		ProcessManager k = new ProcessManager();
-		
-		k.run();
+        private String h;
+        private int i = 0;
+        while (i < args.length) {
+            if (args[i] == "-c") {
+                i++;
+                h = args[i];
+                i++;
+            } else {
+                return "Invalid argument";
+            }
+        }
+        ProcessManager p = new ProcessManager(h);
 	}
-	
-	public void run() {
-		if (!suspendMe) {
-			System.out.println("FALSE");
-		}
-		else {
-			System.out.println("TRUE");
-		}
-	}
-	
 }
