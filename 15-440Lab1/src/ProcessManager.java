@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class ProcessManager {
@@ -27,14 +29,14 @@ public class ProcessManager {
         
         processes = new ThreadGroup("processes");
         Scanner sc = new Scanner(System.in);
-        Thread[] threads;
+        Thread[] threads = new Thread[processes.activeCount()];
         while (true) {
             System.out.print(">> ");
             String input = sc.nextLine();
             if (input == "ps") {
                 processes.enumerate(threads);
                 for (Thread t: threads) {
-                    System.out.println(t.toString());
+                    System.out.println(((MigratableProcess) t).toString());
                 }
             } else if (input == "quit") {
                 System.out.println("Goodbye!");
