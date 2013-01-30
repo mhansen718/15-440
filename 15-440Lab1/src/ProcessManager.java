@@ -5,14 +5,17 @@ public class ProcessManager {
     private ThreadGroup processes;
     private final String hostname;
     
-    private void ProcessManager(String h) {
-        if (!h) {
+    
+    public ProcessManager(String hostname) {
+		super();
+		this.hostname = hostname;
+		
+		if (hostname == null) {
             masterManager();
         } else {
-            this.hostname = h;
             slaveManager();
         }
-    }
+	}
     
     // I'll make this two threads, one that manages processes, one that is a slave
     private void masterManager() {
@@ -43,11 +46,11 @@ public class ProcessManager {
     }
     
     public int runningProcesses() {
-        return proceses.activeCount();
+        return processes.activeCount();
     }
     
 	public static void main(String[] args) {
-        String h;
+        String h = null;
         int i = 0;
         while (i < args.length) {
             if (args[i] == "-c") {
@@ -55,7 +58,7 @@ public class ProcessManager {
                 h = args[i];
                 i++;
             } else {
-                return "Invalid argument";
+                System.out.println("Invalid argument!" + args[i]);
             }
         }
         ProcessManager p = new ProcessManager(h);
