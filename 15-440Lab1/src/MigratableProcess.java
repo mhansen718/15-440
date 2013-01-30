@@ -7,4 +7,5 @@ public interface MigratableProcess extends Runnable, Serializable {
 	   migration methods, they can be totally nomadic like that */
 	
 	void suspend();
+	String toString();
 }
