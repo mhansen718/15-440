@@ -50,8 +50,15 @@ public class ProcessManager {
     	return;
     }
     
-    private void plopProcess(String processName) {
-    	//TODO: Make it so this suspends and serialized a thread
+    private void plopProcess() throws Exception {
+    	/* Get the first thread in the processes and suspend it */
+    	Thread[] processesAsThreads = new Thread[processes.activeCount()];
+    	processes.enumerate(processesAsThreads);
+    	
+    	((MigratableProcess) processesAsThreads[0]).suspend();
+    	
+    	/* Now serialize it */
+    	//TODO
     }
     
     private void plantProcess(String processName) {
