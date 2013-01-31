@@ -7,16 +7,9 @@ public class ProcessManager {
     private ThreadGroup processes;
     private final String hostname; 
     
-    
     public ProcessManager(String hostname) {
 		super();
 		this.hostname = hostname;
-
-		if (hostname == null) {
-            masterManager();
-        } else {
-            slaveManager();
-        }
 	}
     
     // I'll make this two threads, one that manages processes, one that is a slave
@@ -117,14 +110,18 @@ public class ProcessManager {
     	return;
     }
     
-    private void plantProcess(String processClass, boolean wasSerialized) {
-    	/* Run or restart a new process on this node */
+    private void planetProcess(String processName) {
+    	
     	ObjectInputStream objIn;
+    }
+    
+    private void newProcess(String[] args) {
+    	/* Run a new process on this node. The master will give the*/
     	Class objClass;
     	Constructor objConstruct;
     	
     	try {
-    		objClass = Class.forName(processClass);
+    		objClass = Class.forName(args[0]);
     	} catch (ClassNotFoundException excpt) {
     		System.out.println("Error: Class: " + processClass + " was not found");
     		return;
@@ -132,13 +129,11 @@ public class ProcessManager {
     		System.out.println("Error: Failed to find class for name: " + processClass);
     		return;
     	}
-    	
-    	if (wasSerialized) {
-    		
-    	} else {
-    		try {
-    			objConstruct = objClass.getConstructor(parameterTypes);
-    		}
+    	try {
+    		objConstruct = objClass.getConstructor();
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to get constructor for class " + processClass);
+        	return;
     	}
     	
     }
@@ -147,18 +142,29 @@ public class ProcessManager {
         return processes.activeCount();
     }
     
+    private void begin() {
+    	/* Run either as master or slave based on hostname */
+    	if (hostname == null) {
+            masterManager();
+        } else {
+            slaveManager();
+        }
+    	return;
+    }
+    
 	public static void main(String[] args) {
-        String h = null;
+        String hostnameLocal = null;
         int i = 0;
         while (i < args.length) {
             if (args[i] == "-c") {
                 i++;
-                h = args[i];
+                hostnameLocal = args[i];
                 i++;
             } else {
-                System.out.println("Invalid argument!" + args[i]);
+                System.out.println("Invalid argument: " + args[i]);
             }
         }
-        ProcessManager p = new ProcessManager(h);
+        ProcessManager p = new ProcessManager(hostnameLocal);
+        p.begin();
 	}
 }

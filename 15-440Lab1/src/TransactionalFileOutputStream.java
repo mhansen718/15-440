@@ -18,12 +18,10 @@ public class TransactionalFileOutputStream extends OutputStream implements Seria
 		if (append) {
 			try {
 				this.filePointer = (new File(this.fileName)).length();
-			}
-			catch (Exception excp) {
+			} catch (Exception excp) {
 				System.out.print("Error Creating TransactionalFileOutputStream: " + excp);
 			}
-		}
-		else {
+		} else {
 			this.filePointer = 0;
 		}
 	}
@@ -44,12 +42,8 @@ public class TransactionalFileOutputStream extends OutputStream implements Seria
 			this.filePointer = writeMe.getFilePointer();
 			
 			writeMe.close();
-		}
-		catch (FileNotFoundException excp) {
+		} catch (FileNotFoundException excp) {
 			System.out.print("File Not Found: " + this.fileName);
 		}
-	}
-	
-	
-	
+	}	
 }
