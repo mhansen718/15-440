@@ -1,5 +1,5 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.lang.reflect.Constructor;
 import java.util.Scanner;
 
 public class ProcessManager {
@@ -27,10 +27,16 @@ public class ProcessManager {
     private void slaveManager() {
         //TODO: Connect to master
     	Thread[] processesAsThreads;
+    	Thread UI;
     	
     	/* Create the user interface as separate thread */
-    	Thread UI = new Thread(new userInterface(processes));
-    	UI.start();
+    	try {
+    		UI = new Thread(new userInterface(processes));
+    		UI.start();
+    	} catch (Exception expt) {
+    		System.out.println("Error: Failed to create UI; Exiting...");
+    		return;
+    	}
     	
     	while (UI.getState() != Thread.State.TERMINATED) {
     		// TODO: If heartbeat, plant or plop
@@ -50,19 +56,91 @@ public class ProcessManager {
     	return;
     }
     
-    private void plopProcess() throws Exception {
-    	/* Get the first thread in the processes and suspend it */
+    private void plopProcess() {
+    	/* Get the first thread in the processes and suspend it. Then, serialize it. */
     	Thread[] processesAsThreads = new Thread[processes.activeCount()];
     	processes.enumerate(processesAsThreads);
+    	MigratableProcess plopProcess;
+    	String plopName;
+    	ObjectOutputStream objOut;
     	
-    	((MigratableProcess) processesAsThreads[0]).suspend();
+    	/* Take the plot process and suspend it */
+    	try {
+    		plopProcess = ((MigratableProcess) processesAsThreads[0]);
+    		plopName = processesAsThreads[0].getName();
+    	} catch (ArrayIndexOutOfBoundsException excpt) {
+    		System.out.println("Error: No running processes on this node");
+    		return;
+    	}
+    	
+    	try {
+    		plopProcess.suspend();
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to suspend process " + processesAsThreads[0].getName());
+    		return;
+    	}
     	
     	/* Now serialize it */
-    	//TODO
+    	try {
+    		objOut = new ObjectOutputStream(new FileOutputStream(plopName + ".ser"));
+    	} catch (IOException excpt) {
+    		System.out.println("Error: Failed to open file stream for serialization due to IO Error");
+    		return;
+    	} catch (SecurityException excpt) {
+    		System.out.println("Error: Permission denied in creating output stream");
+    		return;
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to open file stream");
+    		return;
+    	}
+    	
+    	try {
+    		objOut.writeObject(plopProcess);
+    		objOut.flush();
+    	} catch (NotSerializableException excpt) {
+    		System.out.println("Error: Process " + plopName + " does not appear serializable");
+    		return;
+    	} catch (IOException excpt) {
+    		System.out.println("Error: Failed to write object to file");
+    		return;
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to open file stream");
+    		return;
+    	}
+
+    	/* Close and leave if alls well */
+    	try {
+			objOut.close();
+		} catch (IOException excpt) {
+			System.out.println("Error: Failed to close output stream successfully");
+		}
+    	return;
     }
     
-    private void plantProcess(String processName) {
-    	//TODO: Make it so this deserialized and runs a process
+    private void plantProcess(String processClass, boolean wasSerialized) {
+    	/* Run or restart a new process on this node */
+    	ObjectInputStream objIn;
+    	Class objClass;
+    	Constructor objConstruct;
+    	
+    	try {
+    		objClass = Class.forName(processClass);
+    	} catch (ClassNotFoundException excpt) {
+    		System.out.println("Error: Class: " + processClass + " was not found");
+    		return;
+    	} catch (Exception expt) {
+    		System.out.println("Error: Failed to find class for name: " + processClass);
+    		return;
+    	}
+    	
+    	if (wasSerialized) {
+    		
+    	} else {
+    		try {
+    			objConstruct = objClass.getConstructor(parameterTypes);
+    		}
+    	}
+    	
     }
     
     public int runningProcesses() {

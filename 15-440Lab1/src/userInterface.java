@@ -24,8 +24,7 @@ public class userInterface implements Runnable {
     		if (inputString == "ps") {
     			if (processes.activeCount() == 0) {
     				System.out.println("No Running Local Processes");
-    			}
-    			else {
+    			} else {
     				/* Print out all local processes (in local processes group) */
     				processesAsThreads = new Thread[processes.activeCount()];
     				processes.enumerate(processesAsThreads);
@@ -34,12 +33,10 @@ public class userInterface implements Runnable {
     					System.out.println(((MigratableProcess) t).toString());
     				}
     			}
-    		}
-    		else if (inputString == "quit") {
+    		} else if (inputString == "quit") {
     			System.out.println("Goodbye!");
     			return;
-    		}
-    		else {
+    		} else {
     			//TODO: Send to Master for processing
     		}
     	}
