@@ -110,29 +110,51 @@ public class ProcessManager {
     	return;
     }
     
-    private void planetProcess(String processName) {
-    	
+    private void plantProcess() {
+    	/* Begin a process that was formerly serialized */
     	ObjectInputStream objIn;
+    	File here = new File(".");
+    	String[] potentials = here.list();
+    	String[] parseFileName;
+    	String fileName;
+    	String className;
+    	String id;
+    	
+    	for (String p : potentials) {
+    		if (p.endsWith(".ser")) {
+    			try {
+    				fileName = p;
+    				parseFileName = p.split(".");
+    				className = parseFileName[0];
+    				id = parseFileName[1];
+    			} catch (Exception excpt) {
+    				System.out.println("Error: Failed to parse serialized file");
+    	    		return;
+    			}
+    			break;
+    		}
+    	}
+    	
     }
     
-    private void newProcess(String[] args) {
-    	/* Run a new process on this node. The master will give the*/
+    private void newProcess(String[] args, String id) {
+    	/* Run a new process on this node. The master will give the args and an id number*/
     	Class objClass;
     	Constructor objConstruct;
     	
     	try {
     		objClass = Class.forName(args[0]);
     	} catch (ClassNotFoundException excpt) {
-    		System.out.println("Error: Class: " + processClass + " was not found");
+    		System.out.println("Error: Class: " + args[0] + " was not found");
     		return;
     	} catch (Exception expt) {
-    		System.out.println("Error: Failed to find class for name: " + processClass);
+    		System.out.println("Error: Failed to find class for name: " + args[0]);
     		return;
     	}
     	try {
     		objConstruct = objClass.getConstructor();
     	} catch (Exception excpt) {
-    		System.out.println("Error: Failed to get constructor for class " + processClass);
+    		System.out.println("Error: Failed to get constructor for class " + args[0]);
         	return;
     	}
     	
