@@ -5,15 +5,13 @@ import java.util.Scanner;
 public class ProcessManager {
     
     private ThreadGroup processes;
-    private final String hostname;
-    private volatile boolean quit; 
+    private final String hostname; 
     
     
     public ProcessManager(String hostname) {
 		super();
 		this.hostname = hostname;
-		this.quit = false;
-		
+
 		if (hostname == null) {
             masterManager();
         } else {
@@ -30,9 +28,11 @@ public class ProcessManager {
         //TODO: Connect to master
     	Thread[] processesAsThreads;
     	
-    	Thread UI = new Thread();
+    	/* Create the user interface as separate thread */
+    	Thread UI = new Thread(new userInterface(processes));
+    	UI.start();
     	
-    	while (!quit) {
+    	while (UI.getState() != Thread.State.TERMINATED) {
     		// TODO: If heartbeat, plant or plop
     		if (YOUR STUFF) {
     			
@@ -50,40 +50,12 @@ public class ProcessManager {
     	return;
     }
     
-    private void userInterface() {
-    	/* Variables to be used for user input */
-    	String inputString = new String();
-    	Scanner inputScan = new Scanner(System.in);
-    	Thread[] processesAsThreads;
-    	
-    	/* Loop forever waiting on user input and process that input */
-    	while (true) {
-    		System.out.print("->> ");
-    		inputString = inputScan.nextLine();
-    		
-    		if (inputString == "ps") {
-    			if (processes.activeCount() == 0) {
-    				System.out.println("No Running Local Processes");
-    			}
-    			else {
-    				/* Print out all local processes (in local processes group) */
-    				processesAsThreads = new Thread[processes.activeCount()];
-    				processes.enumerate(processesAsThreads);
-    				System.out.println(processes.getName());
-    				for (Thread t: processesAsThreads) {
-    					System.out.println(((MigratableProcess) t).toString());
-    				}
-    			}
-    		}
-    		else if (inputString == "quit") {
-    			System.out.println("Goodbye!");
-    			quit = true;
-    		}
-    		else {
-    			//TODO: Send to Master for processing
-    		}
-    	}
-    	
+    private void plopProcess(String processName) {
+    	//TODO: Make it so this suspends and serialized a thread
+    }
+    
+    private void plantProcess(String processName) {
+    	//TODO: Make it so this deserialized and runs a process
     }
     
     public int runningProcesses() {
