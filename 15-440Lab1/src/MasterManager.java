@@ -59,7 +59,7 @@ public class MasterManager implements Runnable {
         
     }
     
-    //Migrates process, if it fails to restart it tries again on a random slave
+    //Migrates process, if it fails to restart it tries again on up to 5 random slaves
     private void migrate(SlaveConnection source, SlaveConnection dest) {
         private String sourceResponse;
         private String destResponse;
