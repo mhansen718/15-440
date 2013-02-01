@@ -1,5 +1,6 @@
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -118,25 +119,18 @@ public class ProcessManager {
     	File here = new File(".");
     	String[] potentials = here.list();
     	String[] parseFileName;
-    	String fileName;
     	String className;
     	String id;
-    	
-    	for (String p : potentials) {
-    		if (p.endsWith(".ser")) {
-    			try {
-    				fileName = p;
-    				parseFileName = p.split(".");
-    				className = parseFileName[0];
-    				id = parseFileName[1];
-    			} catch (Exception excpt) {
-    				System.out.println("Error: Failed to parse serialized file");
-    	    		return;
-    			}
-    			break;
-    		}
+   
+    	try {
+    		parseFileName = fileName.split(".");
+    		className = parseFileName[0];
+    		id = parseFileName[1];
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to parse serialized file");
+    		return;
     	}
-    	
+
     }
     
     private void newProcess(String[] args, String id) {
@@ -144,14 +138,16 @@ public class ProcessManager {
     	Class<?> objClass;
     	Constructor<?> objConstructs;
     	Object newProcess;
+    	Object[] newProcessArgs = new Object[1];
+    	Thread processThread;
     	
     	try {
     		objClass = Class.forName(args[0]);
     	} catch (ClassNotFoundException excpt) {
-    		System.out.println("Error: Class: " + args[0] + " was not found");
+    		System.out.println("Error: Class " + args[0] + " was not found");
     		return;
     	} catch (Exception expt) {
-    		System.out.println("Error: Failed to find class for name: " + args[0]);
+    		System.out.println("Error: Failed to ressolve class for name " + args[0]);
     		return;
     	}
     	
@@ -163,7 +159,29 @@ public class ProcessManager {
     	}
     	
     	try {
-    		newProcess = objConstructs.newInstance(Arrays.copyOfRange(args, arg1, arg2));
+    		newProcessArgs[0] = ((Object) Arrays.copyOfRange(args, 1, args.length));
+    		newProcess = objConstructs.newInstance(newProcessArgs);
+    		if (newProcess instanceof MigratableProcess) {
+    			System.out.println("Error: Class " + args[0] + " is not a MigratableProcess");
+    			return;
+    		}
+    	} catch (IllegalArgumentException excpt) {
+    		System.out.println("Error: Illegal argument provided to class " + args[0]);
+    		return;
+    	} catch (InvocationTargetException excpt) {
+    		System.out.println("Error: Constructor for class " + args[0] + " threw exception " + excpt);
+    		return;
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to create new instance of class " + args[0]);
+    		return;
+    	}
+    	
+    	try {
+    		processThread = new Thread(processes, ((Runnable) newProcess), args[0] + id);
+    		processThread.start();
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to run new process of class " + args[0]);
+    		return;
     	}
     }
     
