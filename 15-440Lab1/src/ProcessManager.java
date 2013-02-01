@@ -5,11 +5,13 @@ import java.util.Scanner;
 public class ProcessManager {
     
     private ThreadGroup processes;
-    private final String hostname; 
+    private final String hostname;
+    private final int port;
     
-    public ProcessManager(String hostname) {
+    public ProcessManager(String hostname, int port) {
 		super();
 		this.hostname = hostname;
+        this.port = port;
 	}
     
     // I'll make this two threads, one that manages processes, one that is a slave
@@ -176,17 +178,22 @@ public class ProcessManager {
     
 	public static void main(String[] args) {
         String hostnameLocal = null;
+        int port = 8000; // Default port (I think 8000 is safe, change it if it isn't)
         int i = 0;
         while (i < args.length) {
             if (args[i] == "-c") {
                 i++;
                 hostnameLocal = args[i];
                 i++;
+            } else if (args[i] == "-p") {
+                i++;
+                port = Integer(args[i]);
+                i++;
             } else {
                 System.out.println("Invalid argument: " + args[i]);
             }
         }
-        ProcessManager p = new ProcessManager(hostnameLocal);
+        ProcessManager p = new ProcessManager(hostnameLocal, port);
         p.begin();
 	}
 }
