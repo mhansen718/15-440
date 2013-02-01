@@ -60,7 +60,7 @@ public class MasterManager implements Runnable {
     }
     
     //Migrates process, if it fails to restart it tries again on a random slave
-    private void migrate(Thread source, Thread dest) {
+    private void migrate(SlaveConnection source, SlaveConnection dest) {
         private String sourceResponse;
         private String destResponse;
         private int tries = 0;
@@ -75,13 +75,15 @@ public class MasterManager implements Runnable {
         while (destResponse == "Error") {
             System.err.println("Error restarting process");
             tries++;
-            if (tries >= 5) {
+            if (tries >= 30) {
+                System.err.println("Giving up on that process, sorry");
+                return;
+            } else if (tries % 5 == 0) {
                 System.err.println("Trying different node");
                 if (slaves[0] == null) {
                     ML.slaves.enumerate(slaves);
                 }
-                dest = slaves[(int)(Math.random() * slaves.length)];
-                tries = 0;
+                dest = (SlaveConnection)slaves[(int)(Math.random() * slaves.length)];
             }
             destResponse = dest.messageSlave("PLANT" + sourceResponse);
         }
