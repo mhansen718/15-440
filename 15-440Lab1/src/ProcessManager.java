@@ -88,7 +88,7 @@ public class ProcessManager {
     		System.out.println("Error: Permission denied in creating output stream");
     		return "";
     	} catch (Exception excpt) {
-    		System.out.println("Error: Failed to open file stream");
+    		System.out.println("Error: Failed to open file stream for serialization");
     		return "";
     	}
     	
@@ -112,18 +112,21 @@ public class ProcessManager {
 		} catch (IOException excpt) {
 			System.out.println("Error: Failed to close output stream successfully");
 		}
+    	
     	return plopName + ".ser";
     }
     
     private void plantProcess(String fileName) {
     	/* Begin a process that was formerly serialized */
     	ObjectInputStream objIn;
-    	File here = new File(".");
-    	String[] potentials = here.list();
+    	Object plantProcess;
+    	Thread processThread;
+    	File thisFile = new File(fileName);
     	String[] parseFileName;
     	String className;
     	String id;
    
+    	/* Get name and class data from file */
     	try {
     		parseFileName = fileName.split(".");
     		className = parseFileName[0];
@@ -132,7 +135,51 @@ public class ProcessManager {
     		System.out.println("Error: Failed to parse serialized file");
     		return;
     	}
+    	
+    	/* Open file and read data from it */
+    	try {
+    		objIn = new ObjectInputStream(new FileInputStream(fileName));
+    	} catch (IOException excpt) {
+    		System.out.println("Error: IO error in reading file " + fileName);
+    		return;
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to open file stream for deserialization");
+    		return;
+    	}
+    	
+    	try {
+    		plantProcess = objIn.readObject();
+    	} catch (ClassNotFoundException excpt) {
+    		System.out.println("Error: Class " + className + " was not found");
+    		return;
+    	} catch (InvalidClassException excpt) {
+    		System.out.println("Error: Class " + className + " is not a valid serializable class");
+    		return;
+    	} catch (IOException excpt) {
+    		System.out.println("Error: Failed to read from input stream");
+    		return;
+    	}
+    	
+    	/* Run new thread for the class */
+    	try {
+    		processThread = new Thread(processes, ((Runnable) plantProcess), className + id);
+    		processThread.start();
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to run new process of class " + className);
+    		return;
+    	}
 
+    	/* Close, delete the file and leave if alls well */
+    	try {
+			objIn.close();
+			if (!(thisFile.delete())) {
+				System.out.println("Error: Failed to delete serialized object file");
+			}
+		} catch (IOException excpt) {
+			System.out.println("Error: Failed to close output stream successfully");
+		}
+    	
+    	return;
     }
     
     private void newProcess(String[] args, String id) {
@@ -185,6 +232,8 @@ public class ProcessManager {
     		System.out.println("Error: Failed to run new process of class " + args[0]);
     		return;
     	}
+    	
+    	return;
     }
     
     public int runningProcesses() {
