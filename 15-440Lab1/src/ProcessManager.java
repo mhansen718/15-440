@@ -226,7 +226,7 @@ public class ProcessManager {
     	}
     	
     	try {
-    		processThread = new Thread(processes, ((Runnable) newProcess), args[0] + id);
+    		processThread = new Thread(processes, ((Runnable) newProcess), args[0] + "." + id);
     		processThread.start();
     	} catch (Exception excpt) {
     		System.out.println("Error: Failed to run new process of class " + args[0]);
