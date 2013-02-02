@@ -30,7 +30,7 @@ public class userInterface implements Runnable {
     				processes.enumerate(processesAsThreads);
     				System.out.println(processes.getName());
     				for (Thread t: processesAsThreads) {
-    					System.out.println(((MigratableProcess) t).toString());
+    					System.out.println(ProcessManager.convertFromThreadName(t.getName()));
     				}
     			}
     		} else if (inputString == "quit") {

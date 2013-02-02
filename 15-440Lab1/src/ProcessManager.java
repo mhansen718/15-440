@@ -60,12 +60,14 @@ public class ProcessManager {
     	processes.enumerate(processesAsThreads);
     	MigratableProcess plopProcess;
     	String plopName;
+    	String humanName;
     	ObjectOutputStream objOut;
     	
     	/* Take the plot process and suspend it */
     	try {
     		plopProcess = ((MigratableProcess) processesAsThreads[0]);
     		plopName = processesAsThreads[0].getName();
+    		humanName = convertFromThreadName(plopName);
     	} catch (ArrayIndexOutOfBoundsException excpt) {
     		System.out.println("Error: No running processes on this node");
     		return "";
@@ -74,7 +76,7 @@ public class ProcessManager {
     	try {
     		plopProcess.suspend();
     	} catch (Exception excpt) {
-    		System.out.println("Error: Failed to suspend process " + processesAsThreads[0].getName());
+    		System.out.println("Error: Failed to suspend process " + humanName);
     		return "";
     	}
     	
@@ -96,7 +98,7 @@ public class ProcessManager {
     		objOut.writeObject(plopProcess);
     		objOut.flush();
     	} catch (NotSerializableException excpt) {
-    		System.out.println("Error: Process " + plopName + " does not appear serializable");
+    		System.out.println("Error: Process " + humanName + " does not appear serializable");
     		return "";
     	} catch (IOException excpt) {
     		System.out.println("Error: Failed to write object to file");
@@ -120,17 +122,16 @@ public class ProcessManager {
     	/* Begin a process that was formerly serialized */
     	ObjectInputStream objIn;
     	Object plantProcess;
+    	File thisFile;
     	Thread processThread;
-    	File thisFile = new File(fileName);
-    	String[] parseFileName;
-    	String className;
-    	String id;
+    	String threadName;
+    	String processArgs;
    
     	/* Get name and class data from file */
     	try {
-    		parseFileName = fileName.split(".");
-    		className = parseFileName[0];
-    		id = parseFileName[1];
+    		/* Remove extension and make a human readable version for errors */
+    		threadName = fileName.substring(0, (fileName.length() - 4));
+    		processArgs = ProcessManager.convertFromThreadName(threadName);
     	} catch (Exception excpt) {
     		System.out.println("Error: Failed to parse serialized file");
     		return;
@@ -139,6 +140,7 @@ public class ProcessManager {
     	/* Open file and read data from it */
     	try {
     		objIn = new ObjectInputStream(new FileInputStream(fileName));
+    		thisFile = new File(fileName);
     	} catch (IOException excpt) {
     		System.out.println("Error: IO error in reading file " + fileName);
     		return;
@@ -150,10 +152,10 @@ public class ProcessManager {
     	try {
     		plantProcess = objIn.readObject();
     	} catch (ClassNotFoundException excpt) {
-    		System.out.println("Error: Class " + className + " was not found");
+    		System.out.println("Error: Class " + processArgs + " was not found");
     		return;
     	} catch (InvalidClassException excpt) {
-    		System.out.println("Error: Class " + className + " is not a valid serializable class");
+    		System.out.println("Error: Class " + processArgs + " is not a valid serializable class");
     		return;
     	} catch (IOException excpt) {
     		System.out.println("Error: Failed to read from input stream");
@@ -162,10 +164,10 @@ public class ProcessManager {
     	
     	/* Run new thread for the class */
     	try {
-    		processThread = new Thread(processes, ((Runnable) plantProcess), className + id);
+    		processThread = new Thread(processes, ((Runnable) plantProcess), threadName);
     		processThread.start();
     	} catch (Exception excpt) {
-    		System.out.println("Error: Failed to run new process of class " + className);
+    		System.out.println("Error: Failed to run new process of class " + processArgs);
     		return;
     	}
 
@@ -226,7 +228,8 @@ public class ProcessManager {
     	}
     	
     	try {
-    		processThread = new Thread(processes, ((Runnable) newProcess), args[0] + "." + id);
+    		processThread = new Thread(processes, ((Runnable) newProcess), 
+    				ProcessManager.convertToThreadName(args, id));
     		processThread.start();
     	} catch (Exception excpt) {
     		System.out.println("Error: Failed to run new process of class " + args[0]);
@@ -234,6 +237,30 @@ public class ProcessManager {
     	}
     	
     	return;
+    }
+    
+    /* Utility functions */
+    public static String convertFromThreadName(String threadName) {
+    	String[] splitName = threadName.split("#");
+    	String humanName = new String();
+    	
+    	for (int i = 0; i < splitName.length; i++) {
+    		humanName.concat(splitName[i] + " ");
+    	}
+    	
+    	return humanName;
+    }
+    
+    private static String convertToThreadName(String[] args, String id) {
+    	String threadName = new String();
+    	
+    	for (int i = 0; i < args.length; i++) {
+    		threadName.concat(args[i] + "#");
+    	}
+    	
+    	threadName.concat(id);
+    	
+    	return threadName;
     }
     
     public int runningProcesses() {
