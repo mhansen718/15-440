@@ -210,7 +210,7 @@ public class ProcessManager {
     	}
     	
     	try {
-    		newProcessArgs[0] = ((Object) Arrays.copyOfRange(args, 1, args.length));
+    		newProcessArgs = ((Object[]) Arrays.copyOfRange(args, 1, args.length));
     		newProcess = objConstructs.newInstance(newProcessArgs);
     		if (newProcess instanceof MigratableProcess) {
     			System.out.println("Error: Class " + args[0] + " is not a MigratableProcess");
