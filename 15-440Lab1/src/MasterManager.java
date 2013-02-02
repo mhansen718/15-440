@@ -1,4 +1,5 @@
 import java.net.*
+import java.io.*
 
 public class MasterListener implements Runnable {
     
@@ -29,9 +30,13 @@ public class MasterListener implements Runnable {
 public class SlaveConnection implements Runnable {
     
     private Socket socket = null;
+    private PrintWriter out = null;
+    private BufferedReader in = null;
     
     public SlaveConnection(Socket socket) {
         this.socket = socket;
+        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     }
     
     public void run() {
@@ -39,7 +44,17 @@ public class SlaveConnection implements Runnable {
     }
     
     public String messageSlave(String msg) {
-        
+        String response = "";
+        String input;
+        try {
+            out.println(msg);
+            while ((input = in.readLine()) != "END") {
+                response += input;
+            }
+            return response;
+        } catch (IOException e) {
+            return "Error";
+        }
     }
 }
 
