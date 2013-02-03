@@ -287,7 +287,11 @@ public class ProcessManager {
                 i++;
             } else if (args[i] == "-p") {
                 i++;
-                port = Integer.parseInt(args[i]);
+                try {
+                	port = Integer.parseInt(args[i]);
+                } catch (NumberFormatException excpt) {
+                	System.out.println("Invalid port number: " + args[i])
+                }
                 i++;
             } else {
                 System.out.println("Invalid argument: " + args[i]);

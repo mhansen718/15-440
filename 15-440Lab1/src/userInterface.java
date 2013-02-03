@@ -38,6 +38,11 @@ public class userInterface implements Runnable {
     			return;
     		} else {
     			//TODO: Send to Master for processing
+    			if (inputString.contains("#")) {
+    				System.out.println("Error: Class/Arguments cannot contain '#' character");
+    			} else {
+    				// Do your thing
+    			}
     		}
     	}
 	}
