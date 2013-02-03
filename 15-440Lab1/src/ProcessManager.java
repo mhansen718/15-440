@@ -288,7 +288,7 @@ public class ProcessManager {
                 i++;
             } else if (args[i] == "-p") {
                 i++;
-                port = Integer(args[i]);
+                port = Integer.parseInt(args[i]);
                 i++;
             } else {
                 System.out.println("Invalid argument: " + args[i]);
