@@ -84,21 +84,24 @@ public class MasterManager implements Runnable {
         private int bCount = 0;
         private int temp;
         private String response;
+        private String[] splitResponse;
         
         ML.slaves.enumerate(slaves);
         
         for (SlaveConnection t : slaves) {
-            try {
-                response = t.messageSlave("BEAT");
-            } catch (IOException e) {
+            response = t.messageSlave("BEAT");
+            if (response == "Error") {
                 continue;
             }
             if (response == "DEAD") {
                 t.dead = true;
-                this.numSlaves--;
                 continue;
             }
-            temp = Integer.parseInt(response);
+            splitResponse = response.split(" ", 2);
+            if (splitResponse.length == 2) {
+                startProcess(splitResponse[1]);
+            }
+            temp = Integer.parseInt(splitResponse[0]);
             if (temp < fCount) {
                 fCount = temp;
                 freeest = t;
@@ -110,6 +113,19 @@ public class MasterManager implements Runnable {
         if (bCount - fCount >= 2) {
             migrate(busiest,freeest);
         }
+        this.numSlaves = ML.slaves.activeCount();
+    }
+    
+    // Starts a new process on a random node
+    private void startProcess(String process) {
+        // TODO: Find out what you want for pids.
+        private int pid = 1234;
+        private Thread[] slaves = new Thread[ML.slaves.activeCount()];
+        private SlaveConnection target;
+        
+        ML.slaves.enumerate(slaves);
+        target = (SlaveConnection)slaves[(int)(Math.random() * slaves.length)];
+        target.messageSlave(pid + " " + process);
     }
     
     //Migrates process, if it fails to restart it tries again on up to 5 random slaves
