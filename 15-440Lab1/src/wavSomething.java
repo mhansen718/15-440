@@ -163,20 +163,7 @@ public class wavSomething implements MigratableProcess {
 					writeIntToFile(0x61746164, 4);
 					writeIntToFile(newDataSize, 4);
 					fileOut.flush();
-					
-					System.out.println("Input File Properties");
-					System.out.println("Size: " + Integer.toString(fileSize));
-					System.out.println("Data Size: " + Integer.toString(subChunk2Size));
-					System.out.println("SampleRate: " + Integer.toString(sampleRate));
-					System.out.println("Channels: " + Integer.toString(numChannels));
-					System.out.println("Bits Per Samples: " + Integer.toString(bitsPerSample));
-					
-					System.out.println("Output File Properties");
-					System.out.println("Size: " + Integer.toString(newSize));
-					System.out.println("Data Size: " + Integer.toString(newDataSize));
-					System.out.println("SampleRate: " + Integer.toString(sampleRate));
-					System.out.println("Channels: " + Integer.toString(numChannels));
-					System.out.println("Bits Per Samples: " + Integer.toString(bitsPerSample));
+
 					break;
 				case "goodStuff":
 					/* The body of the file, use previous information to parse and process */
