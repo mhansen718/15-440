@@ -2,7 +2,6 @@ import java.net.*
 import java.io.*
 
 public class MasterListener implements Runnable {
-    
     private ServerSocket serverSocket = null;
     private final int port;
     public ThreadGroup slaves;
@@ -28,10 +27,10 @@ public class MasterListener implements Runnable {
 }
 
 public class SlaveConnection implements Runnable {
-    
     private Socket socket = null;
     private PrintWriter out = null;
     private BufferedReader in = null;
+    public Boolean dead = false;
     
     public SlaveConnection(Socket socket) {
         this.socket = socket;
@@ -40,7 +39,9 @@ public class SlaveConnection implements Runnable {
     }
     
     public void run() {
-        
+        while (!dead) {
+            
+        }
     }
     
     public String messageSlave(String msg) {
@@ -59,19 +60,56 @@ public class SlaveConnection implements Runnable {
 }
 
 public class MasterManager implements Runnable {
-    
     private MasterListener = null;
+    private numSlaves;
     
     public MasterManager(MasterListener ML) {
         this.MasterListener = ML;
+        this.numSlaves = 1;
     }
     
     public void run() {
-        
+        while (this.numSlaves > 0) {
+            sleep(5000);
+            heartbeat();
+        }
+        return;
     }
     
+    // Checks number of running processes and migrates if needed.
     private void heartbeat() {
+        private Thread[] slaves = new Thread[ML.slaves.activeCount()];
+        private Thread freeest, busiest;
+        private int fCount = Integer.MAX_VALUE;
+        private int bCount = 0;
+        private int temp;
+        private String response;
         
+        ML.slaves.enumerate(slaves);
+        
+        for (SlaveConnection t : slaves) {
+            try {
+                response = t.messageSlave("BEAT");
+            } catch (IOException e) {
+                continue;
+            }
+            if (response == "DEAD") {
+                t.dead = true;
+                this.numSlaves--;
+                continue;
+            }
+            temp = Integer.parseInt(response);
+            if (temp < fCount) {
+                fCount = temp;
+                freeest = t;
+            } else if (temp > bCount) {
+                bCount = temp;
+                busiest = t;
+            }
+        }
+        if (bCount - fCount >= 2) {
+            migrate(busiest,freeest);
+        }
     }
     
     //Migrates process, if it fails to restart it tries again on up to 5 random slaves
