@@ -1,4 +1,6 @@
+import java.io.EOFException;
 import java.io.IOException;
+import java.util.Arrays;
 
 
 public class wavSomething implements MigratableProcess {
@@ -23,14 +25,22 @@ public class wavSomething implements MigratableProcess {
 	public void run() {
 		String field = new String("RIFF");
 		byte[] bytesRead = new byte[4];
-		int fileSize;
-		int subChunk1Size;
-		int subChunk2Size;
-		int numChannels;
-		int sampleRate;
-		int byteRate;
-		int blockAlign;
-		int bitsPerSample;
+		/* Original Data */
+		int fileSize = 0;
+		int subChunk1Size = 0;
+		int subChunk2Size = 0;
+		int numChannels = 0;
+		int sampleRate = 0;
+		int byteRate = 0;
+		int blockAlign = 0;
+		int bitsPerSample = 0;
+		/* New Data */
+		int newSize = 0;
+		int newDataSize = 0;
+		int[] shiftBuffer = new int[0];
+		int frontOfBuffer = 0;
+		int backOfBuffer = 0;
+		int pulledValue = 0;
 
 		try {
 			while (!suspendMe) {
@@ -114,16 +124,50 @@ public class wavSomething implements MigratableProcess {
 				case "dataSize":
 					subChunk2Size = byteArrayToInt(bytesRead, 1)[0];
 					field = "goodStuff";
+					/* Do a bunch of  calculations and 
+					 * writes to file for header now that we have all relevant data */
+					shiftBuffer = new int[((byteRate * delay) / 1000)];
+					backOfBuffer = shiftBuffer.length - 1;
+					newSize = fileSize + shiftBuffer.length;
+					newDataSize = subChunk2Size + shiftBuffer.length;
+					writeIntToFile(0x52494646, 4);
+					writeIntToFile(newSize, 4);
+					writeIntToFile(0x57415645, 4);
+					writeIntToFile(0x666D7420, 4);
+					writeIntToFile(subChunk1Size, 4);
+					writeIntToFile(1, 2);
+					writeIntToFile(numChannels, 2);
+					writeIntToFile(sampleRate, 4);
+					writeIntToFile(byteRate, 4);
+					writeIntToFile(blockAlign, 2);
+					writeIntToFile(bitsPerSample, 2);
+					writeIntToFile(0x64617461, 4);
+					writeIntToFile(newDataSize, 4);
 					break;
 				case "goodStuff":
 					/* The body of the file, use previous information to parse and process */
+					/* Loop over each byte or 2 bytes samples and process them */
+					for (int i = 0; i < (32 / bitsPerSample); i++) {
+						pulledValue = byteArrayToInt(bytesRead, (32 / bitsPerSample))[0];
+						/* Shift the bytesRead array */
+						bytesRead = Arrays.copyOfRange(bytesRead, 
+								(i + (bitsPerSample / 8)), bytesRead.length);
+						shiftBuffer[backOfBuffer] = (((pulledValue << bitsPerSample) >> 
+						bitsPerSample) / 4);
+						pulledValue = pulledValue + shiftBuffer[frontOfBuffer];
+						writeIntToFile(pulledValue, (bitsPerSample / 8));
+						frontOfBuffer = (frontOfBuffer + 1) % shiftBuffer.length;
+						backOfBuffer = (backOfBuffer + 1) % shiftBuffer.length;
+					}
 					break;
-
 				}
 			}
+		} catch (EOFException excpt) {
+			/* Get out when the file is done */
 		} catch (IOException excpt) {
 			System.out.println("wavSomeithng Error: " + excpt);
 		}
+		
 		/* Read in the wav and process the header data */
 		/* Unassert suspend signal and exit */
 		suspendMe = false;
@@ -158,7 +202,7 @@ public class wavSomething implements MigratableProcess {
 		return returnValue;
 	}
 	
-	private void writeIntToFile(int value, int size) throws IOException{
+	private void writeIntToFile(int value, int size) throws IOException {
 		int shrinkSize = size;
 		int shrinkValue = value;
 		
