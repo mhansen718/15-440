@@ -5,17 +5,19 @@ public class wavSomething implements MigratableProcess {
 
 	private TransactionalFileInputStream fileIn;
 	private TransactionalFileOutputStream fileOut;
+	private int delay;
 	
 	private volatile boolean suspendMe;
 	
 	public wavSomething(String[] args) throws Exception {
 		/* Take the input file and output file and process them as arguments */
-		if (args.length != 2) {
-			System.out.println("Usage: wavSomething <inputFile> <outputFile>");
+		if (args.length != 3) {
+			System.out.println("Usage: wavSomething <inputFile> <outputFile> <delay (ms)>");
 		}
 		
 		fileIn = new TransactionalFileInputStream(args[0]);
 		fileOut = new TransactionalFileOutputStream(args[1], false);
+		delay = Integer.parseInt(args[2]);
 	}
 	
 	public void run() {
@@ -154,5 +156,18 @@ public class wavSomething implements MigratableProcess {
 		}
 
 		return returnValue;
+	}
+	
+	private void writeIntToFile(int value, int size) throws IOException{
+		int shrinkSize = size;
+		int shrinkValue = value;
+		
+		while (shrinkSize > 0) {
+			fileOut.write(shrinkValue);
+			shrinkValue = shrinkValue >> 8;
+			shrinkSize--;
+		}
+		
+		return;
 	}
 }
