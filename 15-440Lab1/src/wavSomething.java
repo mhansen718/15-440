@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 public class wavSomething implements MigratableProcess {
 
+	private static final long serialVersionUID = -5986283291309750150L;
 	private TransactionalFileInputStream fileIn;
 	private TransactionalFileOutputStream fileOut;
 	private int delay;

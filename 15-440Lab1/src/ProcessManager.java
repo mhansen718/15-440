@@ -2,7 +2,6 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class ProcessManager {
     
@@ -37,7 +36,7 @@ public class ProcessManager {
     	
     	while (UI.getState() != Thread.State.TERMINATED) {
     		// TODO: If heartbeat, plant or plop
-    		if (YOUR STUFF) {
+    		if (false) {
     			
     		}
     		
