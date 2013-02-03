@@ -34,8 +34,8 @@ public class TransactionalFileInputStream extends InputStream implements Seriali
 			this.filePointer = readMe.getFilePointer();
 			
 			readMe.close();
-		} catch (FileNotFoundException excp) {
-			System.out.print("File Not Found: " + this.fileName);
+		} catch (FileNotFoundException excpt) {
+			System.out.println("File Not Found: " + this.fileName);
 			byteRead = -1;
 		}
 		

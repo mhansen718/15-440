@@ -26,6 +26,10 @@ public class wavSomething implements MigratableProcess {
 	public void run() {
 		String field = new String("RIFF");
 		byte[] bytesRead = new byte[4];
+		int doneReading = 0;
+		int extraBytes = 0;
+		int offset = 0;
+
 		/* Original Data */
 		int fileSize = 0;
 		int subChunk1Size = 0;
@@ -35,6 +39,7 @@ public class wavSomething implements MigratableProcess {
 		int byteRate = 0;
 		int blockAlign = 0;
 		int bitsPerSample = 0;
+		
 		/* New Data */
 		int newSize = 0;
 		int newDataSize = 0;
@@ -42,10 +47,22 @@ public class wavSomething implements MigratableProcess {
 		int frontOfBuffer = 0;
 		int backOfBuffer = 0;
 		int pulledValue = 0;
-
+		
 		try {
-			while (!suspendMe) {
-				fileIn.read(bytesRead);
+			/* Either the process is suspended or the file s completely written */
+			while (!suspendMe && !((doneReading == -1) && (extraBytes >= shiftBuffer.length))) {
+				
+				/* If we're reading from a 8bit file, add an offset to unused 
+				 * elements of bytesRead */
+				if ((bitsPerSample <= 8) && (field == "goodStuff")) {
+					Arrays.fill(bytesRead, ((byte) 128));
+				} else {
+					Arrays.fill(bytesRead, ((byte) 0));
+				}
+					
+				if (doneReading >= 0) {
+					doneReading = fileIn.read(bytesRead);
+				}
 
 				/* field determines what part of the header we're in, or if
 				 * we're in the body of the file. In any case, readout the important data
@@ -127,14 +144,15 @@ public class wavSomething implements MigratableProcess {
 					field = "goodStuff";
 					/* Do a bunch of  calculations and 
 					 * writes to file for header now that we have all relevant data */
-					shiftBuffer = new int[((byteRate * delay) / 1000)];
+					shiftBuffer = new int[(((byteRate * delay) / 1000) / (bitsPerSample / 8))];
+					Arrays.fill(shiftBuffer, 0);
 					backOfBuffer = shiftBuffer.length - 1;
-					newSize = fileSize + shiftBuffer.length;
-					newDataSize = subChunk2Size + shiftBuffer.length;
-					writeIntToFile(0x52494646, 4);
+					newSize = fileSize + ((byteRate * delay) / 1000);
+					newDataSize = subChunk2Size + ((byteRate * delay) / 1000);
+					writeIntToFile(0x46464952, 4);
 					writeIntToFile(newSize, 4);
-					writeIntToFile(0x57415645, 4);
-					writeIntToFile(0x666D7420, 4);
+					writeIntToFile(0x45564157, 4);
+					writeIntToFile(0x20746D66, 4);
 					writeIntToFile(subChunk1Size, 4);
 					writeIntToFile(1, 2);
 					writeIntToFile(numChannels, 2);
@@ -142,29 +160,57 @@ public class wavSomething implements MigratableProcess {
 					writeIntToFile(byteRate, 4);
 					writeIntToFile(blockAlign, 2);
 					writeIntToFile(bitsPerSample, 2);
-					writeIntToFile(0x64617461, 4);
+					writeIntToFile(0x61746164, 4);
 					writeIntToFile(newDataSize, 4);
+					fileOut.flush();
+					
+					System.out.println("Input File Properties");
+					System.out.println("Size: " + Integer.toString(fileSize));
+					System.out.println("Data Size: " + Integer.toString(subChunk2Size));
+					System.out.println("SampleRate: " + Integer.toString(sampleRate));
+					System.out.println("Channels: " + Integer.toString(numChannels));
+					System.out.println("Bits Per Samples: " + Integer.toString(bitsPerSample));
+					
+					System.out.println("Output File Properties");
+					System.out.println("Size: " + Integer.toString(newSize));
+					System.out.println("Data Size: " + Integer.toString(newDataSize));
+					System.out.println("SampleRate: " + Integer.toString(sampleRate));
+					System.out.println("Channels: " + Integer.toString(numChannels));
+					System.out.println("Bits Per Samples: " + Integer.toString(bitsPerSample));
 					break;
 				case "goodStuff":
 					/* The body of the file, use previous information to parse and process */
 					/* Loop over each byte or 2 bytes samples and process them */
 					for (int i = 0; i < (32 / bitsPerSample); i++) {
-						pulledValue = byteArrayToInt(bytesRead, (32 / bitsPerSample))[0];
-						/* Shift the bytesRead array */
-						bytesRead = Arrays.copyOfRange(bytesRead, 
-								(i + (bitsPerSample / 8)), bytesRead.length);
-						shiftBuffer[backOfBuffer] = (((pulledValue << bitsPerSample) >> 
-						bitsPerSample) / 4);
-						pulledValue = pulledValue + shiftBuffer[frontOfBuffer];
+						pulledValue = byteArrayToInt(bytesRead, (32 / bitsPerSample))[i];
+						
+						/* If its 8-bit or less, handle as 0-255 unsigned. Else, handle as
+						 * two's compliment
+						 */
+						if (bitsPerSample <= 8) {
+							offset = (1 << (bitsPerSample - 1));
+							shiftBuffer[backOfBuffer] = (pulledValue - offset) / 2;
+							pulledValue = satAddUnsigned(pulledValue, 
+									shiftBuffer[frontOfBuffer],
+									bitsPerSample);
+						} else {
+							shiftBuffer[backOfBuffer] = sexInt(pulledValue, bitsPerSample) / 2;
+							pulledValue = satAddSigned(sexInt(pulledValue, bitsPerSample), 
+									shiftBuffer[frontOfBuffer], 
+									bitsPerSample);
+						}
+						
 						writeIntToFile(pulledValue, (bitsPerSample / 8));
 						frontOfBuffer = (frontOfBuffer + 1) % shiftBuffer.length;
 						backOfBuffer = (backOfBuffer + 1) % shiftBuffer.length;
+						if (doneReading == -1) {
+							extraBytes++;
+						}
 					}
+					fileOut.flush();
 					break;
 				}
 			}
-		} catch (EOFException excpt) {
-			/* Get out when the file is done */
 		} catch (IOException excpt) {
 			System.out.println("wavSomeithng Error: " + excpt);
 		}
@@ -196,7 +242,7 @@ public class wavSomething implements MigratableProcess {
 				index++;
 				shiftAmount = 0;
 			}
-			returnValue[index] = returnValue[index] | (b << shiftAmount);
+			returnValue[index] = returnValue[index] | ((b & 0xFF) << shiftAmount);
 			shiftAmount = shiftAmount + 8;
 		}
 
@@ -214,5 +260,34 @@ public class wavSomething implements MigratableProcess {
 		}
 		
 		return;
+	}
+	
+	private int sexInt(int sample, int size) {
+		return ((sample << (32 - size)) >> (32 - size));
+	}
+	
+	private int satAddSigned(int a, int b, int size) {
+		int value = a + b;
+		int maxVal = ((1 << (size - 1)) - 1);
+		int minVal = sexInt((1 << (size - 1)), size);
+		
+		if (value > maxVal) {
+			return maxVal;
+		} else if (value < minVal) {
+			return minVal;
+		} else {
+			return value;
+		}
+	}
+	
+	private int satAddUnsigned(int a, int b, int size) {
+		int value = a + b;
+		int maxVal = ((1 << size) - 1);
+		
+		if (value > maxVal) {
+			return maxVal;
+		} else {
+			return value;
+		}
 	}
 }
