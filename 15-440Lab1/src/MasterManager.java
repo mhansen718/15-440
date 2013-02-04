@@ -35,6 +35,8 @@ public class MasterManager implements Runnable {
         String response;
         String[] splitResponse;
         
+        System.out.println("Heartbeat");
+        
         this.lock.lock();
         iterator = (ML.getSlaves()).iterator();
         
