@@ -16,7 +16,6 @@ public class userInterface implements Runnable {
     	/* Variables to be used for user input */
     	String inputString = new String();
     	Scanner inputScan = new Scanner(System.in);
-    	Thread[] processesAsThreads;
         Set<MigratableThread> processes;
         Iterator<MigratableThread> iterator;
     	
@@ -42,7 +41,6 @@ public class userInterface implements Runnable {
     			System.out.println("Goodbye!");
     			return;
     		} else {
-                                                                                    //TODO: Send to Master for processing
     			if (inputString.contains("#")) {
     				System.out.println("Error: Class/Arguments cannot contain '#' character");
     			} else {
