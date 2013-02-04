@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ProcessManager {
     
-    private ThreadGroup processes;
+    private Set<MigratableProcess> processes;
     private final String hostname;
     private final int port;
     private String buffer;
@@ -20,7 +20,7 @@ public class ProcessManager {
         this.port = port;
         this.input = "";
         this.in = null;
-        this.processes = new ThreadGroup("Local Running Processes");
+        this.processes = new HashSet<MigratableProcess>();
 	}
     
     // I'll make this two threads, one that manages processes, one that is a slave
@@ -35,7 +35,7 @@ public class ProcessManager {
         return;
     }
     
-    public ThreadGroup getProcesses() {
+    public Set<MigratableProcesses> getProcesses() {
         return processes;
     }
     
@@ -53,12 +53,12 @@ public class ProcessManager {
     }
     
     private void slaveManager() {
-    	Thread[] processesAsThreads;
     	Thread UI;
     	Thread slaveListen;
         Socket socket = null;
     	PrintWriter out = null;
         String[] splitInput;
+        Iterator<MigratableProcess> iterator;
         
         try {
             socket = new Socket(hostname,port);
@@ -87,7 +87,6 @@ public class ProcessManager {
     		return;
     	}
     	
-    	
     	while (UI.getState() != Thread.State.TERMINATED) {
     		
             if (input.equals("PLOP")) {
@@ -98,7 +97,7 @@ public class ProcessManager {
                 out.println("SUCCESS\nEND");
                 input = "";
             } else if (input.equals("BEAT")) {
-                out.println(processes.activeCount() + "#" + buffer);
+                out.println(processes.size() + "#" + buffer);
                 buffer = "";
                 input = "";
             } else if (input.startsWith("NEW")) {
@@ -107,9 +106,10 @@ public class ProcessManager {
                 input = "";
             }
     		
-    		processesAsThreads = new Thread[processes.activeCount()];
-    		processes.enumerate(processesAsThreads);
-    		for (Thread t : processesAsThreads) {
+            iterator = this.processes.iterator();
+            
+    		while (iterator.hasNext()) {
+                MigratableProcess t = iterator.next();
     			if (t.getState() == Thread.State.TERMINATED) {
     				System.out.println("Process " + t.getName() + " has terminated.");
     			}
@@ -122,8 +122,7 @@ public class ProcessManager {
     private String plopProcess() {
     	/* Get the first thread in the processes and suspend it. Then, serialize it.
     	 * Output the serialized filename */
-    	Thread[] processesAsThreads = new Thread[processes.activeCount()];
-    	processes.enumerate(processesAsThreads);
+    	MigratableProcess[] processesAsThreads = (MigratableProcess[])processes.toArray();
     	MigratableProcess plopProcess;
     	String plopName;
     	String humanName;
@@ -131,7 +130,7 @@ public class ProcessManager {
     	
     	/* Take the plot process and suspend it */
     	try {
-    		plopProcess = ((MigratableProcess) processesAsThreads[0]);
+    		plopProcess = (processesAsThreads[0]);
     		plopName = processesAsThreads[0].getName();
     		humanName = convertFromThreadName(plopName);
     	} catch (ArrayIndexOutOfBoundsException excpt) {
