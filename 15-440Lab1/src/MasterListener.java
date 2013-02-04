@@ -31,9 +31,10 @@ public class MasterListener implements Runnable {
         
         while (true) {
         	try {
-                Thread newThread = new Thread(new SlaveConnection(serverSocket.accept()));
+                SlaveConnection connection = new SlaveConnection(serverSocket.accept());
+                Thread newThread = new Thread(connection);
                 this.lock.lock();
-        		this.slaves.add((SlaveConnection)newThread);
+        		this.slaves.add(connection);
                 this.lock.unlock();
                 newThread.start();
         	} catch (IOException e) {
