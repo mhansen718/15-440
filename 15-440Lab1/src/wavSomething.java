@@ -7,6 +7,43 @@ public class wavSomething implements MigratableProcess {
 	private TransactionalFileInputStream fileIn;
 	private TransactionalFileOutputStream fileOut;
 	private int delay;
+	/* field:
+	 * 1 - RIFF check
+	 * 2 - fileSize
+	 * 3 - WAVE check
+	 * 4 - fmt check
+	 * 5 - subchk1Size
+	 * 6 - audioFormat check
+	 * 7 - sampleRate
+	 * 8 - byteRate
+	 * 9 - blockAlign
+	 * 10 - data check
+	 * 11 - subchk2Size
+	 * 12 - read and process data
+	 */
+	private int field = 1;
+	private byte[] bytesRead = new byte[4];
+	private int doneReading = 0;
+	private int extraBytes = 0;
+	private int offset = 0;
+
+	/* Original Data */
+	private int fileSize = 0;
+	private int subChunk1Size = 0;
+	private int subChunk2Size = 0;
+	private int numChannels = 0;
+	private int sampleRate = 0;
+	private int byteRate = 0;
+	private int blockAlign = 0;
+	private int bitsPerSample = 0;
+	
+	/* New Data */
+	private int newSize = 0;
+	private int newDataSize = 0;
+	private int[] shiftBuffer = new int[0];
+	private int frontOfBuffer = 0;
+	private int backOfBuffer = 0;
+	private int pulledValue = 0;
 	
 	private volatile boolean suspendMe;
 	
@@ -26,44 +63,6 @@ public class wavSomething implements MigratableProcess {
 	}
 	
 	public void run() {
-		/* field:
-		 * 1 - RIFF check
-		 * 2 - fileSize
-		 * 3 - WAVE check
-		 * 4 - fmt check
-		 * 5 - subchk1Size
-		 * 6 - audioFormat check
-		 * 7 - sampleRate
-		 * 8 - byteRate
-		 * 9 - blockAlign
-		 * 10 - data check
-		 * 11 - subchk2Size
-		 * 12 - read and process data
-		 */
-		int field = 1;
-		byte[] bytesRead = new byte[4];
-		int doneReading = 0;
-		int extraBytes = 0;
-		int offset = 0;
-
-		/* Original Data */
-		int fileSize = 0;
-		int subChunk1Size = 0;
-		int subChunk2Size = 0;
-		int numChannels = 0;
-		int sampleRate = 0;
-		int byteRate = 0;
-		int blockAlign = 0;
-		int bitsPerSample = 0;
-		
-		/* New Data */
-		int newSize = 0;
-		int newDataSize = 0;
-		int[] shiftBuffer = new int[0];
-		int frontOfBuffer = 0;
-		int backOfBuffer = 0;
-		int pulledValue = 0;
-		
 		try {
 			/* Either the process is suspended or the file s completely written */
 			while (!suspendMe && !((doneReading == -1) && (extraBytes >= shiftBuffer.length))) {
