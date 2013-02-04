@@ -7,6 +7,7 @@ public class wavSomething implements MigratableProcess {
 	private TransactionalFileInputStream fileIn;
 	private TransactionalFileOutputStream fileOut;
 	private int delay;
+	private String myString;
 	/* field:
 	 * 1 - RIFF check
 	 * 2 - fileSize
@@ -57,6 +58,11 @@ public class wavSomething implements MigratableProcess {
 			fileIn = new TransactionalFileInputStream(args[0]);
 			fileOut = new TransactionalFileOutputStream(args[1], false);
 			delay = Integer.parseInt(args[2]);
+			myString = new String("wavSomething ");
+
+			for (String arg : args) {
+				myString.concat(arg + " ");
+			}
 		} catch (Exception excpt) {
 			System.out.println("Invalid Arguments");
 		}
@@ -300,5 +306,9 @@ public class wavSomething implements MigratableProcess {
 		} else {
 			return value;
 		}
+	}
+	
+	public String toString() {
+		return myString;
 	}
 }

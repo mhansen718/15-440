@@ -3,11 +3,14 @@ import java.net.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class ProcessManager {
     
-    private Set<MigratableProcess> processes;
+    private Set<MigratableThread> processes;
     private final String hostname;
     private final int port;
     private String buffer;
@@ -20,7 +23,7 @@ public class ProcessManager {
         this.port = port;
         this.input = "";
         this.in = null;
-        this.processes = new HashSet<MigratableProcess>();
+        this.processes = new HashSet<MigratableThread>();
 	}
     
     // I'll make this two threads, one that manages processes, one that is a slave
@@ -35,7 +38,7 @@ public class ProcessManager {
         return;
     }
     
-    public Set<MigratableProcesses> getProcesses() {
+    public Set<MigratableThread> getProcesses() {
         return processes;
     }
     
@@ -58,7 +61,7 @@ public class ProcessManager {
         Socket socket = null;
     	PrintWriter out = null;
         String[] splitInput;
-        Iterator<MigratableProcess> iterator;
+        Iterator<MigratableThread> iterator;
         
         try {
             socket = new Socket(hostname,port);
@@ -109,9 +112,9 @@ public class ProcessManager {
             iterator = this.processes.iterator();
             
     		while (iterator.hasNext()) {
-                MigratableProcess t = iterator.next();
-    			if (t.getState() == Thread.State.TERMINATED) {
-    				System.out.println("Process " + t.getName() + " has terminated.");
+                MigratableThread t = iterator.next();
+    			if (t.processThread.getState() == Thread.State.TERMINATED) {
+    				System.out.println("Process " + t.process.toString() + " has terminated.");
     			}
     		}
     	}
@@ -122,24 +125,24 @@ public class ProcessManager {
     private String plopProcess() {
     	/* Get the first thread in the processes and suspend it. Then, serialize it.
     	 * Output the serialized filename */
-    	MigratableProcess[] processesAsThreads = (MigratableProcess[])processes.toArray();
-    	MigratableProcess plopProcess;
+    	MigratableThread[] processesAsThreads = (MigratableThread[])processes.toArray();
+    	MigratableThread plopProcess;
     	String plopName;
     	String humanName;
     	ObjectOutputStream objOut;
     	
     	/* Take the plot process and suspend it */
     	try {
-    		plopProcess = (processesAsThreads[0]);
-    		plopName = processesAsThreads[0].getName();
-    		humanName = convertFromThreadName(plopName);
+    		plopProcess = processesAsThreads[0];
+    		humanName = plopProcess.process.toString();
+    		plopName = convertToFileName(humanName.split(" "), plopProcess.id);
     	} catch (ArrayIndexOutOfBoundsException excpt) {
     		System.out.println("Error: No running processes on this node");
     		return "";
     	}
     	
     	try {
-    		plopProcess.suspend();
+    		plopProcess.process.suspend();
     	} catch (Exception excpt) {
     		System.out.println("Error: Failed to suspend process " + humanName);
     		return "";
@@ -160,7 +163,7 @@ public class ProcessManager {
     	}
     	
     	try {
-    		objOut.writeObject(plopProcess);
+    		objOut.writeObject(plopProcess.process);
     		objOut.flush();
     	} catch (NotSerializableException excpt) {
     		System.out.println("Error: Process " + humanName + " does not appear serializable");
@@ -189,19 +192,18 @@ public class ProcessManager {
     	Object plantProcess;
     	File thisFile;
     	Thread processThread;
-    	String threadName;
-    	String processArgs;
-   
-    	/* Get name and class data from file */
+    	String id;
+    	String[] parseHelp;
+    	MigratableThread newEntry = new MigratableThread();
+    	
+    	/* Get ID from file name */
     	try {
-    		/* Remove extension and make a human readable version for errors */
-    		threadName = fileName.substring(0, (fileName.length() - 4));
-    		processArgs = ProcessManager.convertFromThreadName(threadName);
+    		parseHelp = fileName.split("#");
+    		id = parseHelp[parseHelp.length - 1].substring(0, (fileName.length() - 5)); 
     	} catch (Exception excpt) {
-    		System.out.println("Error: Failed to parse serialized file");
+    		System.out.println("Error: Failed to parse file name " + fileName);
     		return;
     	}
-    	
     	/* Open file and read data from it */
     	try {
     		objIn = new ObjectInputStream(new FileInputStream(fileName));
@@ -217,10 +219,10 @@ public class ProcessManager {
     	try {
     		plantProcess = objIn.readObject();
     	} catch (ClassNotFoundException excpt) {
-    		System.out.println("Error: Class " + processArgs + " was not found");
+    		System.out.println("Error: Class  from file " + fileName + " was not found");
     		return;
     	} catch (InvalidClassException excpt) {
-    		System.out.println("Error: Class " + processArgs + " is not a valid serializable class");
+    		System.out.println("Error: Class from file " + fileName + " is not a valid serializable class");
     		return;
     	} catch (IOException excpt) {
     		System.out.println("Error: Failed to read from input stream");
@@ -229,10 +231,20 @@ public class ProcessManager {
     	
     	/* Run new thread for the class */
     	try {
-    		processThread = new Thread(processes, ((Runnable) plantProcess), threadName);
+    		processThread = new Thread(((Runnable) plantProcess));
     		processThread.start();
     	} catch (Exception excpt) {
-    		System.out.println("Error: Failed to run new process of class " + processArgs);
+    		System.out.println("Error: Failed to run new process");
+    		return;
+    	}
+    	
+    	try {
+    		newEntry.process = ((MigratableProcess) plantProcess);
+    		newEntry.processThread = processThread;
+    		newEntry.id = id;
+    		processes.add(newEntry);
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to add process to process list");
     		return;
     	}
 
@@ -256,6 +268,7 @@ public class ProcessManager {
     	Object newProcess;
     	Object[] newProcessArgs = new Object[1];
     	Thread processThread;
+    	MigratableThread newEntry = new MigratableThread();
     	
     	try {
     		objClass = Class.forName(args[0]);
@@ -293,11 +306,20 @@ public class ProcessManager {
     	}
     	
     	try {
-    		processThread = new Thread(processes, ((Runnable) newProcess), 
-    				ProcessManager.convertToThreadName(args, id));
+    		processThread = new Thread(((Runnable) newProcess));
     		processThread.start();
     	} catch (Exception excpt) {
     		System.out.println("Error: Failed to run new process of class " + args[0]);
+    		return;
+    	}
+    	
+    	try {
+    		newEntry.process = ((MigratableProcess) newProcess);
+    		newEntry.processThread = processThread;
+    		newEntry.id = id;
+    		processes.add(newEntry);
+    	} catch (Exception excpt) {
+    		System.out.println("Error: Failed to add process to process list");
     		return;
     	}
     	
@@ -305,31 +327,20 @@ public class ProcessManager {
     }
     
     /* Utility functions */
-    public static String convertFromThreadName(String threadName) {
-    	String[] splitName = threadName.split("#");
-    	String humanName = new String();
-    	
-    	for (int i = 0; i < splitName.length; i++) {
-    		humanName.concat(splitName[i] + " ");
-    	}
-    	
-    	return humanName;
-    }
-    
-    private static String convertToThreadName(String[] args, String id) {
-    	String threadName = new String();
+    private static String convertToFileName(String[] args, String id) {
+    	String fileName = new String();
     	
     	for (int i = 0; i < args.length; i++) {
-    		threadName.concat(args[i] + "#");
+    		fileName.concat(args[i] + "#");
     	}
     	
-    	threadName.concat(id);
+    	fileName.concat(id);
     	
-    	return threadName;
+    	return fileName;
     }
     
     public int runningProcesses() {
-        return processes.activeCount();
+        return processes.size();
     }
     
     private void begin() {

@@ -1,4 +1,6 @@
+import java.util.Iterator;
 import java.util.Scanner;
+import java.util.Set;
 
 
 public class userInterface implements Runnable {
@@ -15,7 +17,8 @@ public class userInterface implements Runnable {
     	String inputString = new String();
     	Scanner inputScan = new Scanner(System.in);
     	Thread[] processesAsThreads;
-        ThreadGroup processes;
+        Set<MigratableThread> processes;
+        Iterator<MigratableThread> iterator;
     	
     	/* Loop forever waiting on user input and process that input */
     	while (true) {
@@ -27,12 +30,12 @@ public class userInterface implements Runnable {
     			if (processes.size() == 0) {
     				System.out.println("No Running Local Processes");
     			} else {
-    				/* Print out all local processes (in local processes group) */
-    				processesAsThreads = new Thread[processes.activeCount()];
-    				processes.enumerate(processesAsThreads);
+    				/* Print out all local processes (in local processes set) */
+    				iterator = processes.iterator();
     				System.out.println("Local Running Processes");
-    				for (Thread t: processesAsThreads) {
-    					System.out.println(ProcessManager.convertFromThreadName(t.getName()));
+    	    		while (iterator.hasNext()) {
+    	                MigratableThread t = iterator.next();
+    					System.out.println(t.process.toString());
     				}
     			}
     		} else if (inputString.equals("quit")) {
