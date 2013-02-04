@@ -4,10 +4,12 @@ public class MasterManager implements Runnable {
     private MasterListener ML = null;
     private int pid = 0;
     private boolean noSlaves = false;
+    private ReentrantLock lock;
     
-    public MasterManager(MasterListener ML) {
+    public MasterManager(MasterListener ML,ReentrantLock lock) {
         this.ML = ML;
         new Thread(ML).start();
+        this.lock = lock;
     }
     
     public void run() {
@@ -32,6 +34,7 @@ public class MasterManager implements Runnable {
         String response;
         String[] splitResponse;
         
+        this.lock.lock();
         iterator = (ML.getSlaves()).iterator();
         
         while (iterator.hasNext()) {
@@ -59,6 +62,7 @@ public class MasterManager implements Runnable {
         if (bCount - fCount >= 2) {
             migrate(busiest,freeest);
         }
+        this.lock.unlock();
         this.noSlaves = (ML.getSlaves()).isEmpty();
     }
     
