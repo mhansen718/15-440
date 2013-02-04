@@ -100,7 +100,7 @@ public class ProcessManager {
                 out.println("SUCCESS\nEND");
                 input = "";
             } else if (input.equals("BEAT")) {
-                out.println(processes.size() + "#" + buffer);
+                out.println(processes.size() + "#" + buffer + "\nEND");
                 buffer = "";
                 input = "";
             } else if (input.startsWith("NEW")) {
