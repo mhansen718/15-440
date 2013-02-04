@@ -20,9 +20,7 @@ public class SlaveConnection extends Thread {
     }
     
     public void run() {
-        while (!dead) {
-            
-        }
+        while (!dead);
     }
     
     public String messageSlave(String msg) {

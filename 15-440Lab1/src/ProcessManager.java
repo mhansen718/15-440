@@ -38,7 +38,6 @@ public class ProcessManager {
         BufferedReader in = null;
         String input;
         String[] splitInput;
-        volatile boolean dead = false;
         
         try {
             socket = new Socket(hostname,port);
@@ -59,7 +58,13 @@ public class ProcessManager {
     	}
     	
     	while (UI.getState() != Thread.State.TERMINATED) {
-            input = in.readLine();
+            try {
+				input = in.readLine();
+			} catch (IOException excpt) {
+				System.out.println("Error: Failed to commune with master");
+				return;
+			}
+            
             if (input == "PLOP") {
                 out.println(plopProcess() + "\nEND");
             } else if (input.startsWith("PLANT")) {
