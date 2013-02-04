@@ -1,15 +1,24 @@
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MasterListener implements Runnable {
     private ServerSocket serverSocket = null;
     private final int port;
-    public ThreadGroup slaves;
+    private Set<SlaveConnection> slaves;
+    private ReentrantLock lock;
     
-    public MasterListener(int port) {
+    public MasterListener(int port,ReentrantLock lock) {
         super();
         this.port = port;
-        this.slaves = new ThreadGroup("Slaves");
+        this.slaves = new HashSet<SlaveConnection>();
+        this.lock = lock;
+    }
+    
+    public Set<SlaveConnection> getSlaves() {
+        return slaves;
     }
     
     public void run() {
@@ -22,7 +31,11 @@ public class MasterListener implements Runnable {
         
         while (true) {
         	try {
-        		new Thread(this.slaves, new SlaveConnection(serverSocket.accept())).start();
+                Thread newThread = new Thread(new SlaveConnection(serverSocket.accept()))
+                this.lock.lock();
+        		this.slaves.add(newThread);
+                this.lock.unlock();
+                newThread.start();
         	} catch (IOException e) {
         		System.err.println("Error accepting connection from slave.");
         	}

@@ -3,6 +3,7 @@ import java.net.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ProcessManager {
     
@@ -24,7 +25,8 @@ public class ProcessManager {
     
     // I'll make this two threads, one that manages processes, one that is a slave
     private void masterManager() {
-        new Thread(new MasterManager(new MasterListener(port))).start();
+        ReentrantLock lock = new ReentrantLock();
+        new Thread(new MasterManager(new MasterListener(port, lock), lock)).start();
         return;
     }
     
