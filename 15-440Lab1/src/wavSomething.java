@@ -225,7 +225,7 @@ public class wavSomething implements MigratableProcess {
 				}
 			}
 		} catch (IOException excpt) {
-			System.out.println("wavSomeithng Error: " + excpt);
+			System.out.println("wavSomething Error: " + excpt);
 		}
 		
 		/* Read in the wav and process the header data */
