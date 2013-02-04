@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MasterManager implements Runnable {
@@ -18,7 +19,7 @@ public class MasterManager implements Runnable {
             try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
-				System.out.println("Error: Master interrupted during sleep, heartbeat expedited");
+				System.out.println("Master Error: Interrupted during sleep, heartbeat expedited");
 			}
             heartbeat();
         }
@@ -51,7 +52,11 @@ public class MasterManager implements Runnable {
                     startProcess(splitResponse[i]);
                 }
             }
-            temp = Integer.parseInt(splitResponse[0]);
+            try {
+            	temp = Integer.parseInt(splitResponse[0]);
+            } catch (Exception excpt) {
+            	System.err.println("Master Error: Slave response corrupted");
+            }
             if (temp < fCount) {
                 fCount = temp;
                 freeest = t;
@@ -69,7 +74,7 @@ public class MasterManager implements Runnable {
     
     // Starts a new process on a random node
     private void startProcess(String process) {
-        SlaveConnection[] slaves = (ML.getSlaves()).toArray();
+        SlaveConnection[] slaves = (SlaveConnection[]) (ML.getSlaves()).toArray();
         SlaveConnection target;
         
         target = slaves[(int)(Math.random() * slaves.length)];
@@ -81,24 +86,24 @@ public class MasterManager implements Runnable {
         String sourceResponse;
         String destResponse;
         int tries = 0;
-        SlaveConnection[] slaves;
+        SlaveConnection[] slaves = null;
         
         sourceResponse = source.messageSlave("PLOP");
         if (sourceResponse.equals("Error")) {
-            System.err.println("Error serializing process");
+            System.err.println("Master Error: Failed to serialize process");
             return;
         }
         destResponse = dest.messageSlave("PLANT" + sourceResponse);
         while (destResponse.equals("Error")) {
-            System.err.println("Error restarting process");
+            System.err.println("Master Error: Failed to restart process");
             tries++;
             if (tries >= 30) {
-                System.err.println("Giving up on that process, sorry");
+                System.err.println("Master: Giving up on that process, sorry");
                 return;
             } else if (tries % 5 == 0) {
-                System.err.println("Trying different node");
+                System.err.println("Master: Trying different node");
                 if (slaves == null) {
-                    slaves = (ML.getSlaves()).toArray();
+                    slaves = (SlaveConnection[]) (ML.getSlaves()).toArray();
                     
                 }
                 dest = (SlaveConnection)slaves[(int)(Math.random() * slaves.length)];
