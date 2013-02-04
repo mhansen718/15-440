@@ -20,11 +20,13 @@ public class ProcessManager {
     
     // I'll make this two threads, one that manages processes, one that is a slave
     private void masterManager() {
-        new MasterManager(new MasterListener(port)).run();
+        new Thread(new MasterManager(new MasterListener(port))).start();
+        return;
     }
     
     public void insertToBuffer(String input) {
         this.buffer += input;
+        return;
     }
     
     public ThreadGroup getProcesses() {
