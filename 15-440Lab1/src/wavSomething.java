@@ -24,6 +24,20 @@ public class wavSomething implements MigratableProcess {
 	}
 	
 	public void run() {
+		/* field:
+		 * 1 - RIFF check
+		 * 2 - fileSize
+		 * 3 - WAVE check
+		 * 4 - fmt check
+		 * 5 - subchk1Size
+		 * 6 - audioFormat check
+		 * 7 - sampleRate
+		 * 8 - byteRate
+		 * 9 - blockAlign
+		 * 10 - data check
+		 * 11 - subchk2Size
+		 * 12 - read and process data
+		 */
 		String field = new String("RIFF");
 		byte[] bytesRead = new byte[4];
 		int doneReading = 0;
