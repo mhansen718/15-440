@@ -15,6 +15,7 @@ public class ProcessManager {
 		super();
 		this.hostname = hostname;
         this.port = port;
+        this.processes = new ThreadGroup("Local Running Processes");
 	}
     
     // I'll make this two threads, one that manages processes, one that is a slave

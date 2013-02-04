@@ -24,6 +24,7 @@ public class userInterface implements Runnable {
     		
     		if (inputString.equals("ps")) {
                 processes = manager.getProcesses();
+                System.out.println(processes.toString());
     			if (processes.activeCount() == 0) {
     				System.out.println("No Running Local Processes");
     			} else {
