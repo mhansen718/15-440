@@ -2,12 +2,12 @@ import java.util.Scanner;
 
 
 public class userInterface implements Runnable {
-	
-	private ThreadGroup processes;
 
-	public userInterface(ThreadGroup processes) {
+    private ProcessManager manager = null;
+
+	public userInterface(ProcessManager manager) {
 		super();
-		this.processes = processes;
+		this.manager = manager;
 	}
 
 	public void run() {
@@ -15,6 +15,7 @@ public class userInterface implements Runnable {
     	String inputString = new String();
     	Scanner inputScan = new Scanner(System.in);
     	Thread[] processesAsThreads;
+        ThreadGroup processes;
     	
     	/* Loop forever waiting on user input and process that input */
     	while (true) {
@@ -22,6 +23,7 @@ public class userInterface implements Runnable {
     		inputString = inputScan.nextLine();
     		
     		if (inputString == "ps") {
+                processes = manager.getProcesses();
     			if (processes.activeCount() == 0) {
     				System.out.println("No Running Local Processes");
     			} else {
@@ -41,7 +43,7 @@ public class userInterface implements Runnable {
     			if (inputString.contains("#")) {
     				System.out.println("Error: Class/Arguments cannot contain '#' character");
     			} else {
-    				// Do your thing
+    				manager.insertToBuffer("#" + inputString);
     			}
     		}
     	}

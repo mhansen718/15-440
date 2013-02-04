@@ -22,6 +22,14 @@ public class ProcessManager {
         new MasterManager(new MasterListener(port)).run();
     }
     
+    public void insertToBuffer(String input) {
+        this.buffer += input;
+    }
+    
+    public ThreadGroup getProcesses() {
+        return processes;
+    }
+    
     private void slaveManager() {
     	Thread[] processesAsThreads;
     	Thread UI;
@@ -30,6 +38,7 @@ public class ProcessManager {
         BufferedReader in = null;
         String input;
         String[] splitInput;
+        volatile boolean dead = false;
         
         try {
             socket = new Socket(hostname,port);
@@ -42,7 +51,7 @@ public class ProcessManager {
         
     	/* Create the user interface as separate thread */
     	try {
-    		UI = new Thread(new userInterface(processes));
+    		UI = new Thread(new userInterface(this));
     		UI.start();
     	} catch (Exception expt) {
     		System.out.println("Error: Failed to create UI; Exiting...");
@@ -50,7 +59,6 @@ public class ProcessManager {
     	}
     	
     	while (UI.getState() != Thread.State.TERMINATED) {
-                                                                                // TODO: If heartbeat, plant or plop
             input = in.readLine();
             if (input == "PLOP") {
                 out.println(plopProcess() + "\nEND");

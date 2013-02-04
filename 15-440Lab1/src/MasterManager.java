@@ -7,7 +7,7 @@ public class MasterManager implements Runnable {
     
     public MasterManager(MasterListener ML) {
         this.ML = ML;
-        ML.run();
+        new Thread(ML).start();
         this.numSlaves = 1;
     }
     
@@ -41,10 +41,6 @@ public class MasterManager implements Runnable {
         for (SlaveConnection t : slaveConnectionArray) {
             response = t.messageSlave("BEAT");
             if (response == "Error") {
-                continue;
-            }
-            if (response == "DEAD") {
-                t.dead = true;
                 continue;
             }
             splitResponse = response.split("#");

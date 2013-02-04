@@ -35,6 +35,7 @@ public class SlaveConnection extends Thread {
             }
             return response;
         } catch (IOException e) {
+            this.dead = true;
             return "Error";
         }
     }
