@@ -10,11 +10,15 @@ public class ProcessManager {
     private final String hostname;
     private final int port;
     private String buffer;
+    private volatile String input;
+    private BufferedReader in;
     
     public ProcessManager(String hostname, int port) {
 		super();
 		this.hostname = hostname;
         this.port = port;
+        this.input = "";
+        this.in = null;
         this.processes = new ThreadGroup("Local Running Processes");
 	}
     
@@ -33,13 +37,25 @@ public class ProcessManager {
         return processes;
     }
     
+    public BufferedReader getIn() {
+    	return this.in;
+    }
+    
+    public boolean inputSafe() {
+    	return input.equals("");
+    }
+    
+    public void writeInput(String newInput) {
+    	this.input = newInput;
+    	return;
+    }
+    
     private void slaveManager() {
     	Thread[] processesAsThreads;
     	Thread UI;
+    	Thread slaveListen;
         Socket socket = null;
     	PrintWriter out = null;
-        BufferedReader in = null;
-        String input;
         String[] splitInput;
         
         try {
@@ -51,6 +67,15 @@ public class ProcessManager {
             return;
         }
         
+        /* Create a listener to get instructions from the master */
+    	try {
+    		slaveListen = new Thread(new SlaveListener(this));
+    		slaveListen.start();
+    	} catch (Exception expt) {
+    		System.out.println("Error: Failed to create UI; Exiting...");
+    		return;
+    	}
+    	
     	/* Create the user interface as separate thread */
     	try {
     		UI = new Thread(new userInterface(this));
@@ -60,25 +85,24 @@ public class ProcessManager {
     		return;
     	}
     	
+    	
     	while (UI.getState() != Thread.State.TERMINATED) {
-            try {
-				input = in.readLine();
-			} catch (IOException excpt) {
-				System.out.println("Error: Failed to commune with master");
-				return;
-			}
-            
+    		
             if (input.equals("PLOP")) {
                 out.println(plopProcess() + "\nEND");
+                input = "";
             } else if (input.startsWith("PLANT")) {
                 plantProcess(input.substring(5));
                 out.println("SUCCESS\nEND");
+                input = "";
             } else if (input.equals("BEAT")) {
                 out.println(processes.activeCount() + "#" + buffer);
                 buffer = "";
-            } else {
+                input = "";
+            } else if (input.startsWith("NEW")) {
                 splitInput = input.split(" ", 2);
                 newProcess(splitInput[1].split(" "),splitInput[0]);
+                input = "";
             }
     		
     		processesAsThreads = new Thread[processes.activeCount()];
@@ -89,7 +113,7 @@ public class ProcessManager {
     			}
     		}
     	}
-    	
+
     	return;
     }
     
@@ -340,5 +364,7 @@ public class ProcessManager {
         }
         ProcessManager p = new ProcessManager(hostnameLocal, port);
         p.begin();
+        
+        System.exit(0);
 	}
 }
