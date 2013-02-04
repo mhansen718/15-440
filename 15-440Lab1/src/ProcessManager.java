@@ -315,8 +315,8 @@ public class ProcessManager {
     
 	public static void main(String[] args) {
         String hostnameLocal = null;
-        int port = 8000; // Default port (I think 8000 is safe, change it if it isn't)
-        int i = 0;
+        int port = 27000; // Default port (I think 27000 is safe, change it if it isn't)
+        int i = 1;
         while (i < args.length) {
             if (args[i] == "-c") {
                 i++;
@@ -332,6 +332,7 @@ public class ProcessManager {
                 i++;
             } else {
                 System.out.println("Invalid argument: " + args[i]);
+		return;
             }
         }
         ProcessManager p = new ProcessManager(hostnameLocal, port);
