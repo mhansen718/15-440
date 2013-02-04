@@ -65,6 +65,7 @@ public class MasterManager implements Runnable {
     
     public MasterManager(MasterListener ML) {
         this.MasterListener = ML;
+        ML.run();
         this.numSlaves = 1;
     }
     
@@ -97,9 +98,11 @@ public class MasterManager implements Runnable {
                 t.dead = true;
                 continue;
             }
-            splitResponse = response.split(" ", 2);
-            if (splitResponse.length == 2) {
-                startProcess(splitResponse[1]);
+            splitResponse = response.split("#");
+            if (splitResponse.length >= 2) {
+                for (int i = 1; i < splitResponse.length; i++) {
+                    startProcess(splitResponse[i]);
+                }
             }
             temp = Integer.parseInt(splitResponse[0]);
             if (temp < fCount) {
@@ -118,7 +121,7 @@ public class MasterManager implements Runnable {
     
     // Starts a new process on a random node
     private void startProcess(String process) {
-        // TODO: Find out what you want for pids.
+                                                                                // TODO: Find out what you want for pids.
         private int pid = 1234;
         private Thread[] slaves = new Thread[ML.slaves.activeCount()];
         private SlaveConnection target;

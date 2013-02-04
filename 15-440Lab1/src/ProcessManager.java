@@ -1,4 +1,5 @@
 import java.io.*;
+import java.net.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -17,14 +18,25 @@ public class ProcessManager {
     
     // I'll make this two threads, one that manages processes, one that is a slave
     private void masterManager() {
-        
+        new MasterManager(new MasterListener(port)).run();
     }
     
     private void slaveManager() {
-        //TODO: Connect to master
     	Thread[] processesAsThreads;
     	Thread UI;
-    	
+        Socket socket = null;
+    	PrintWriter out = null;
+        BufferedReader in = null;
+        
+        try {
+            socket = new Socket(hostname,port);
+            out = new PrintWriter(socket.getOutputStream(), true);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        } catch {
+            System.err.println("Could not connect to server.");
+            return;
+        }
+        
     	/* Create the user interface as separate thread */
     	try {
     		UI = new Thread(new userInterface(processes));
@@ -35,7 +47,7 @@ public class ProcessManager {
     	}
     	
     	while (UI.getState() != Thread.State.TERMINATED) {
-    		// TODO: If heartbeat, plant or plop
+                                                                                // TODO: If heartbeat, plant or plop
     		if (false) {
     			
     		}
@@ -270,9 +282,8 @@ public class ProcessManager {
     	/* Run either as master or slave based on hostname */
     	if (hostname == null) {
             masterManager();
-        } else {
-            slaveManager();
         }
+        slaveManager();
     	return;
     }
     
