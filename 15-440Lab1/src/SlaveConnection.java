@@ -28,7 +28,7 @@ public class SlaveConnection extends Thread {
         String input;
         try {
             out.println(msg);
-            while ((input = in.readLine()) != "END") {
+            while (!(input = in.readLine()).equals("END")) {
                 response += input;
             }
             return response;

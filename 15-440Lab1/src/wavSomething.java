@@ -16,9 +16,13 @@ public class wavSomething implements MigratableProcess {
 			System.out.println("Usage: wavSomething <inputFile> <outputFile> <delay (ms)>");
 		}
 		
-		fileIn = new TransactionalFileInputStream(args[0]);
-		fileOut = new TransactionalFileOutputStream(args[1], false);
-		delay = Integer.parseInt(args[2]);
+		try {
+			fileIn = new TransactionalFileInputStream(args[0]);
+			fileOut = new TransactionalFileOutputStream(args[1], false);
+			delay = Integer.parseInt(args[2]);
+		} catch (Exception excpt) {
+			System.out.println("Invalid Arguments");
+		}
 	}
 	
 	public void run() {

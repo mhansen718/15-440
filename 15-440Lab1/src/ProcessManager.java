@@ -65,12 +65,12 @@ public class ProcessManager {
 				return;
 			}
             
-            if (input == "PLOP") {
+            if (input.equals("PLOP")) {
                 out.println(plopProcess() + "\nEND");
             } else if (input.startsWith("PLANT")) {
                 plantProcess(input.substring(5));
                 out.println("SUCCESS\nEND");
-            } else if (input == "BEAT") {
+            } else if (input.equals("BEAT")) {
                 out.println(processes.activeCount() + "#" + buffer);
                 buffer = "";
             } else {
@@ -316,13 +316,13 @@ public class ProcessManager {
 	public static void main(String[] args) {
         String hostnameLocal = null;
         int port = 27000; // Default port (I think 27000 is safe, change it if it isn't)
-        int i = 1;
+        int i = 0;
         while (i < args.length) {
-            if (args[i] == "-c") {
+            if (args[i].equals("-c")) {
                 i++;
                 hostnameLocal = args[i];
                 i++;
-            } else if (args[i] == "-p") {
+            } else if (args[i].equals("-p")) {
                 i++;
                 try {
                 	port = Integer.parseInt(args[i]);

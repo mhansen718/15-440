@@ -22,7 +22,7 @@ public class userInterface implements Runnable {
     		System.out.print("->> ");
     		inputString = inputScan.nextLine();
     		
-    		if (inputString == "ps") {
+    		if (inputString.equals("ps")) {
                 processes = manager.getProcesses();
     			if (processes.activeCount() == 0) {
     				System.out.println("No Running Local Processes");
@@ -35,7 +35,7 @@ public class userInterface implements Runnable {
     					System.out.println(ProcessManager.convertFromThreadName(t.getName()));
     				}
     			}
-    		} else if (inputString == "quit") {
+    		} else if (inputString.equals("quit")) {
     			System.out.println("Goodbye!");
     			return;
     		} else {

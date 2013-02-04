@@ -40,7 +40,7 @@ public class MasterManager implements Runnable {
         
         for (SlaveConnection t : slaveConnectionArray) {
             response = t.messageSlave("BEAT");
-            if (response == "Error") {
+            if (response.equals("Error")) {
                 continue;
             }
             splitResponse = response.split("#");
@@ -87,12 +87,12 @@ public class MasterManager implements Runnable {
         Thread[] threads = new  Thread[ML.slaves.activeCount()];
         
         sourceResponse = source.messageSlave("PLOP");
-        if (sourceResponse == "Error") {
+        if (sourceResponse.equals("Error")) {
             System.err.println("Error serializing process");
             return;
         }
         destResponse = dest.messageSlave("PLANT" + sourceResponse);
-        while (destResponse == "Error") {
+        while (destResponse.equals("Error")) {
             System.err.println("Error restarting process");
             tries++;
             if (tries >= 30) {
