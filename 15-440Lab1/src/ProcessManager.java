@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ProcessManager {
     
     private Set<MigratableThread> processes;
-    private final String hostname;
+    private String hostname;
     private final int port;
     private String buffer;
     private volatile String input;
@@ -63,8 +63,10 @@ public class ProcessManager {
         String[] splitInput;
         Iterator<MigratableThread> iterator;
         
+        System.out.println(hostname);
+        
         try {
-            socket = new Socket(hostname,port);
+            socket = new Socket(hostname, port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
@@ -93,19 +95,23 @@ public class ProcessManager {
     	while (UI.getState() != Thread.State.TERMINATED) {
     		
             if (input.equals("PLOP")) {
+            	System.out.println("I am plotting");
                 out.println(plopProcess() + "\nEND");
                 input = "";
             } else if (input.startsWith("PLANT")) {
+            	System.out.println("I am planting");
                 plantProcess(input.substring(5));
                 out.println("SUCCESS\nEND");
                 input = "";
             } else if (input.equals("BEAT")) {
-                out.println(processes.size() + "#" + buffer);
+            	System.out.println("I am beating");
+                out.println(processes.size() + "#" + buffer + "\nEND");
                 buffer = "";
                 input = "";
             } else if (input.startsWith("NEW")) {
-                splitInput = input.split(" ", 2);
-                newProcess(splitInput[1].split(" "),splitInput[0]);
+            	System.out.println("I am newing");
+                splitInput = input.split(" ", 3);
+                newProcess(splitInput[2].split(" "),splitInput[1]);
                 input = "";
             }
     		
@@ -348,6 +354,13 @@ public class ProcessManager {
     	if (hostname == null) {
             masterManager();
         }
+    	
+    	try {
+			hostname = InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			System.out.println("Error: localhost unfound");
+			return;
+		}
         slaveManager();
     	return;
     }

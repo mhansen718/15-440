@@ -22,6 +22,7 @@ public class MasterManager implements Runnable {
 			}
             heartbeat();
         }
+        System.out.println("BYE!");
         return;
     }
     
@@ -43,6 +44,7 @@ public class MasterManager implements Runnable {
         while (iterator.hasNext()) {
             SlaveConnection t = iterator.next();
             response = t.messageSlave("BEAT");
+            System.out.println(response);
             if (response.equals("Error")) {
                 iterator.remove();
                 continue;
@@ -80,7 +82,7 @@ public class MasterManager implements Runnable {
         SlaveConnection target;
         
         target = slaves[(int)(Math.random() * slaves.length)];
-        target.messageSlave((this.pid++) + " " + process);
+        target.messageSlave("NEW " + (this.pid++) + " " + process);
     }
     
     //Migrates process, if it fails to restart it tries again on up to 5 random slaves

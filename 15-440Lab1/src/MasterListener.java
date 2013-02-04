@@ -37,6 +37,7 @@ public class MasterListener implements Runnable {
         		this.slaves.add(connection);
                 this.lock.unlock();
                 newThread.start();
+                System.out.println("Got new connection");
         	} catch (IOException e) {
         		System.err.println("Error accepting connection from slave.");
         	}
