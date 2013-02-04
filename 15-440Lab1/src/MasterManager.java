@@ -2,21 +2,20 @@ import java.util.Arrays;
 
 public class MasterManager implements Runnable {
     private MasterListener ML = null;
-    private int numSlaves;
     private int pid = 0;
+    private boolean noSlaves = false;
     
     public MasterManager(MasterListener ML) {
         this.ML = ML;
         new Thread(ML).start();
-        this.numSlaves = 1;
     }
     
     public void run() {
-        while (this.numSlaves > 0) {
+        while (!this.noSlaves) {
             try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
-				System.out.println("Error: Master interuptted during sleep, heartbeat expedited");
+				System.out.println("Error: Master interrupted during sleep, heartbeat expedited");
 			}
             heartbeat();
         }
@@ -25,8 +24,7 @@ public class MasterManager implements Runnable {
     
     // Checks number of running processes and migrates if needed.
     private void heartbeat() {
-        SlaveConnection[] slaveConnectionArray = new SlaveConnection[ML.slaves.activeCount()];
-        Thread[] threadArray = new Thread[ML.slaves.activeCount()];
+        Iterator<SlaveConnection> iterator;
         SlaveConnection freeest = null, busiest = null;
         int fCount = Integer.MAX_VALUE;
         int bCount = 0;
@@ -34,13 +32,13 @@ public class MasterManager implements Runnable {
         String response;
         String[] splitResponse;
         
-        ML.slaves.enumerate(threadArray);
+        iterator = (ML.getSlaves()).iterator();
         
-        slaveConnectionArray = Arrays.copyOf(threadArray, threadArray.length, SlaveConnection[].class);
-        
-        for (SlaveConnection t : slaveConnectionArray) {
+        while (iterator.hasNext()) {
+            SlaveConnection t = iterator.next();
             response = t.messageSlave("BEAT");
             if (response.equals("Error")) {
+                iterator.remove();
                 continue;
             }
             splitResponse = response.split("#");
@@ -61,18 +59,13 @@ public class MasterManager implements Runnable {
         if (bCount - fCount >= 2) {
             migrate(busiest,freeest);
         }
-        this.numSlaves = ML.slaves.activeCount();
+        this.noSlaves = (ML.getSlaves()).isEmpty();
     }
     
     // Starts a new process on a random node
     private void startProcess(String process) {
-        SlaveConnection[] slaves = new SlaveConnection[ML.slaves.activeCount()];
-        Thread[] threads = new Thread[ML.slaves.activeCount()];
+        SlaveConnection[] slaves = (ML.getSlaves()).toArray();
         SlaveConnection target;
-        
-        ML.slaves.enumerate(threads);
-        
-        slaves = Arrays.copyOf(threads, threads.length, SlaveConnection[].class);
         
         target = slaves[(int)(Math.random() * slaves.length)];
         target.messageSlave((this.pid++) + " " + process);
@@ -83,8 +76,7 @@ public class MasterManager implements Runnable {
         String sourceResponse;
         String destResponse;
         int tries = 0;
-        SlaveConnection[] slaves = new SlaveConnection[ML.slaves.activeCount()];
-        Thread[] threads = new  Thread[ML.slaves.activeCount()];
+        SlaveConnection[] slaves;
         
         sourceResponse = source.messageSlave("PLOP");
         if (sourceResponse.equals("Error")) {
@@ -100,10 +92,8 @@ public class MasterManager implements Runnable {
                 return;
             } else if (tries % 5 == 0) {
                 System.err.println("Trying different node");
-                if (slaves[0] == null) {
-                    ML.slaves.enumerate(threads);
-                    
-                    slaves = Arrays.copyOf(threads, threads.length, SlaveConnection[].class);
+                if (slaves == null) {
+                    slaves = (ML.getSlaves()).toArray();
                     
                 }
                 dest = (SlaveConnection)slaves[(int)(Math.random() * slaves.length)];
