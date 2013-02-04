@@ -61,8 +61,9 @@ public class wavSomething implements MigratableProcess {
 			myString = new String("wavSomething ");
 
 			for (String arg : args) {
-				myString.concat(arg + " ");
+				myString = myString.concat(arg + " ");
 			}
+
 		} catch (Exception excpt) {
 			System.out.println("Invalid Arguments");
 		}

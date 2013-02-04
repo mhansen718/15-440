@@ -78,7 +78,7 @@ public class MasterManager implements Runnable {
     
     // Starts a new process on a random node
     private void startProcess(String process) {
-        SlaveConnection[] slaves = (SlaveConnection[]) (ML.getSlaves()).toArray();
+        SlaveConnection[] slaves = (ML.getSlaves()).toArray(new SlaveConnection[0]);
         SlaveConnection target;
         
         target = slaves[(int)(Math.random() * slaves.length)];
@@ -107,7 +107,7 @@ public class MasterManager implements Runnable {
             } else if (tries % 5 == 0) {
                 System.err.println("Master: Trying different node");
                 if (slaves == null) {
-                    slaves = (SlaveConnection[]) (ML.getSlaves()).toArray();
+                    slaves = (ML.getSlaves()).toArray(new SlaveConnection[0]);
                     
                 }
                 dest = (SlaveConnection)slaves[(int)(Math.random() * slaves.length)];
