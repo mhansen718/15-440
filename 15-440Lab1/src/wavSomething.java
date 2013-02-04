@@ -1,7 +1,5 @@
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.Arrays;
-
 
 public class wavSomething implements MigratableProcess {
 
@@ -38,7 +36,7 @@ public class wavSomething implements MigratableProcess {
 		 * 11 - subchk2Size
 		 * 12 - read and process data
 		 */
-		String field = new String("RIFF");
+		int field = 1;
 		byte[] bytesRead = new byte[4];
 		int doneReading = 0;
 		int extraBytes = 0;
@@ -68,7 +66,7 @@ public class wavSomething implements MigratableProcess {
 				
 				/* If we're reading from a 8bit file, add an offset to unused 
 				 * elements of bytesRead */
-				if ((bitsPerSample <= 8) && (field == "goodStuff")) {
+				if ((bitsPerSample <= 8) && (field == 12)) {
 					Arrays.fill(bytesRead, ((byte) 128));
 				} else {
 					Arrays.fill(bytesRead, ((byte) 0));
@@ -84,7 +82,8 @@ public class wavSomething implements MigratableProcess {
 				 * the output file.
 				 */
 				switch (field) {
-				case "RIFF":
+				case 1:
+					/* Check RIFF file type */
 					if ((bytesRead[0] != 0x52) || 
 							(bytesRead[1] != 0x49) || 
 							(bytesRead[2] != 0x46) ||
@@ -92,13 +91,15 @@ public class wavSomething implements MigratableProcess {
 						System.out.println("wavSomeithng Error: not a RIFF file");
 						return;
 					}
-					field = "fileSize";
+					field = 2;
 					break;
-				case "fileSize":
+				case 2:
+					/* Get file size */
 					fileSize = byteArrayToInt(bytesRead, 1)[0];
-					field = "WAVE";
+					field = 3;
 					break;
-				case "WAVE":
+				case 3:
+					/* Check WAVE file type */
 					if ((bytesRead[0] != 0x57) || 
 							(bytesRead[1] != 0x41) || 
 							(bytesRead[2] != 0x56) ||
@@ -106,9 +107,10 @@ public class wavSomething implements MigratableProcess {
 						System.out.println("wavSomeithng Error: not a WAV file");
 						return;
 					}
-					field = "fmt";
+					field = 4;
 					break;
-				case "fmt":
+				case 4:
+					/* Check fmt chunk title */
 					if ((bytesRead[0] != 0x66) || 
 							(bytesRead[1] != 0x6D) || 
 							(bytesRead[2] != 0x74) ||
@@ -116,34 +118,40 @@ public class wavSomething implements MigratableProcess {
 						System.out.println("wavSomeithng Error: subchunk1 error");
 						return;
 					}
-					field = "subchk1Size";
+					field = 5;
 					break;
-				case "subchk1Size":
+				case 5:
+					/* Get fmt chunk size */
 					subChunk1Size = byteArrayToInt(bytesRead, 1)[0];
-					field = "audioFormat";
+					field = 6;
 					break;
-				case "audioFormat":
+				case 6:
+					/* Check PCM codec and number of channels */
 					if (byteArrayToInt(bytesRead, 2)[0] != 1) {
 						System.out.println("wavSomeithng Error: not PCM format");
 						return;
 					}
 					numChannels = byteArrayToInt(bytesRead, 2)[1];
-					field = "sampleRate";
+					field = 7;
 					break;
-				case "sampleRate":
+				case 7:
+					/* Get sample rate */
 					sampleRate = byteArrayToInt(bytesRead, 1)[0];
-					field = "byteRate";
+					field = 8;
 					break;
-				case "byteRate":
+				case 8:
+					/* Get byte rate */
 					byteRate = byteArrayToInt(bytesRead, 1)[0];
-					field = "blockAlign";
+					field = 9;
 					break;
-				case "blockAlign":
+				case 9:
+					/* Get alignment and bits per sample */
 					blockAlign = byteArrayToInt(bytesRead, 2)[0];
 					bitsPerSample = byteArrayToInt(bytesRead, 2)[1];
-					field = "data";
+					field = 10;
 					break;
-				case "data":
+				case 10:
+					/* Check data chunk title */
 					if ((bytesRead[0] != 0x64) || 
 							(bytesRead[1] != 0x61) || 
 							(bytesRead[2] != 0x74) ||
@@ -151,11 +159,12 @@ public class wavSomething implements MigratableProcess {
 						System.out.println("wavSomeithng Error: subchunk2 error");
 						return;
 					}
-					field = "dataSize";
+					field = 11;
 					break;
-				case "dataSize":
+				case 11:
+					/* Get data chunk size */
 					subChunk2Size = byteArrayToInt(bytesRead, 1)[0];
-					field = "goodStuff";
+					field = 12;
 					/* Do a bunch of  calculations and 
 					 * writes to file for header now that we have all relevant data */
 					shiftBuffer = new int[(((byteRate * delay) / 1000) / (bitsPerSample / 8))];
@@ -179,15 +188,14 @@ public class wavSomething implements MigratableProcess {
 					fileOut.flush();
 
 					break;
-				case "goodStuff":
+				case 12:
 					/* The body of the file, use previous information to parse and process */
 					/* Loop over each byte or 2 bytes samples and process them */
 					for (int i = 0; i < (32 / bitsPerSample); i++) {
 						pulledValue = byteArrayToInt(bytesRead, (32 / bitsPerSample))[i];
 						
 						/* If its 8-bit or less, handle as 0-255 unsigned. Else, handle as
-						 * two's compliment
-						 */
+						 * two's compliment */
 						if (bitsPerSample <= 8) {
 							offset = (1 << (bitsPerSample - 1));
 							shiftBuffer[backOfBuffer] = (pulledValue - offset) / 2;
@@ -224,8 +232,7 @@ public class wavSomething implements MigratableProcess {
 	
 	public void suspend() {
 		/* The basic suspend function, nothing to do here but assert
-		 * the suspend signal and wait for the run function to exit
-		 */
+		 * the suspend signal and wait for the run function to exit */
 		suspendMe = true;
 		
 		while (suspendMe);
