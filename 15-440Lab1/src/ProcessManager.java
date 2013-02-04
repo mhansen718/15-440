@@ -74,7 +74,7 @@ public class ProcessManager {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             System.out.println("LOL3");
         } catch (IOException e) {
-            System.err.println("Could not connect to server.");
+            System.err.println("Could not connect to server." + e);
             return;
         }
         
