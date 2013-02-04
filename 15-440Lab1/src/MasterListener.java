@@ -31,12 +31,15 @@ public class MasterListener implements Runnable {
         
         while (true) {
         	try {
+        		System.out.println("I r listening");
                 SlaveConnection connection = new SlaveConnection(serverSocket.accept());
+                System.out.println("I got one bitch");
                 Thread newThread = new Thread(connection);
                 this.lock.lock();
         		this.slaves.add(connection);
                 this.lock.unlock();
                 newThread.start();
+                System.out.println("Got new connection");
         	} catch (IOException e) {
         		System.err.println("Error accepting connection from slave.");
         	}

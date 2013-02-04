@@ -11,9 +11,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ProcessManager {
     
     private Set<MigratableThread> processes;
-    private final String hostname;
+    private String hostname;
     private final int port;
-    private String buffer;
+    private volatile String buffer;
     private volatile String input;
     private BufferedReader in;
     
@@ -23,6 +23,7 @@ public class ProcessManager {
         this.port = port;
         this.input = "";
         this.in = null;
+        this.buffer = "";
         this.processes = new HashSet<MigratableThread>();
 	}
     
@@ -63,12 +64,17 @@ public class ProcessManager {
         String[] splitInput;
         Iterator<MigratableThread> iterator;
         
+        System.out.println(hostname);
+        
         try {
-            socket = new Socket(hostname,port);
+            socket = new Socket(hostname, port);
+            System.out.println("LOL");
             out = new PrintWriter(socket.getOutputStream(), true);
+            System.out.println("LOL2");
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            System.out.println("LOL3");
         } catch (IOException e) {
-            System.err.println("Could not connect to server.");
+            System.err.println("Could not connect to server." + e);
             return;
         }
         
@@ -93,19 +99,28 @@ public class ProcessManager {
     	while (UI.getState() != Thread.State.TERMINATED) {
     		
             if (input.equals("PLOP")) {
+            	System.out.println("I am plotting");
                 out.println(plopProcess() + "\nEND");
                 input = "";
             } else if (input.startsWith("PLANT")) {
+            	System.out.println("I am planting");
                 plantProcess(input.substring(5));
                 out.println("SUCCESS\nEND");
                 input = "";
             } else if (input.equals("BEAT")) {
-                out.println(processes.size() + "#" + buffer + "\nEND");
-                buffer = "";
-                input = "";
+            	System.out.println("I am beating");
+            	if (buffer.length() > 0) {
+            		out.println(processes.size() + buffer + "\nEND");
+            	} else {
+            		out.println(processes.size() + "\nEND");
+            	}
+            	buffer = "";
+            	input = "";
             } else if (input.startsWith("NEW")) {
-                splitInput = input.split(" ", 2);
-                newProcess(splitInput[1].split(" "),splitInput[0]);
+            	System.out.println("I am newing");
+                splitInput = input.split(" ", 3);
+                newProcess(splitInput[2].split(" "),splitInput[1]);
+                out.println("SUCCESS\nEND");
                 input = "";
             }
     		
@@ -114,7 +129,8 @@ public class ProcessManager {
     		while (iterator.hasNext()) {
                 MigratableThread t = iterator.next();
     			if (t.processThread.getState() == Thread.State.TERMINATED) {
-    				System.out.println("Process " + t.process.toString() + " has terminated.");
+    				System.out.println("Process " + t.process.toString() + "has terminated.");
+    				iterator.remove();
     			}
     		}
     	}
@@ -125,7 +141,7 @@ public class ProcessManager {
     private String plopProcess() {
     	/* Get the first thread in the processes and suspend it. Then, serialize it.
     	 * Output the serialized filename */
-    	MigratableThread[] processesAsThreads = (MigratableThread[])processes.toArray();
+    	MigratableThread[] processesAsThreads = processes.toArray(new MigratableThread[0]);
     	MigratableThread plopProcess;
     	String plopName;
     	String humanName;
@@ -265,6 +281,7 @@ public class ProcessManager {
     	/* Run a new process on this node. The master will give the args and an id number*/
     	Class<?> objClass;
     	Constructor<?> objConstructs;
+    	Class[] argsClass = new Class[1];
     	Object newProcess;
     	Object[] newProcessArgs = new Object[1];
     	Thread processThread;
@@ -281,16 +298,17 @@ public class ProcessManager {
     	}
     	
     	try {
-    		objConstructs = objClass.getConstructor();
+    		argsClass[0] = String[].class;
+    		objConstructs = objClass.getConstructor(argsClass);
     	} catch (Exception excpt) {
-    		System.out.println("Error: Failed to get constructor for class " + args[0]);
+    		System.out.println("Error: Failed to get constructor for class " + args[0] + excpt);
         	return;
     	}
     	
     	try {
-    		newProcessArgs = ((Object[]) Arrays.copyOfRange(args, 1, args.length));
+    		newProcessArgs[0] = Arrays.copyOfRange(args, 1, args.length);
     		newProcess = objConstructs.newInstance(newProcessArgs);
-    		if (newProcess instanceof MigratableProcess) {
+    		if (!(newProcess instanceof MigratableProcess)) {
     			System.out.println("Error: Class " + args[0] + " is not a MigratableProcess");
     			return;
     		}
@@ -348,6 +366,13 @@ public class ProcessManager {
     	if (hostname == null) {
             masterManager();
         }
+    	
+    	try {
+			hostname = InetAddress.getLocalHost().getHostName();
+		} catch (UnknownHostException e) {
+			System.out.println("Error: localhost unfound");
+			return;
+		}
         slaveManager();
     	return;
     }

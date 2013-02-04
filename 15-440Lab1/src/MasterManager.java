@@ -22,6 +22,7 @@ public class MasterManager implements Runnable {
 			}
             heartbeat();
         }
+        System.out.println("BYE!");
         return;
     }
     
@@ -43,6 +44,7 @@ public class MasterManager implements Runnable {
         while (iterator.hasNext()) {
             SlaveConnection t = iterator.next();
             response = t.messageSlave("BEAT");
+            System.out.println(response);
             if (response.equals("Error")) {
                 iterator.remove();
                 continue;
@@ -76,11 +78,11 @@ public class MasterManager implements Runnable {
     
     // Starts a new process on a random node
     private void startProcess(String process) {
-        SlaveConnection[] slaves = (SlaveConnection[]) (ML.getSlaves()).toArray();
+        SlaveConnection[] slaves = (ML.getSlaves()).toArray(new SlaveConnection[0]);
         SlaveConnection target;
         
         target = slaves[(int)(Math.random() * slaves.length)];
-        target.messageSlave((this.pid++) + " " + process);
+        target.messageSlave("NEW " + (this.pid++) + " " + process);
     }
     
     //Migrates process, if it fails to restart it tries again on up to 5 random slaves
@@ -105,7 +107,7 @@ public class MasterManager implements Runnable {
             } else if (tries % 5 == 0) {
                 System.err.println("Master: Trying different node");
                 if (slaves == null) {
-                    slaves = (SlaveConnection[]) (ML.getSlaves()).toArray();
+                    slaves = (ML.getSlaves()).toArray(new SlaveConnection[0]);
                     
                 }
                 dest = (SlaveConnection)slaves[(int)(Math.random() * slaves.length)];
