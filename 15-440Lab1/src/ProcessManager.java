@@ -32,7 +32,7 @@ public class ProcessManager {
             socket = new Socket(hostname,port);
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        } catch {
+        } catch (IOException e) {
             System.err.println("Could not connect to server.");
             return;
         }
@@ -301,7 +301,7 @@ public class ProcessManager {
                 try {
                 	port = Integer.parseInt(args[i]);
                 } catch (NumberFormatException excpt) {
-                	System.out.println("Invalid port number: " + args[i])
+                	System.out.println("Invalid port number: " + args[i]);
                 }
                 i++;
             } else {
