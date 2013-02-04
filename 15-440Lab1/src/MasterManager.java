@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MasterManager implements Runnable {
@@ -69,7 +70,7 @@ public class MasterManager implements Runnable {
     
     // Starts a new process on a random node
     private void startProcess(String process) {
-        SlaveConnection[] slaves = (ML.getSlaves()).toArray();
+        SlaveConnection[] slaves = (SlaveConnection[]) (ML.getSlaves()).toArray();
         SlaveConnection target;
         
         target = slaves[(int)(Math.random() * slaves.length)];
@@ -81,7 +82,7 @@ public class MasterManager implements Runnable {
         String sourceResponse;
         String destResponse;
         int tries = 0;
-        SlaveConnection[] slaves;
+        SlaveConnection[] slaves = null;
         
         sourceResponse = source.messageSlave("PLOP");
         if (sourceResponse.equals("Error")) {
@@ -98,7 +99,7 @@ public class MasterManager implements Runnable {
             } else if (tries % 5 == 0) {
                 System.err.println("Trying different node");
                 if (slaves == null) {
-                    slaves = (ML.getSlaves()).toArray();
+                    slaves = (SlaveConnection[]) (ML.getSlaves()).toArray();
                     
                 }
                 dest = (SlaveConnection)slaves[(int)(Math.random() * slaves.length)];
