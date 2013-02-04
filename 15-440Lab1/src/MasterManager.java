@@ -3,6 +3,7 @@ import java.util.Arrays;
 public class MasterManager implements Runnable {
     private MasterListener ML = null;
     private int numSlaves;
+    private int pid = 0;
     
     public MasterManager(MasterListener ML) {
         this.ML = ML;
@@ -69,8 +70,6 @@ public class MasterManager implements Runnable {
     
     // Starts a new process on a random node
     private void startProcess(String process) {
-                                                                                // TODO: Find out what you want for pids.
-        int pid = 1234;
         SlaveConnection[] slaves = new SlaveConnection[ML.slaves.activeCount()];
         Thread[] threads = new Thread[ML.slaves.activeCount()];
         SlaveConnection target;
@@ -80,7 +79,7 @@ public class MasterManager implements Runnable {
         slaves = Arrays.copyOf(threads, threads.length, SlaveConnection[].class);
         
         target = slaves[(int)(Math.random() * slaves.length)];
-        target.messageSlave(pid + " " + process);
+        target.messageSlave((this.pid++) + " " + process);
     }
     
     //Migrates process, if it fails to restart it tries again on up to 5 random slaves

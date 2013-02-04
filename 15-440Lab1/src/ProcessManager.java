@@ -9,6 +9,7 @@ public class ProcessManager {
     private ThreadGroup processes;
     private final String hostname;
     private final int port;
+    private String buffer;
     
     public ProcessManager(String hostname, int port) {
 		super();
@@ -27,6 +28,8 @@ public class ProcessManager {
         Socket socket = null;
     	PrintWriter out = null;
         BufferedReader in = null;
+        String input;
+        String[] splitInput;
         
         try {
             socket = new Socket(hostname,port);
@@ -48,9 +51,19 @@ public class ProcessManager {
     	
     	while (UI.getState() != Thread.State.TERMINATED) {
                                                                                 // TODO: If heartbeat, plant or plop
-    		if (false) {
-    			
-    		}
+            input = in.readLine();
+            if (input == "PLOP") {
+                out.println(plopProcess() + "\nEND");
+            } else if (input.startsWith("PLANT")) {
+                plantProcess(input.substring(5));
+                out.println("SUCCESS\nEND");
+            } else if (input == "BEAT") {
+                out.println(processes.activeCount() + "#" + buffer);
+                buffer = "";
+            } else {
+                splitInput = input.split(" ", 2);
+                newProcess(splitInput[1].split(" "),splitInput[0]);
+            }
     		
     		processesAsThreads = new Thread[processes.activeCount()];
     		processes.enumerate(processesAsThreads);
