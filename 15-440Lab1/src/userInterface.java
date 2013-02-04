@@ -24,13 +24,13 @@ public class userInterface implements Runnable {
     		
     		if (inputString.equals("ps")) {
                 processes = manager.getProcesses();
-    			if (processes.activeCount() == 0) {
+    			if (processes.size() == 0) {
     				System.out.println("No Running Local Processes");
     			} else {
     				/* Print out all local processes (in local processes group) */
     				processesAsThreads = new Thread[processes.activeCount()];
     				processes.enumerate(processesAsThreads);
-    				System.out.println(processes.getName());
+    				System.out.println("Local Running Processes");
     				for (Thread t: processesAsThreads) {
     					System.out.println(ProcessManager.convertFromThreadName(t.getName()));
     				}
