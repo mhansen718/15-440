@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -32,7 +31,7 @@ public class MasterManager implements Runnable {
         SlaveConnection freeest = null, busiest = null;
         int fCount = Integer.MAX_VALUE;
         int bCount = 0;
-        int temp;
+        int temp = 0;
         String response;
         String[] splitResponse;
         
@@ -57,6 +56,7 @@ public class MasterManager implements Runnable {
             } catch (Exception excpt) {
             	System.err.println("Master Error: Slave response corrupted");
             }
+            
             if (temp < fCount) {
                 fCount = temp;
                 freeest = t;
