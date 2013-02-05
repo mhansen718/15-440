@@ -87,7 +87,7 @@ public class MasterManager implements Runnable {
         SlaveConnection[] slaves = (ML.getSlaves()).toArray(new SlaveConnection[0]);
         SlaveConnection target;
         
-        target = slaves[0];//(int)(Math.random() * slaves.length)];
+        target = slaves[(int)(Math.random() * slaves.length)];
         target.messageSlave("NEW " + (this.pid++) + " " + process);
     }
     
