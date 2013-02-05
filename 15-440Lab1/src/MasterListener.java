@@ -41,7 +41,9 @@ public class MasterListener implements Runnable {
                 newThread.start();
                 System.out.println("Got new connection");
         	} catch (IOException e) {
-        		System.err.println("Error accepting connection from slave.");
+        		System.out.println();
+        		System.err.println("Master Error: Fail to accept connection from slave");
+        		System.out.print("->>");
         	}
         }
     }

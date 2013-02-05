@@ -18,11 +18,12 @@ public class MasterManager implements Runnable {
             try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
+				System.out.println();
 				System.out.println("Master Error: Interrupted during sleep, heartbeat expedited");
+				System.out.print("->>");
 			}
             heartbeat();
         }
-        System.out.println("BYE!");
         return;
     }
     
@@ -36,15 +37,12 @@ public class MasterManager implements Runnable {
         String response;
         String[] splitResponse;
         
-        System.out.println("Heartbeat");
-        
         this.lock.lock();
         iterator = (ML.getSlaves()).iterator();
         
         while (iterator.hasNext()) {
             SlaveConnection t = iterator.next();
             response = t.messageSlave("BEAT");
-            System.out.println(response);
             if (response.equals("Error")) {
                 iterator.remove();
                 continue;
@@ -58,7 +56,9 @@ public class MasterManager implements Runnable {
             try {
             	temp = Integer.parseInt(splitResponse[0]);
             } catch (Exception excpt) {
+            	System.out.println();
             	System.err.println("Master Error: Slave response corrupted");
+            	System.out.print("->>");
             }
             
             if (temp < fCount) {
@@ -81,7 +81,7 @@ public class MasterManager implements Runnable {
         SlaveConnection[] slaves = (ML.getSlaves()).toArray(new SlaveConnection[0]);
         SlaveConnection target;
         
-        target = slaves[(int)(Math.random() * slaves.length)];
+        target = slaves[0];//(int)(Math.random() * slaves.length)];
         target.messageSlave("NEW " + (this.pid++) + " " + process);
     }
     
@@ -91,21 +91,30 @@ public class MasterManager implements Runnable {
         String destResponse;
         int tries = 0;
         SlaveConnection[] slaves = null;
+        System.out.println("migration");
         
         sourceResponse = source.messageSlave("PLOP");
         if (sourceResponse.equals("Error")) {
+        	System.out.println();
             System.err.println("Master Error: Failed to serialize process");
+            System.out.print("->>");
             return;
         }
         destResponse = dest.messageSlave("PLANT" + sourceResponse);
         while (destResponse.equals("Error")) {
+        	System.out.println();
             System.err.println("Master Error: Failed to restart process");
+            System.out.print("->>");
             tries++;
             if (tries >= 30) {
+            	System.out.println();
                 System.err.println("Master: Giving up on that process, sorry");
+                System.out.print("->>");
                 return;
             } else if (tries % 5 == 0) {
+            	System.out.println();
                 System.err.println("Master: Trying different node");
+                System.out.print("->>");
                 if (slaves == null) {
                     slaves = (ML.getSlaves()).toArray(new SlaveConnection[0]);
                     
