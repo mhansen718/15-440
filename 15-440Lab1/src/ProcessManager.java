@@ -64,17 +64,12 @@ public class ProcessManager {
         String[] splitInput;
         Iterator<MigratableThread> iterator;
         
-        System.out.println(hostname);
-        
         try {
             socket = new Socket(hostname, port);
-            System.out.println("LOL");
             out = new PrintWriter(socket.getOutputStream(), true);
-            System.out.println("LOL2");
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            System.out.println("LOL3");
         } catch (IOException e) {
-            System.err.println("Could not connect to server." + e);
+            System.err.println("Could not connect to server; Exiting...");
             return;
         }
         
@@ -83,10 +78,11 @@ public class ProcessManager {
     		slaveListen = new Thread(new SlaveListener(this));
     		slaveListen.start();
     	} catch (Exception expt) {
-    		System.out.println("Error: Failed to create UI; Exiting...");
+    		System.out.println("Error: Failed to create listen thread; Exiting...");
     		return;
     	}
     	
+    	System.out.println("System Initiating // Master@" + hostname + ":" + port);
     	/* Create the user interface as separate thread */
     	try {
     		UI = new Thread(new userInterface(this));
@@ -96,7 +92,8 @@ public class ProcessManager {
     		return;
     	}
     	
-    	while (UI.getState() != Thread.State.TERMINATED) {
+    	while ((UI.getState() != Thread.State.TERMINATED) && 
+    			(slaveListen.getState() != Thread.State.TERMINATED)) {
     		
             if (input.equals("PLOP")) {
             	System.out.println("I am plotting");
@@ -108,7 +105,6 @@ public class ProcessManager {
                 out.println("SUCCESS\nEND");
                 input = "";
             } else if (input.equals("BEAT")) {
-            	System.out.println("I am beating");
             	if (buffer.length() > 0) {
             		out.println(processes.size() + buffer + "\nEND");
             	} else {
@@ -129,7 +125,9 @@ public class ProcessManager {
     		while (iterator.hasNext()) {
                 MigratableThread t = iterator.next();
     			if (t.processThread.getState() == Thread.State.TERMINATED) {
+    				System.out.println();
     				System.out.println("Process " + t.process.toString() + "has terminated.");
+    				System.out.println("->>");
     				iterator.remove();
     			}
     		}
@@ -153,14 +151,18 @@ public class ProcessManager {
     		humanName = plopProcess.process.toString();
     		plopName = convertToFileName(humanName.split(" "), plopProcess.id);
     	} catch (ArrayIndexOutOfBoundsException excpt) {
+    		System.out.println();
     		System.out.println("Error: No running processes on this node");
+    		System.out.println("->>");
     		return "";
     	}
     	
     	try {
     		plopProcess.process.suspend();
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to suspend process " + humanName);
+    		System.out.println("->>");
     		return "";
     	}
     	
@@ -168,13 +170,19 @@ public class ProcessManager {
     	try {
     		objOut = new ObjectOutputStream(new FileOutputStream(plopName + ".ser"));
     	} catch (IOException excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to open file stream for serialization due to IO Error");
+    		System.out.println("->>");
     		return "";
     	} catch (SecurityException excpt) {
+    		System.out.println();
     		System.out.println("Error: Permission denied in creating output stream");
+    		System.out.println("->>");
     		return "";
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to open file stream for serialization");
+    		System.out.println("->>");
     		return "";
     	}
     	
@@ -182,13 +190,19 @@ public class ProcessManager {
     		objOut.writeObject(plopProcess.process);
     		objOut.flush();
     	} catch (NotSerializableException excpt) {
+    		System.out.println();
     		System.out.println("Error: Process " + humanName + " does not appear serializable");
+    		System.out.println("->>");
     		return "";
     	} catch (IOException excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to write object to file");
+    		System.out.println("->>");
     		return "";
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to open file stream");
+    		System.out.println("->>");
     		return "";
     	}
 
@@ -196,7 +210,9 @@ public class ProcessManager {
     	try {
 			objOut.close();
 		} catch (IOException excpt) {
+			System.out.println();
 			System.out.println("Error: Failed to close output stream successfully");
+			System.out.println("->>");
 		}
     	
     	return plopName + ".ser";
@@ -217,7 +233,9 @@ public class ProcessManager {
     		parseHelp = fileName.split("#");
     		id = parseHelp[parseHelp.length - 1].substring(0, (fileName.length() - 5)); 
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to parse file name " + fileName);
+    		System.out.println("->>");
     		return;
     	}
     	/* Open file and read data from it */
@@ -225,10 +243,14 @@ public class ProcessManager {
     		objIn = new ObjectInputStream(new FileInputStream(fileName));
     		thisFile = new File(fileName);
     	} catch (IOException excpt) {
+    		System.out.println();
     		System.out.println("Error: IO error in reading file " + fileName);
+    		System.out.println("->>");
     		return;
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to open file stream for deserialization");
+    		System.out.println("->>");
     		return;
     	}
     	
@@ -236,12 +258,17 @@ public class ProcessManager {
     		plantProcess = objIn.readObject();
     	} catch (ClassNotFoundException excpt) {
     		System.out.println("Error: Class  from file " + fileName + " was not found");
+    		System.out.println("->>");
     		return;
     	} catch (InvalidClassException excpt) {
+    		System.out.println();
     		System.out.println("Error: Class from file " + fileName + " is not a valid serializable class");
+    		System.out.println("->>");
     		return;
     	} catch (IOException excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to read from input stream");
+    		System.out.println("->>");
     		return;
     	}
     	
@@ -250,7 +277,9 @@ public class ProcessManager {
     		processThread = new Thread(((Runnable) plantProcess));
     		processThread.start();
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to run new process");
+    		System.out.println("->>");
     		return;
     	}
     	
@@ -260,7 +289,9 @@ public class ProcessManager {
     		newEntry.id = id;
     		processes.add(newEntry);
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to add process to process list");
+    		System.out.println("->>");
     		return;
     	}
 
@@ -268,10 +299,14 @@ public class ProcessManager {
     	try {
 			objIn.close();
 			if (!(thisFile.delete())) {
+				System.out.println();
 				System.out.println("Error: Failed to delete serialized object file");
+				System.out.println("->>");
 			}
 		} catch (IOException excpt) {
+			System.out.println();
 			System.out.println("Error: Failed to close output stream successfully");
+			System.out.println("->>");
 		}
     	
     	return;
@@ -290,10 +325,14 @@ public class ProcessManager {
     	try {
     		objClass = Class.forName(args[0]);
     	} catch (ClassNotFoundException excpt) {
+    		System.out.println();
     		System.out.println("Error: Class " + args[0] + " was not found");
+    		System.out.println("->>");
     		return;
     	} catch (Exception expt) {
+    		System.out.println();
     		System.out.println("Error: Failed to ressolve class for name " + args[0]);
+    		System.out.println("->>");
     		return;
     	}
     	
@@ -301,7 +340,9 @@ public class ProcessManager {
     		argsClass[0] = String[].class;
     		objConstructs = objClass.getConstructor(argsClass);
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to get constructor for class " + args[0] + excpt);
+    		System.out.println("->>");
         	return;
     	}
     	
@@ -309,17 +350,25 @@ public class ProcessManager {
     		newProcessArgs[0] = Arrays.copyOfRange(args, 1, args.length);
     		newProcess = objConstructs.newInstance(newProcessArgs);
     		if (!(newProcess instanceof MigratableProcess)) {
+    			System.out.println();
     			System.out.println("Error: Class " + args[0] + " is not a MigratableProcess");
+    			System.out.println("->>");
     			return;
     		}
     	} catch (IllegalArgumentException excpt) {
+    		System.out.println();
     		System.out.println("Error: Illegal argument provided to class " + args[0]);
+    		System.out.println("->>");
     		return;
     	} catch (InvocationTargetException excpt) {
+    		System.out.println();
     		System.out.println("Error: Constructor for class " + args[0] + " threw exception " + excpt);
+    		System.out.println("->>");
     		return;
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to create new instance of class " + args[0]);
+    		System.out.println("->>");
     		return;
     	}
     	
@@ -327,7 +376,9 @@ public class ProcessManager {
     		processThread = new Thread(((Runnable) newProcess));
     		processThread.start();
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to run new process of class " + args[0]);
+    		System.out.println("->>");
     		return;
     	}
     	
@@ -337,7 +388,9 @@ public class ProcessManager {
     		newEntry.id = id;
     		processes.add(newEntry);
     	} catch (Exception excpt) {
+    		System.out.println();
     		System.out.println("Error: Failed to add process to process list");
+    		System.out.println("->>");
     		return;
     	}
     	
@@ -365,14 +418,14 @@ public class ProcessManager {
     	/* Run either as master or slave based on hostname */
     	if (hostname == null) {
             masterManager();
+            try {
+    			hostname = InetAddress.getLocalHost().getHostName();
+    		} catch (UnknownHostException e) {
+    			System.out.println("Error: localhost not found; Exiting...");
+    			return;
+    		}
         }
     	
-    	try {
-			hostname = InetAddress.getLocalHost().getHostName();
-		} catch (UnknownHostException e) {
-			System.out.println("Error: localhost unfound");
-			return;
-		}
         slaveManager();
     	return;
     }
