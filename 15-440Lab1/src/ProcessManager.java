@@ -96,11 +96,9 @@ public class ProcessManager {
     			(slaveListen.getState() != Thread.State.TERMINATED)) {
     		try {
     			if (input.equals("PLOP")) {
-    				System.out.println("I am plopping");
     				out.println(plopProcess() + "\nEND");
     				input = "";
     			} else if (input.startsWith("PLANT")) {
-    				System.out.println("I am planting");
     				plantProcess(input.substring(5));
     				out.println("SUCCESS\nEND");
     				input = "";
@@ -113,7 +111,6 @@ public class ProcessManager {
     				buffer = "";
     				input = "";
     			} else if (input.startsWith("NEW")) {
-    				System.out.println("I am newing");
     				splitInput = input.split(" ", 3);
     				newProcess(splitInput[2].split(" "),splitInput[1]);
     				out.println("SUCCESS\nEND");
