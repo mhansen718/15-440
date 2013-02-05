@@ -16,7 +16,7 @@ public class SlaveConnection extends Thread {
     	} catch (IOException e) {
     		System.out.println();
     		System.err.println("Master Error: Could not connect to slave");
-    		System.out.print("->>");
+    		System.out.print("->> ");
     		return;
     	}
     }

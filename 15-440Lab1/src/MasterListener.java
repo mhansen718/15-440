@@ -43,7 +43,7 @@ public class MasterListener implements Runnable {
         	} catch (IOException e) {
         		System.out.println();
         		System.err.println("Master Error: Fail to accept connection from slave");
-        		System.out.print("->>");
+        		System.out.print("->> ");
         	}
         }
     }
