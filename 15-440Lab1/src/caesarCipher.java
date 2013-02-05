@@ -57,7 +57,11 @@ public class caesarCipher implements MigratableProcess {
             	System.err.println("Read failed!");
             	return;
             }
-
+            
+            if (!inputChar) {
+                return;
+            }
+            
             if (Character.isLetter(inputChar)) {
             	index = alpha.indexOf(inputChar);
             	outputChar = alpha.charAt(index + this.shift);
