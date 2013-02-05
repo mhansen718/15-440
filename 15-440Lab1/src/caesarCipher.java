@@ -1,5 +1,9 @@
+import java.io.IOException;
+
 public class caesarCipher implements MigratableProcess {
-    private String nameAndArgs = "caesarCipher";
+
+	private static final long serialVersionUID = -8437240783838198401L;
+	private String nameAndArgs = "caesarCipher";
     private TransactionalFileInputStream in;
     private TransactionalFileOutputStream out;
     private int shift;
@@ -7,7 +11,7 @@ public class caesarCipher implements MigratableProcess {
     private volatile boolean suspended;
     
     public caesarCipher(String[] args) {
-        if (args.length > 3) || (args.length < 2) {
+        if ((args.length > 3) || (args.length < 2)) {
             System.out.print("\nUsage: caesarCipher <shift> <inputFile> [outputFile]\n->>");
         }
         
@@ -18,7 +22,7 @@ public class caesarCipher implements MigratableProcess {
             return;
         }
         
-        if (this.shift < 0) || (this.shift > 26) {
+        if ((this.shift < 0) || (this.shift > 26)) {
             System.err.print("\nShift has to be an integer between 0 and 26\n->>");
             return;
         }
@@ -30,7 +34,7 @@ public class caesarCipher implements MigratableProcess {
             } else {
                 out = new TransactionalFileOutputStream("encoded" + args[2],false);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.print("\nCould not open file\n->>");
             return;
         }
@@ -47,17 +51,23 @@ public class caesarCipher implements MigratableProcess {
         
         while (!suspended) {
             try {
-                inputChar = in.read()
+                inputChar = (char) in.read();
             } catch (IOException e) {
-                System.err.println("Read failed!");
+            	System.err.println("Read failed!");
+            	return;
             }
-            
-            index = alpha.indexOf(inputChar);
-            outputChar = alpha.charAt(index + this.shift);
+
+            if (Character.isLetter(inputChar)) {
+            	index = alpha.indexOf(inputChar);
+            	outputChar = alpha.charAt(index + this.shift);
+            } else {
+            	outputChar = inputChar;
+            }
             try {
-                out.write(outputChar);
+            	out.write(outputChar);
             } catch (IOException e) {
-                System.err.println("Write failed!");
+            	System.err.println("Write failed!");
+            	return;
             }
         }
         
