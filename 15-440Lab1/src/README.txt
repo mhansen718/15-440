@@ -7,3 +7,5 @@ Our migratable processes are wavSomething and caesarCipher, wavSomething adds an
 Usage:
 wavSomething <inputFile> <outputFile> <delay (ms)>
 caesarCipher <shift> <inputFile> <outputFile> (optional, if not supplied defaults to "encoded_" + inputFile)
+
+The Examples folder holds two simple wav files for use with wavSomething (delays of more than a second (1000) take a very long time to run)
