@@ -409,10 +409,10 @@ public class ProcessManager {
     	String fileName = new String();
     	
     	for (int i = 0; i < args.length; i++) {
-    		fileName.concat(args[i] + "#");
+    		fileName = fileName.concat(args[i] + "#");
     	}
     	
-    	fileName.concat(id);
+    	fileName = fileName.concat(id);
     	
     	return fileName;
     }
