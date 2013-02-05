@@ -23,8 +23,9 @@ public class userInterface implements Runnable {
     	while (true) {
     		System.out.print("->> ");
     		inputString = inputScan.nextLine();
-    		
-    		if (inputString.equals("ps")) {
+    		if (inputString.equals("")) {
+                continue;
+    		} else if (inputString.equals("ps")) {
                 processes = manager.getProcesses();
     			if (processes.size() == 0) {
     				System.out.println("No Running Local Processes");
