@@ -7,8 +7,13 @@ public class caesarCipher implements MigratableProcess {
     private volatile boolean suspended;
     
     public caesarCipher(String[] args) {
+        for (String arg : args) {
+            this.nameAndArgs += " " + arg;
+        }
+        
         if (args.length > 3) || (args.length < 2) {
             System.out.print("\nUsage: caesarCipher <shift> <inputFile> [outputFile]\n->>");
+            return;
         }
         
         try {
@@ -33,10 +38,6 @@ public class caesarCipher implements MigratableProcess {
         } catch (IOException e) {
             System.err.print("\nCould not open file\n->>");
             return;
-        }
-        
-        for (String arg : args) {
-            this.nameAndArgs += " " + arg;
         }
     }
     
