@@ -11,6 +11,11 @@ public class caesarCipher implements MigratableProcess {
     private volatile boolean suspended;
     
     public caesarCipher(String[] args) {
+    	
+    	for (String arg : args) {
+			nameAndArgs = nameAndArgs.concat(" " + arg);
+		}
+    	
         if ((args.length > 3) || (args.length < 2)) {
             System.out.print("\nUsage: caesarCipher <shift> <inputFile> [outputFile]\n->>");
         }
@@ -37,10 +42,6 @@ public class caesarCipher implements MigratableProcess {
         } catch (Exception e) {
             System.err.print("\nCould not open file\n->>");
             return;
-        }
-        
-        for (String arg : args) {
-            this.nameAndArgs += " " + arg;
         }
     }
     
