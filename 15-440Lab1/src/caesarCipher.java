@@ -34,10 +34,11 @@ public class caesarCipher implements MigratableProcess {
         
         try {
             in = new TransactionalFileInputStream(args[1]);
+            System.out.println("YO");
             if (args.length > 2) {
                 out = new TransactionalFileOutputStream(args[2],false);
             } else {
-                out = new TransactionalFileOutputStream("encoded" + args[2],false);
+                out = new TransactionalFileOutputStream("encoded_" + args[1],false);
             }
         } catch (Exception e) {
             System.err.print("\nCould not open file\n->>");
