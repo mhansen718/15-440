@@ -58,7 +58,7 @@ public class caesarCipher implements MigratableProcess {
             	return;
             }
             
-            if (!inputChar) {
+            if (((int) inputChar) == -1) {
                 return;
             }
             
