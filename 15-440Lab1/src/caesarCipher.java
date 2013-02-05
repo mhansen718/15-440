@@ -34,7 +34,6 @@ public class caesarCipher implements MigratableProcess {
         
         try {
             in = new TransactionalFileInputStream(args[1]);
-            System.out.println("YO");
             if (args.length > 2) {
                 out = new TransactionalFileOutputStream(args[2],false);
             } else {
