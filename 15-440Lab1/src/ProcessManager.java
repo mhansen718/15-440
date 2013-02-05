@@ -126,7 +126,7 @@ public class ProcessManager {
                 MigratableThread t = iterator.next();
     			if (t.processThread.getState() == Thread.State.TERMINATED) {
     				System.out.println();
-    				System.out.println("Process " + t.process.toString() + "has terminated.");
+    				System.out.println("Process " + t.process.toString() + " has terminated.");
     				System.out.print("->> ");
     				iterator.remove();
     			}
