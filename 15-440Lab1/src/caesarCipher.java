@@ -77,6 +77,12 @@ public class caesarCipher implements MigratableProcess {
             	System.err.println("Write failed!");
             	return;
             }
+            try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
         
         this.suspended = false;
