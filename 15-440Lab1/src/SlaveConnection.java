@@ -16,7 +16,7 @@ public class SlaveConnection extends Thread {
     	} catch (IOException e) {
     		System.out.println();
     		System.err.println("Master Error: Could not connect to slave");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     }
@@ -34,7 +34,7 @@ public class SlaveConnection extends Thread {
                 response += input;
             }
             return response;
-        } catch (IOException e) {
+        } catch (Exception e) {
             this.dead = true;
             return "Error";
         }

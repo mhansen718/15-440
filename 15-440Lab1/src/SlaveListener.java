@@ -15,7 +15,7 @@ public class SlaveListener implements Runnable {
 			if (manager.inputSafe()) {
 				try {
 					manager.writeInput(manager.getIn().readLine());
-				} catch (IOException excpt) {
+				} catch (Exception excpt) {
 					System.out.println("Error: Failed to commune with master; Exiting...");
 					return;
 				}

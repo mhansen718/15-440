@@ -127,7 +127,7 @@ public class ProcessManager {
     			if (t.processThread.getState() == Thread.State.TERMINATED) {
     				System.out.println();
     				System.out.println("Process " + t.process.toString() + "has terminated.");
-    				System.out.println("->>");
+    				System.out.print("->>");
     				iterator.remove();
     			}
     		}
@@ -153,7 +153,7 @@ public class ProcessManager {
     	} catch (ArrayIndexOutOfBoundsException excpt) {
     		System.out.println();
     		System.out.println("Error: No running processes on this node");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return "";
     	}
     	
@@ -162,7 +162,7 @@ public class ProcessManager {
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to suspend process " + humanName);
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return "";
     	}
     	
@@ -172,17 +172,17 @@ public class ProcessManager {
     	} catch (IOException excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to open file stream for serialization due to IO Error");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return "";
     	} catch (SecurityException excpt) {
     		System.out.println();
     		System.out.println("Error: Permission denied in creating output stream");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return "";
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to open file stream for serialization");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return "";
     	}
     	
@@ -192,17 +192,17 @@ public class ProcessManager {
     	} catch (NotSerializableException excpt) {
     		System.out.println();
     		System.out.println("Error: Process " + humanName + " does not appear serializable");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return "";
     	} catch (IOException excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to write object to file");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return "";
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to open file stream");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return "";
     	}
 
@@ -212,7 +212,7 @@ public class ProcessManager {
 		} catch (IOException excpt) {
 			System.out.println();
 			System.out.println("Error: Failed to close output stream successfully");
-			System.out.println("->>");
+			System.out.print("->>");
 		}
     	
     	return plopName + ".ser";
@@ -235,7 +235,7 @@ public class ProcessManager {
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to parse file name " + fileName);
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     	/* Open file and read data from it */
@@ -245,12 +245,12 @@ public class ProcessManager {
     	} catch (IOException excpt) {
     		System.out.println();
     		System.out.println("Error: IO error in reading file " + fileName);
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to open file stream for deserialization");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     	
@@ -258,17 +258,17 @@ public class ProcessManager {
     		plantProcess = objIn.readObject();
     	} catch (ClassNotFoundException excpt) {
     		System.out.println("Error: Class  from file " + fileName + " was not found");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	} catch (InvalidClassException excpt) {
     		System.out.println();
     		System.out.println("Error: Class from file " + fileName + " is not a valid serializable class");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	} catch (IOException excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to read from input stream");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     	
@@ -279,7 +279,7 @@ public class ProcessManager {
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to run new process");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     	
@@ -291,7 +291,7 @@ public class ProcessManager {
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to add process to process list");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
 
@@ -301,12 +301,12 @@ public class ProcessManager {
 			if (!(thisFile.delete())) {
 				System.out.println();
 				System.out.println("Error: Failed to delete serialized object file");
-				System.out.println("->>");
+				System.out.print("->>");
 			}
 		} catch (IOException excpt) {
 			System.out.println();
 			System.out.println("Error: Failed to close output stream successfully");
-			System.out.println("->>");
+			System.out.print("->>");
 		}
     	
     	return;
@@ -327,12 +327,12 @@ public class ProcessManager {
     	} catch (ClassNotFoundException excpt) {
     		System.out.println();
     		System.out.println("Error: Class " + args[0] + " was not found");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	} catch (Exception expt) {
     		System.out.println();
     		System.out.println("Error: Failed to ressolve class for name " + args[0]);
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     	
@@ -342,7 +342,7 @@ public class ProcessManager {
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to get constructor for class " + args[0] + excpt);
-    		System.out.println("->>");
+    		System.out.print("->>");
         	return;
     	}
     	
@@ -352,23 +352,23 @@ public class ProcessManager {
     		if (!(newProcess instanceof MigratableProcess)) {
     			System.out.println();
     			System.out.println("Error: Class " + args[0] + " is not a MigratableProcess");
-    			System.out.println("->>");
+    			System.out.print("->>");
     			return;
     		}
     	} catch (IllegalArgumentException excpt) {
     		System.out.println();
     		System.out.println("Error: Illegal argument provided to class " + args[0]);
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	} catch (InvocationTargetException excpt) {
     		System.out.println();
     		System.out.println("Error: Constructor for class " + args[0] + " threw exception " + excpt);
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to create new instance of class " + args[0]);
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     	
@@ -378,7 +378,7 @@ public class ProcessManager {
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to run new process of class " + args[0]);
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     	
@@ -390,7 +390,7 @@ public class ProcessManager {
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to add process to process list");
-    		System.out.println("->>");
+    		System.out.print("->>");
     		return;
     	}
     	
