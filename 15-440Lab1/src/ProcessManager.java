@@ -47,7 +47,7 @@ public class ProcessManager {
     	return this.in;
     }
     
-    public boolean inputSafe() {
+    public boolean inputSafe() throws Exception {
     	return input.equals("");
     }
     
@@ -94,40 +94,45 @@ public class ProcessManager {
     	
     	while ((UI.getState() != Thread.State.TERMINATED) && 
     			(slaveListen.getState() != Thread.State.TERMINATED)) {
-    		
-            if (input.equals("PLOP")) {
-            	System.out.println("I am plotting");
-                out.println(plopProcess() + "\nEND");
-                input = "";
-            } else if (input.startsWith("PLANT")) {
-            	System.out.println("I am planting");
-                plantProcess(input.substring(5));
-                out.println("SUCCESS\nEND");
-                input = "";
-            } else if (input.equals("BEAT")) {
-            	if (buffer.length() > 0) {
-            		out.println(processes.size() + buffer + "\nEND");
-            	} else {
-            		out.println(processes.size() + "\nEND");
-            	}
-            	buffer = "";
-            	input = "";
-            } else if (input.startsWith("NEW")) {
-            	System.out.println("I am newing");
-                splitInput = input.split(" ", 3);
-                newProcess(splitInput[2].split(" "),splitInput[1]);
-                out.println("SUCCESS\nEND");
-                input = "";
-            }
+    		try {
+    			if (input.equals("PLOP")) {
+    				System.out.println("I am plopping");
+    				out.println(plopProcess() + "\nEND");
+    				input = "";
+    			} else if (input.startsWith("PLANT")) {
+    				System.out.println("I am planting");
+    				plantProcess(input.substring(5));
+    				out.println("SUCCESS\nEND");
+    				input = "";
+    			} else if (input.equals("BEAT")) {
+    				if (buffer.length() > 0) {
+    					out.println(processes.size() + buffer + "\nEND");
+    				} else {
+    					out.println(processes.size() + "\nEND");
+    				}
+    				buffer = "";
+    				input = "";
+    			} else if (input.startsWith("NEW")) {
+    				System.out.println("I am newing");
+    				splitInput = input.split(" ", 3);
+    				newProcess(splitInput[2].split(" "),splitInput[1]);
+    				out.println("SUCCESS\nEND");
+    				input = "";
+    			}
+    		} catch (Exception excpt) {
+    			return;
+    		}
     		
             iterator = this.processes.iterator();
             
     		while (iterator.hasNext()) {
                 MigratableThread t = iterator.next();
     			if (t.processThread.getState() == Thread.State.TERMINATED) {
-    				System.out.println();
-    				System.out.println("Process " + t.process.toString() + " has terminated.");
-    				System.out.print("->> ");
+    				if (!t.moving) {
+    					System.out.println();
+    					System.out.println("Process " + t.process.toString() + " has terminated.");
+    					System.out.print("->> ");
+    				}
     				iterator.remove();
     			}
     		}
@@ -150,6 +155,7 @@ public class ProcessManager {
     		plopProcess = processesAsThreads[0];
     		humanName = plopProcess.process.toString();
     		plopName = convertToFileName(humanName.split(" "), plopProcess.id);
+    		System.out.println(plopName + " and " + humanName);
     	} catch (ArrayIndexOutOfBoundsException excpt) {
     		System.out.println();
     		System.out.println("Error: No running processes on this node");
@@ -159,6 +165,7 @@ public class ProcessManager {
     	
     	try {
     		plopProcess.process.suspend();
+    		plopProcess.moving = true;
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to suspend process " + humanName);

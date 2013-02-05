@@ -46,20 +46,23 @@ public class caesarCipher implements MigratableProcess {
     }
     
     public void run() {
+    	int inputVal;
         char inputChar;
         char outputChar;
         int index;
         
         while (!suspended) {
             try {
-                inputChar = (char) in.read();
+                inputVal = in.read();
             } catch (IOException e) {
             	System.err.println("Read failed!");
             	return;
             }
             
-            if (((int) inputChar) == -1) {
+            if (inputVal == -1) {
                 return;
+            } else {
+            	inputChar = (char) inputVal;
             }
             
             if (Character.isLetter(inputChar)) {

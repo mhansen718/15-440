@@ -9,13 +9,15 @@ public class SlaveListener implements Runnable {
 	
 	public void run() {
 		while (true) {
-			if (manager.inputSafe()) {
-				try {
+			try {
+				if (manager.inputSafe()) {
 					manager.writeInput(manager.getIn().readLine());
-				} catch (Exception excpt) {
-					System.out.println("Error: Failed to commune with master; Exiting...");
-					return;
+					manager.inputSafe();
 				}
+			} catch (Exception excpt) {
+				System.out.println();
+				System.out.println("Error: Failed to commune with master; Exiting...");
+				return;
 			}
 		}
 	}

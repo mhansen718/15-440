@@ -33,7 +33,7 @@ public class MasterManager implements Runnable {
         SlaveConnection freeest = null, busiest = null;
         int fCount = Integer.MAX_VALUE;
         int bCount = 0;
-        int temp = 0;
+        int processesRunning = 0;
         String response;
         String[] splitResponse;
         
@@ -43,6 +43,7 @@ public class MasterManager implements Runnable {
         while (iterator.hasNext()) {
             SlaveConnection t = iterator.next();
             response = t.messageSlave("BEAT");
+
             if (response.equals("Error")) {
                 iterator.remove();
                 continue;
@@ -54,26 +55,31 @@ public class MasterManager implements Runnable {
                 }
             }
             try {
-            	temp = Integer.parseInt(splitResponse[0]);
+            	processesRunning = Integer.parseInt(splitResponse[0]);
             } catch (Exception excpt) {
             	System.out.println();
             	System.err.println("Master Error: Slave response corrupted");
             	System.out.print("->> ");
             }
             
-            if (temp < fCount) {
-                fCount = temp;
+            if (processesRunning < fCount) {
+                fCount = processesRunning;
                 freeest = t;
-            } else if (temp > bCount) {
-                bCount = temp;
+            }
+            if (processesRunning > bCount) {
+                bCount = processesRunning;
                 busiest = t;
             }
         }
+        
         if (bCount - fCount >= 2) {
             migrate(busiest,freeest);
         }
+        
         this.lock.unlock();
         this.noSlaves = (ML.getSlaves()).isEmpty();
+        
+        return;
     }
     
     // Starts a new process on a random node
