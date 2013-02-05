@@ -97,7 +97,6 @@ public class MasterManager implements Runnable {
         String destResponse;
         int tries = 0;
         SlaveConnection[] slaves = null;
-        System.out.println("migration");
         
         sourceResponse = source.messageSlave("PLOP");
         if (sourceResponse.equals("Error")) {
