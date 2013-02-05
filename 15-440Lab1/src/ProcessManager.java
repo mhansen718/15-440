@@ -155,7 +155,6 @@ public class ProcessManager {
     		plopProcess = processesAsThreads[0];
     		humanName = plopProcess.process.toString();
     		plopName = convertToFileName(humanName.split(" "), plopProcess.id);
-    		System.out.println(plopName + " and " + humanName);
     	} catch (ArrayIndexOutOfBoundsException excpt) {
     		System.out.println();
     		System.out.println("Error: No running processes on this node");
@@ -238,7 +237,8 @@ public class ProcessManager {
     	/* Get ID from file name */
     	try {
     		parseHelp = fileName.split("#");
-    		id = parseHelp[parseHelp.length - 1].substring(0, (fileName.length() - 5)); 
+    		id = parseHelp[parseHelp.length - 1].substring(0, 
+    				(parseHelp[parseHelp.length - 1].length() - 5)); 
     	} catch (Exception excpt) {
     		System.out.println();
     		System.out.println("Error: Failed to parse file name " + fileName);
