@@ -1,9 +1,9 @@
 
 public class RemoteObjectRef {
 
-	private int host;
-	private int port;
-	private String name;
-	private String interfaceName;
+	private int objHost;
+	private int objPort;
+	private String objName;
+	private String objInterface;
 	
 }
