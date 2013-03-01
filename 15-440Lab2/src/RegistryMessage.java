@@ -1,8 +1,7 @@
 import java.io.Serializable;
 
 
-public class RegistryMessage implements Serializable
-{
+public class RegistryMessage implements Serializable {
 
 	public String funct;
 	public int objHost;

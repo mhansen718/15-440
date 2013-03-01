@@ -1,3 +1,1 @@
-
-public interface Remote440 {
-}
+public interface Remote440 { }
