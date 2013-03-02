@@ -1,3 +1,4 @@
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -5,6 +6,15 @@ import java.util.Set;
 public class RMIProxy implements Runnable {
 
 	private Set<ProxyStore> localObjs;
+	private String myHost;
+	private int myPort;
+	
+	public RMIProxy(String host) {
+		super();
+		this.localObjs = new HashSet<ProxyStore>();
+		this.myHost = host;
+		this.myPort = 27000; /* Starting port */
+	}
 	
 	public void addObject(String name, Object newObj) {
 		/* This function simply adds a new object to the set. If it is in the set already, remap */
