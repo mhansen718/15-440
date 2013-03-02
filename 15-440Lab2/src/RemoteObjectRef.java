@@ -1,5 +1,7 @@
+import java.io.Serializable;
 
-public class RemoteObjectRef {
+
+public class RemoteObjectRef implements Serializable {
 
 	private String objHost;
 	private int objPort;
