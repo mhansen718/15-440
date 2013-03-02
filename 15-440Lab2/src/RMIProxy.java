@@ -41,5 +41,8 @@ public class RMIProxy implements Runnable {
 	}
 	
 	public void run() {
+		/* TODO: Set up socket and listen */
+		
+		/* TODO: Unpack rmi and spawn thread to handle it */
 	}
 }
