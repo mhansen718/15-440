@@ -1,5 +1,5 @@
 
-public class RegistryStore {
+public class RegistryEntry {
 
 	public String name;
 	public String host;
