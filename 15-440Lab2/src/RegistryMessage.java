@@ -3,7 +3,6 @@ import java.io.Serializable;
 
 public class RegistryMessage implements Serializable {
 
-
 	private static final long serialVersionUID = 5080883249882036893L;
 	
 	/* Stuff needed in messages between registry and registry clients */
