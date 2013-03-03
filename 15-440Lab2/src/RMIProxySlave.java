@@ -33,6 +33,7 @@ public class RMIProxySlave implements Runnable {
 
 		try {
 			returnObj = message.method.invoke(foundObj, message.args);
+			
 			if (Remote440.class.isAssignableFrom(message.method.getReturnType())) {
 				/* If this class is a Remote440 object, package it up as a remote object reference with a unique name */
 				String newName = Integer.toString(returnObj.hashCode());
