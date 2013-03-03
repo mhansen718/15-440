@@ -16,7 +16,11 @@ public class RMIProxySlave implements Runnable {
 	
 	public void run() {
 		RMIMessage returnMessage = new RMIMessage();
-		ProxyEntry foundObj;
+		Object foundObj;
+		
+		returnMessage.name = message.name;
+		returnMessage.method = message.method;
+		returnMessage.args = message.args;
 		
 		/* Try to find the object, if we dont know about it, return a Remote Exception */
 		foundObj = master.findObject(message.name);
@@ -42,6 +46,10 @@ public class RMIProxySlave implements Runnable {
 		} catch (Exception excpt) {
 			returnMessage.exception = excpt;
 		}
+		
+		returnMessage.exception = null;
+		sendMessage(returnMessage);
+		return;
 	}
 		
 	private void sendMessage(RMIMessage message) {
