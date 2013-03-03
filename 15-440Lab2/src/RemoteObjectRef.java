@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.lang.reflect.Proxy;
 
 
 public class RemoteObjectRef implements Serializable {
@@ -18,8 +19,19 @@ public class RemoteObjectRef implements Serializable {
 	
 	public Object localise() {
 		/* TODO: Make this work, for now just stfu eclipse */
-		Object o = new Object();
-		return o;
+		Object obj = null;
+		try {
+			return Proxy.newProxyInstance(
+					ClassLoader.getSystemClassLoader(),
+					new Class<?>[] { Class.forName(this.objInterface) }, 
+					new RMIProxyHandler(this.objHost, this.objPort));
+		} catch (ClassNotFoundException excpt) {
+			System.out.println("Error: Failed to find interface " + this.objInterface);
+			return obj;
+		} catch (Exception excpt) {
+			System.out.println("Error: Failed to localise Remote Object Reference");
+			return obj;
+		}
 	}
 	
 }

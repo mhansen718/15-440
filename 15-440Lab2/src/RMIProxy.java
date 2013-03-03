@@ -14,6 +14,16 @@ public class RMIProxy implements Runnable {
 		this.myPort = 27000; /* Starting port */
 	}
 	
+	public String getHost() {
+		/* Get the host name for this node */
+		return this.myHost;
+	}
+	
+	public int getPort() {
+		/* Get the listening port for this node */
+		return this.myPort;
+	}
+	
 	public void addObject(String name, Object newObj) {
 		/* This function simply adds a new object to the set. If it is in the set already, remap */
 		this.localObjs.put(name, newObj);

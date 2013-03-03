@@ -17,6 +17,7 @@ public class RMIProxySlave implements Runnable {
 	public void run() {
 		RMIMessage returnMessage = new RMIMessage();
 		Object foundObj;
+		Object returnObj;
 		
 		returnMessage.name = message.name;
 		returnMessage.method = message.method;
@@ -25,29 +26,33 @@ public class RMIProxySlave implements Runnable {
 		/* Try to find the object, if we dont know about it, return a Remote Exception */
 		foundObj = master.findObject(message.name);
 		if (foundObj == null) {
-			RemoteException excpt = new RemoteException();
-			returnMessage.exception = excpt;
+			returnMessage.exception = new RemoteException();
 			sendMessage(returnMessage);
 			return;
 		}
-		
+
 		try {
-			returnMessage.returnValue = message.method.invoke(foundObj, message.args);
+			returnObj = message.method.invoke(foundObj, message.args);
 			if (Remote440.class.isAssignableFrom(message.method.getReturnType())) {
-				/* If this class is a Remote440 object, package it up as a remote object reference */
-				
+				/* If this class is a Remote440 object, package it up as a remote object reference with a unique name */
+				String newName = Integer.toString(returnObj.hashCode());
+				RemoteObjectRef newRemote = new RemoteObjectRef(master.getHost(), master.getPort(), 
+						newName, message.method.getReturnType().getName());
+				master.addObject(newName, returnObj);
+				returnMessage.returnValue = newRemote;
+				returnMessage.exception = null;
 			} else if (Serializable.class.isAssignableFrom(message.method.getReturnType())) {
 				/* If this class is a Remote440 object, package it up as a whole object */
+				returnMessage.returnValue = returnObj;
+				returnMessage.exception = null;
 			} else {
 				/* We cant return it, so send remote exception and done */
-				RemoteException excpt = new RemoteException();
-				returnMessage.exception = excpt;
+				returnMessage.exception = new RemoteException();
 			}
 		} catch (Exception excpt) {
 			returnMessage.exception = excpt;
 		}
 		
-		returnMessage.exception = null;
 		sendMessage(returnMessage);
 		return;
 	}
