@@ -22,11 +22,13 @@ public class RemoteObjectRef implements Serializable {
 	public Object localise() {
 		/* Create a proxy for the object, this proxy will handle rmis */
 		Object obj = null;
+
 		try {
+			Class<?> objClass = Class.forName(this.objInterface);
 			return Proxy.newProxyInstance(
 					ClassLoader.getSystemClassLoader(),
-					new Class<?>[] { Class.forName(this.objInterface) }, 
-					new RMIProxyHandler(this.objHost, this.objPort, this.objName));
+					new Class<?>[] { objClass }, 
+					new RMIProxyHandler(this.objHost, this.objPort, this.objName, objClass));
 		} catch (ClassNotFoundException excpt) {
 			System.out.println("Error: Failed to find interface " + this.objInterface);
 			return obj;

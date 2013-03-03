@@ -1,5 +1,4 @@
 import java.io.Serializable;
-import java.lang.reflect.Method;
 
 
 public class RMIMessage implements Serializable {
@@ -8,7 +7,9 @@ public class RMIMessage implements Serializable {
 	
 	/* Stuff for both send and return */
 	public String name;
-	public Method method;
+	public String methodName;
+	public Class<?>[] parameterTypes;
+	public Class<?> cls;
 	public Object[] args;
 	public Object returnValue;
 	public Exception exception;
