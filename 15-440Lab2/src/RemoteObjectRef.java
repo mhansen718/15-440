@@ -4,6 +4,8 @@ import java.lang.reflect.Proxy;
 
 public class RemoteObjectRef implements Serializable {
 
+	private static final long serialVersionUID = 8633449110704983682L;
+	
 	private String objHost;
 	private int objPort;
 	private String objName;
@@ -24,7 +26,7 @@ public class RemoteObjectRef implements Serializable {
 			return Proxy.newProxyInstance(
 					ClassLoader.getSystemClassLoader(),
 					new Class<?>[] { Class.forName(this.objInterface) }, 
-					new RMIProxyHandler(this.objHost, this.objPort));
+					new RMIProxyHandler(this.objHost, this.objPort, this.objName));
 		} catch (ClassNotFoundException excpt) {
 			System.out.println("Error: Failed to find interface " + this.objInterface);
 			return obj;

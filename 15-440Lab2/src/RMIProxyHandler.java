@@ -6,11 +6,13 @@ public class RMIProxyHandler implements InvocationHandler {
 
 	private String host;
 	private int port;
+	private String name;
 	
-	public RMIProxyHandler(String host, int port) {
+	public RMIProxyHandler(String host, int port, String name) {
 		super();
 		this.host = host;
 		this.port = port;
+		this.name = name;
 	}
 	
 	@Override
