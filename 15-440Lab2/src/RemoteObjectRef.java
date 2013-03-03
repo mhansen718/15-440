@@ -20,7 +20,7 @@ public class RemoteObjectRef implements Serializable {
 	}
 	
 	public Object localise() {
-		/* TODO: Make this work, for now just stfu eclipse */
+		/* Create a proxy for the object, this proxy will handle rmis */
 		Object obj = null;
 		try {
 			return Proxy.newProxyInstance(
