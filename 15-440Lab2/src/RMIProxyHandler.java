@@ -28,7 +28,7 @@ public class RMIProxyHandler implements InvocationHandler {
 		RMIMessage received;
 		Object returnObj;
 		
-		/* Ensure all arguments are serializable */
+		/* Ensure all wanted arguments are serializable */
 		for (Class<?> paramClass : method.getParameterTypes()) {
 			if (Serializable.class.isAssignableFrom(paramClass)) {
 				throw new RemoteException();
@@ -45,7 +45,7 @@ public class RMIProxyHandler implements InvocationHandler {
 		sent.exception = null;
 		
 		/* Check to see if the received method resulted in an exception. If so, throw. */
-		if (received.exception == null) {
+		if (received.exception != null) {
 			throw received.exception;
 		}
 		
