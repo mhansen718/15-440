@@ -3,5 +3,5 @@ public class RegistryEntry {
 
 	public String host;
 	public int port;
-	public String interfaceName;
+    public Class<?> objClass;
 }

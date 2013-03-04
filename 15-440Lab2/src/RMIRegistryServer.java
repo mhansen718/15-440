@@ -64,7 +64,6 @@ public class RMIRegistryServer {
         RegistryEntry entry = new RegistryEntry();
         entry.host = message.objHost;
         entry.port = message.objPort;
-        entry.interfaceName = message.objInterface;
         if (message.funct == "bind") {
             try {
                 bind(message.objName,entry);
@@ -113,7 +112,7 @@ public class RMIRegistryServer {
         response.objName = name;
         response.objHost = entry.host;
         response.objPort = entry.port;
-        response.objInterface = entry.interfaceName;
+        response.objClass = entry.objClass;
         return response;
     }
     
