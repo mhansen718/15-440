@@ -23,8 +23,6 @@ public class RMIRegistryServer {
         while (true) {
             try {
                 processRequest(registrySocket.accept());
-                out = new ObjectOutputStream(this.socket.getOutputStream());
-                in = new ObjectInputStream(this.socket.getInputStream());
             } catch (IOException e) {
                 //TODO: Something here
             }

@@ -6,6 +6,7 @@ public class RMIProxy implements Runnable {
 	private ConcurrentHashMap<String, Object> localObjs;
 	private String myHost;
 	private int myPort;
+    private ServerSocket proxySocket = null;
 	
 	public RMIProxy(String host) {
 		super();
@@ -36,8 +37,32 @@ public class RMIProxy implements Runnable {
 	}
 	
 	public void run() {
-		/* TODO: Set up socket and listen */
-		
-		/* TODO: Unpack rmi and spawn thread to handle it */
+		try {
+            this.proxySocket = new ServerSocket(this.myPort);
+        } catch (IOException e) {
+            System.err.println("Could not listen on port: " + this.port);
+            System.exit(-1);
+        }
+        while (true) {
+            try {
+                processRequest(proxySocket.accept());
+            } catch (IOException e) {
+                //TODO: accept error
+            }
+        }
 	}
+    
+    private void processRequest(Socket socket) {
+        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+        RMIMessage message;
+        
+        try {
+            message = (RMIMessage) in.readObject();
+        } catch (IOException e) {
+            //TODO: error
+        }
+        
+        Thread slave = new Thread(new RMIProxySlave(this, message, socket));
+        slave.start();
+    }
 }
