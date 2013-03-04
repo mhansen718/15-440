@@ -27,7 +27,7 @@ public class RMIProxySlave implements Runnable {
 		returnMessage.args = message.args;
 		
 		/* Try to find the object, if we dont know about it, return a Remote Exception */
-		foundObj = master.findObject(message.name);
+		foundObj = this.master.findObject(message.name);
 		if (foundObj == null) {
 			returnMessage.exception = new RemoteException();
 			sendMessage(returnMessage);
@@ -42,9 +42,9 @@ public class RMIProxySlave implements Runnable {
 			if (Remote440.class.isAssignableFrom(method.getReturnType())) {
 				/* If this class is a Remote440 object, package it up as a remote object reference with a unique name */
 				String newName = Integer.toString(returnObj.hashCode());
-				RemoteObjectRef newRemote = new RemoteObjectRef(master.getHost(), master.getPort(), 
-						newName, method.getReturnType().getName());
-				master.addObject(newName, returnObj);
+				RemoteObjectRef newRemote = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
+						newName, method.getReturnType().getName(), this.master);
+				this.master.addObject(newName, returnObj);
 				returnMessage.returnValue = newRemote;
 				returnMessage.exception = null;
 			} else if (Serializable.class.isAssignableFrom(method.getReturnType())) {
