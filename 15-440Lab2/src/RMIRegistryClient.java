@@ -23,7 +23,7 @@ public class RMIRegistryClient {
 			this.localProxy = new Thread(this.myProxy);
 			localProxy.start();
 		} catch (Exception excpt) {
-			System.out.println("Error: Failed to set up Proxy for RMI");
+			System.err.println("Error: Failed to set up Proxy for RMI");
 		}
 	}
 	
@@ -44,7 +44,7 @@ public class RMIRegistryClient {
             socket = new Socket(this.registryHost,this.registryPort);
             out = new ObjectOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
-            //TODO: error
+            System.err.println("Failed to open connection to server");
         }
         message = new RegistryMessage();
         message.funct = funct;
@@ -55,14 +55,15 @@ public class RMIRegistryClient {
         try {
             out.writeObject(message);
         } catch (IOException e) {
-            //TODO: you know by now
+            System.err.println("Failed to send request");
+            return;
         }
         out.close();
         socket.close();
         return;
     }
     
-	public String[] list(String name) {
+	public String[] list() {
         Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
@@ -72,7 +73,8 @@ public class RMIRegistryClient {
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            //TODO: error
+            System.err.println("Failed to open connection to server");
+            return;
         }
         message = new RegistryMessage();
         message.funct = "list";
@@ -80,9 +82,14 @@ public class RMIRegistryClient {
             out.writeObject(message);
             response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            //TODO: second verse, same as the first
+            System.err.println("Failed to communicate with server");
+            return;
         }
-        return response.regList;
+        if (response.error) {
+            System.err.println(response.error);
+        } else {
+            return response.regList;
+        }
 	}
 	
 	public Object lookup(String name) throws Exception {
@@ -96,7 +103,8 @@ public class RMIRegistryClient {
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            //TODO: error
+            System.err.println("Failed to open connection to server");
+            return;
         }
         message = new RegistryMessage();
         message.funct = "lookup";
@@ -105,10 +113,15 @@ public class RMIRegistryClient {
             out.writeObject(message);
             response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            //TODO: Yep.
+            System.err.println("Failed to communicate with server");
+            return;
         }
-        ref = new RemoteObjectRef(response.objHost,response.objPort,response.objName,response.objClass,myProxy);
-        return ref.localise();
+        if (response.error) {
+            System.err.println(response.error);
+        } else {
+            ref = new RemoteObjectRef(response.objHost,response.objPort,response.objName,response.objClass,myProxy);
+            return ref.localise();
+        }
 	}
 	
 }
