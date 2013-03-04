@@ -42,7 +42,8 @@ public class RMIProxyHandler implements InvocationHandler {
 			if ((arg instanceof Remote440) && !(arg instanceof RemoteObjectDeref)) {
 				remoteArgName = Integer.toString(arg.hashCode());
 				remoteArg = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
-						remoteArgName, arg.getClass().getName(), this.master);
+						remoteArgName, arg.getClass(), this.master);
+				this.master.addObject(remoteArgName, arg);
 				trueArgs[idx] = remoteArg;
 			} else {
 				trueArgs[idx] = arg;
