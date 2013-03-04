@@ -12,18 +12,30 @@ public class RMIRegistryClient {
 	private int registryPort;
 	private RMIProxy myProxy;
 	
-	public RMIRegistryClient(String host, int port) {
+	public RMIRegistryClient(String host, int port) throws Exception {
 		super();
+        ServerSocket proxySocket;
 		this.registryHost = host;
 		this.registryPort = port;
 		
 		/* Create the proxy for all RMIs to this node */
+        for (int i = 27000; i<27010; i++) {
+            try {
+                proxySocket = new ServerSocket(port);
+                break;
+            } catch (IOException e) {
+                if (i == 27009) {
+                    throw IOException e;
+                }
+                continue;
+            }
+        }
 		try {
-			this.myProxy = new RMIProxy(InetAddress.getLocalHost().getHostName());
+			this.myProxy = new RMIProxy(InetAddress.getLocalHost().getHostName(), i, proxySocket);
 			this.localProxy = new Thread(this.myProxy);
 			localProxy.start();
 		} catch (Exception excpt) {
-			System.err.println("Error: Failed to set up Proxy for RMI");
+			throw excpt;
 		}
 	}
 	

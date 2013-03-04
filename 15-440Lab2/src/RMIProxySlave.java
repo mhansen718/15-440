@@ -88,7 +88,7 @@ public class RMIProxySlave implements Runnable {
         try {
             out.writeObject(message);
         } catch (IOException e) {
-            //TODO: error
+            return;
         }
 		return;
 	}

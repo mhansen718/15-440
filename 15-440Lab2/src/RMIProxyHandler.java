@@ -69,8 +69,7 @@ public class RMIProxyHandler implements InvocationHandler {
             out.writeObject(sent);
             received = (RMIMessage) in.readObject();
         } catch (IOException e) {
-            System.err.println("Failed to communicate with object");
-            return;
+            throw new RemoteException("Communication failure");
         }
         
 		/* Check to see if the received method resulted in an exception. If so, throw. */
