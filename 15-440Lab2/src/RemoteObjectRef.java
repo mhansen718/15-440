@@ -10,13 +10,15 @@ public class RemoteObjectRef implements Serializable {
 	private int objPort;
 	private String objName;
 	private String objInterface;
+	private RMIProxy master;
 	
-	public RemoteObjectRef(String host, int port, String name, String interfaceName) {
+	public RemoteObjectRef(String host, int port, String name, String interfaceName, RMIProxy master) {
 		super();
 		this.objHost = host;
 		this.objPort = port;
 		this.objName = name;
 		this.objInterface = interfaceName;
+		this.master = master;
 	}
 	
 	public Object localise() {
@@ -28,7 +30,7 @@ public class RemoteObjectRef implements Serializable {
 			return Proxy.newProxyInstance(
 					ClassLoader.getSystemClassLoader(),
 					new Class<?>[] { objClass }, 
-					new RMIProxyHandler(this.objHost, this.objPort, this.objName, objClass));
+					new RMIProxyHandler(this.objHost, this.objPort, this.objName, objClass, this.master));
 		} catch (ClassNotFoundException excpt) {
 			System.out.println("Error: Failed to find interface " + this.objInterface);
 			return obj;

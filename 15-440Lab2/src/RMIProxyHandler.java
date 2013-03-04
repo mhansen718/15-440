@@ -10,13 +10,15 @@ public class RMIProxyHandler implements InvocationHandler {
 	private int port;
 	private String name;
 	private Class<?> cls;
+	private RMIProxy master;
 	
-	public RMIProxyHandler(String host, int port, String name, Class<?> cls) {
+	public RMIProxyHandler(String host, int port, String name, Class<?> cls, RMIProxy master) {
 		super();
 		this.host = host;
 		this.port = port;
 		this.name = name;
 		this.cls = cls;
+		this.master = master;
 	}
 	
 	@Override
@@ -27,12 +29,26 @@ public class RMIProxyHandler implements InvocationHandler {
 		RMIMessage sent = new RMIMessage();
 		RMIMessage received;
 		Object returnObj;
+		Object[] trueArgs = new Object[args.length];
+		int idx = 0;
+		RemoteObjectRef remoteArg;
+		String remoteArgName;
+		
 		
 		/* Ensure all wanted arguments are serializable */
-		for (Class<?> paramClass : method.getParameterTypes()) {
-			if (Serializable.class.isAssignableFrom(paramClass)) {
+		for (Object arg : args) {
+			if (!(arg instanceof Serializable)) {
 				throw new RemoteException();
 			}
+			if (arg instanceof Remote440) {
+				remoteArgName = Integer.toString(arg.hashCode());
+				remoteArg = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
+						remoteArgName, arg.getClass().getName(), this.master);
+				trueArgs[idx] = remoteArg;
+			} else {
+				trueArgs[idx] = arg;
+			}
+			idx++;
 		}
 		
 		/* Load up message to send */
@@ -40,7 +56,7 @@ public class RMIProxyHandler implements InvocationHandler {
 		sent.methodName = method.getName();
 		sent.parameterTypes = method.getParameterTypes();
 		sent.cls = this.cls;
-		sent.args = args;
+		sent.args = trueArgs;
 		sent.returnValue = null;
 		sent.exception = null;
 		
