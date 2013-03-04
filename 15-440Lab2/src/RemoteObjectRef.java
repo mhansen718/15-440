@@ -1,5 +1,4 @@
 import java.io.Serializable;
-import java.lang.reflect.Proxy;
 
 
 public class RemoteObjectRef implements Serializable {
@@ -9,10 +8,10 @@ public class RemoteObjectRef implements Serializable {
 	private String objHost;
 	private int objPort;
 	private String objName;
-	private Class objClass;
+	private Class<?> objClass;
 	private RMIProxy master;
 	
-	public RemoteObjectRef(String host, int port, String name, Class cls, RMIProxy master) {
+	public RemoteObjectRef(String host, int port, String name, Class<?> cls, RMIProxy master) {
 		super();
 		this.objHost = host;
 		this.objPort = port;
