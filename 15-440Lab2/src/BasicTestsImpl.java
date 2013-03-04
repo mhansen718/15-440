@@ -4,8 +4,7 @@ public class BasicTestsImpl implements BasicTests {
 	private String phrase;
 	private int number;
 	
-	@Override
-	public void init(String phrase, int number) {
+	public BasicTestsImpl(String phrase, int number) {
 		this.phrase = phrase;
 		this.number = number;
 	}
