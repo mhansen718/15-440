@@ -45,21 +45,11 @@ public class RMIRegistryServer {
             //TODO: Stuff
         }
         
+        response = new RegistryMessage();
         if (message.funct == "list") {
-            response = new RegistryMessage();
             response.regList = list();
-            try {
-                out.writeObject(response);
-            } catch (IOException e) {  //TODO: errors
-                
-            }
-            return;
         } else if (message.funct == "lookup") {
-            try {
-                out.writeObject(lookup(message.objName));
-            } catch (IOException e) { // TODO: errors
-                
-            }
+            response = lookup(message.objName);
         }
         RegistryEntry entry = new RegistryEntry();
         entry.host = message.objHost;
@@ -68,16 +58,17 @@ public class RMIRegistryServer {
             try {
                 bind(message.objName,entry);
             } catch (AlreadyBoundException e) {
-                response = new RegistryMessage();
                 response.error = e;
-                out.writeObject(response);
             }
         } else if (message.funct == "rebind") {
             rebind(message.objName,entry);
         } else {
-            response = new RegistryMessage();
             response.error = new RemoteException("Invalid Command");
+        }
+        try {
             out.writeObject(response);
+        } catch (IOException e) {
+            //TODO: Internal error
         }
         try {
             out.close();

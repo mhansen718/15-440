@@ -39,7 +39,7 @@ public class RMIRegistryClient {
     private void bothBinds(String name, Remote440 obj, String funct) {
         Socket socket;
         ObjectOutputStream out;
-        RegistryMessage message;
+        RegistryMessage message, response;
 		try {
             socket = new Socket(this.registryHost,this.registryPort);
             out = new ObjectOutputStream(this.socket.getOutputStream());
@@ -54,16 +54,20 @@ public class RMIRegistryClient {
         message.objClass = obj.getClass();
         try {
             out.writeObject(message);
+            response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            System.err.println("Failed to send request");
+            System.err.println("Failed to communicate with server");
             return;
+        }
+        if (response.error) {
+            throw response.error;
         }
         out.close();
         socket.close();
         return;
     }
     
-	public String[] list() {
+	public String[] list() throws Exception{
         Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
@@ -86,7 +90,7 @@ public class RMIRegistryClient {
             return;
         }
         if (response.error) {
-            System.err.println(response.error);
+            throw response.error;
         } else {
             return response.regList;
         }
@@ -117,7 +121,7 @@ public class RMIRegistryClient {
             return;
         }
         if (response.error) {
-            System.err.println(response.error);
+            throw response.error;
         } else {
             ref = new RemoteObjectRef(response.objHost,response.objPort,response.objName,response.objClass,myProxy);
             return ref.localise();
