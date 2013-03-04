@@ -51,7 +51,7 @@ public class RMIRegistryClient {
         message.objName = name;
         message.objHost = this.myProxy.getHost();
         message.objPort = this.myProxy.getPort();
-        message.objInterface = "How do I get this again?"; //TODO
+        message.objClass = obj.getClass();
         try {
             out.writeObject(message);
         } catch (IOException e) {
@@ -85,11 +85,12 @@ public class RMIRegistryClient {
         return response.regList;
 	}
 	
-	public Remote440 lookup(String name) {
+	public Object lookup(String name) throws Exception {
 		Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
         RegistryMessage message, response;
+        RemoteObjectRef ref;
         try {
             socket = new Socket(this.registryHost,this.registryPort);
             in = new ObjectInputStream(socket.getInputStream());
@@ -106,7 +107,8 @@ public class RMIRegistryClient {
         } catch (IOException e) {
             //TODO: Yep.
         }
-        //TODO: make the right return value out of that
+        ref = new RemoteObjectRef(response.objHost,response.objPort,response.objName,response.objClass,myProxy);
+        return ref.localise();
 	}
 	
 }

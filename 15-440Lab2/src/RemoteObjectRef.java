@@ -12,6 +12,7 @@ public class RemoteObjectRef implements Serializable {
 	private String objInterface;
 	private RMIProxy master;
 	
+    //TODO: Change interfaceName to be a Class<?>
 	public RemoteObjectRef(String host, int port, String name, String interfaceName, RMIProxy master) {
 		super();
 		this.objHost = host;
