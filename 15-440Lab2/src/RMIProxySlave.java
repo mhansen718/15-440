@@ -31,7 +31,13 @@ public class RMIProxySlave implements Runnable {
 		/* Localise Any Remote Objects */
 		for (Object arg : message.args) {
 			if (arg instanceof RemoteObjectRef) {
-				trueArgs[idx] = ((RemoteObjectRef) arg).localise();
+				try {
+					trueArgs[idx] = ((RemoteObjectRef) arg).localise();
+				} catch (Exception excpt) {
+					returnMessage.exception = excpt;
+					sendMessage(returnMessage);
+					return;
+				}
 			} else {
 				trueArgs[idx] = arg;
 			}
@@ -55,7 +61,7 @@ public class RMIProxySlave implements Runnable {
 				/* If this class is a Remote440 object, package it up as a remote object reference with a unique name */
 				String newName = Integer.toString(returnObj.hashCode());
 				RemoteObjectRef newRemote = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
-						newName, method.getReturnType().getName(), this.master);
+						newName, method.getReturnType(), this.master);
 				this.master.addObject(newName, returnObj);
 				returnMessage.returnValue = newRemote;
 				returnMessage.exception = null;
