@@ -19,12 +19,24 @@ public class RMIProxySlave implements Runnable {
 		Method method;
 		Object foundObj;
 		Object returnObj;
+		Object[] trueArgs = new Object[message.args.length];
+		int idx = 0;
 		
 		returnMessage.name = message.name;
 		returnMessage.methodName = message.methodName;
 		returnMessage.parameterTypes = message.parameterTypes;
 		returnMessage.cls = message.cls;
 		returnMessage.args = message.args;
+		
+		/* Localise Any Remote Objects */
+		for (Object arg : message.args) {
+			if (arg instanceof RemoteObjectRef) {
+				trueArgs[idx] = ((RemoteObjectRef) arg).localise();
+			} else {
+				trueArgs[idx] = arg;
+			}
+			idx++;
+		}
 		
 		/* Try to find the object, if we dont know about it, return a Remote Exception */
 		foundObj = this.master.findObject(message.name);
