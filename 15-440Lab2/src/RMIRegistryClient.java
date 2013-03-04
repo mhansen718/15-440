@@ -1,6 +1,8 @@
 import java.net.InetAddress;
 import java.net.Socket;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 
 public class RMIRegistryClient {
@@ -25,16 +27,16 @@ public class RMIRegistryClient {
 		}
 	}
 	
-	public static void bind(String name, Remote440 obj) {
+	public void bind(String name, Remote440 obj) {
         bothBinds(name,obj,"bind");
 	}
 	
-	public static void rebind(String name, Remote440 obj) {
+	public void rebind(String name, Remote440 obj) {
         bothBinds(name,obj,"rebind");
 	}
 	
     // Using this because bind and rebind share a lot of code
-    private static void bothBinds(String name, Remote440 obj, String funct) {
+    private void bothBinds(String name, Remote440 obj, String funct) {
         Socket socket;
         ObjectOutputStream out;
         RegistryMessage message;
@@ -58,15 +60,15 @@ public class RMIRegistryClient {
         return;
     }
     
-	public static String[] list(String name) {
+	public String[] list(String name) {
         Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
         RegistryMessage message, response;
         try {
-            this.socket = new Socket(this.registryHost,this.registryPort);
-            in = new ObjectInputStream(this.socket.getInputStream());
-            out = new ObjectOutputStream(this.socket.getOutputStream());
+            socket = new Socket(this.registryHost,this.registryPort);
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             //TODO: error
         }
@@ -74,22 +76,22 @@ public class RMIRegistryClient {
         message.funct = "list";
         try {
             out.writeObject(message);
-            response = in.readObject();
+            response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
             //TODO: second verse, same as the first
         }
         return response.regList;
 	}
 	
-	public static Remote440 lookup(String name) {
+	public Remote440 lookup(String name) {
 		Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
         RegistryMessage message, response;
         try {
-            this.socket = new Socket(this.registryHost,this.registryPort);
-            in = new ObjectInputStream(this.socket.getInputStream());
-            out = new ObjectOutputStream(this.socket.getOutputStream());
+            socket = new Socket(this.registryHost,this.registryPort);
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             //TODO: error
         }
@@ -98,7 +100,7 @@ public class RMIRegistryClient {
         message.objName = name;
         try {
             out.writeObject(message);
-            response = in.readObject();
+            response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
             //TODO: Yep.
         }
