@@ -11,4 +11,5 @@ public class RegistryMessage implements Serializable {
 	public int objPort;
 	public String objName;
 	public String objInterfaces;
+    public String[] regList;
 }

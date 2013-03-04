@@ -30,7 +30,7 @@ public class RMIRegistryServer {
     private void processRequest(Socket socket) {
         ObjectOutputStream out;
         ObjectInputStream in;
-        RMIMessage message;
+        RegistryMessage message;
         
         out = new ObjectOutputStream(this.socket.getOutputStream());
         in = new ObjectInputStream(this.socket.getInputStream());
@@ -41,7 +41,39 @@ public class RMIRegistryServer {
             //TODO: Stuff
         }
         
-        //TODO: get relevant stuff out of message
+        if (message.funct == "list") {
+            RegistryMessage response = new RegistryMessage();
+            response.regList = list();
+            try {
+                out.writeObject(response);
+            } catch (exception e) {  //TODO: errors
+                
+            }
+            return;
+        } else if (message.funct == "lookup") {
+            try {
+                out.writeObject(lookup(message.objName));
+            } catch (exception e) { // TODO: errors
+                
+            }
+        }
+        RegistryEntry entry = new RegistryEntry();
+        entry.host = message.objHost;
+        entry.port = message.objPort;
+        entry.interfaceNames = message.objInterfaces;
+        if (message.funct == "bind") {
+            bind(message.objName,entry);
+        } else if (message.funct == "rebind") {
+            rebind(message.objName,entry);
+        } else {
+            //TODO: No valid command
+        }
+        try {
+            socket.close();
+        } catch (IOException e) {
+            //TODO: Well fuck, you failed to close a socket
+        }
+        return;
     }
     
     //TODO: make sure name and entry aren't null in both
@@ -58,8 +90,19 @@ public class RMIRegistryServer {
         return;
     }
     
-    //TODO: determine return value and how to get it
+    private RegistryMessage lookup(String name) {
+        RegistryMessage response = new RegistryMessage();
+        if ((RegistryEntry entry = this.registry.get(name)) == null) {
+            return response;  //TODO: objectnotfound error
+        }
+        response.objName = name;
+        response.objHost = entry.host;
+        response.objPort = entry.port;
+        response.objInterfaces = entry.interfaceNames;
+        return response;
+    }
+    
     private String[] list() {
-        
+        return (this.registry.keySet()).toArray();
     }
 }
