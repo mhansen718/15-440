@@ -1,4 +1,7 @@
 import java.util.concurrent.ConcurrentHashMap;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class RMIRegistryServer {
 
@@ -60,7 +63,7 @@ public class RMIRegistryServer {
         RegistryEntry entry = new RegistryEntry();
         entry.host = message.objHost;
         entry.port = message.objPort;
-        entry.interfaceNames = message.objInterfaces;
+        entry.interfaceName = message.objInterface;
         if (message.funct == "bind") {
             bind(message.objName,entry);
         } else if (message.funct == "rebind") {
@@ -98,7 +101,7 @@ public class RMIRegistryServer {
         response.objName = name;
         response.objHost = entry.host;
         response.objPort = entry.port;
-        response.objInterfaces = entry.interfaceNames;
+        response.objInterface = entry.interfaceName;
         return response;
     }
     

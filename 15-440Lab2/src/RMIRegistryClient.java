@@ -1,4 +1,6 @@
 import java.net.InetAddress;
+import java.net.Socket;
+import java.io.IOException;
 
 
 public class RMIRegistryClient {
@@ -24,25 +26,83 @@ public class RMIRegistryClient {
 	}
 	
 	public static void bind(String name, Remote440 obj) {
-		/* TODO: Make this go to registry and send its stuff */
+        bothBinds(name,obj,"bind");
 	}
 	
 	public static void rebind(String name, Remote440 obj) {
-		/* TODO: Same but without caring about existing object of same name */
+        bothBinds(name,obj,"rebind");
 	}
 	
+    // Using this because bind and rebind share a lot of code
+    private static void bothBinds(String name, Remote440 obj, String funct) {
+        Socket socket;
+        ObjectOutputStream out;
+        RegistryMessage message;
+		try {
+            this.socket = new Socket(this.registryHost,this.registryPort);
+            out = new ObjectOutputStream(this.socket.getOutputStream());
+        } catch (IOException e) {
+            //TODO: error
+        }
+        message = new RegistryMessage();
+        message.funct = funct;
+        message.objName = name;
+        message.objHost = this.myProxy.getHost();
+        message.objPort = this.myProxy.getPort();
+        message.objInterface = "How do I get this again?"; //TODO
+        try {
+            out.writeObject(message);
+        } catch (IOException e) {
+            //TODO: you know by now
+        }
+        return;
+    }
+    
 	public static String[] list(String name) {
-		/* TODO: Return list of all objects in register (see java.rmi.Naming) */
-		String[] objList = {"HI", "YO"}; // Make Eclipse Happy
-		
-		return objList;
+        Socket socket;
+        ObjectInputStream in;
+        ObjectOutputStream out;
+        RegistryMessage message, response;
+        try {
+            this.socket = new Socket(this.registryHost,this.registryPort);
+            in = new ObjectInputStream(this.socket.getInputStream());
+            out = new ObjectOutputStream(this.socket.getOutputStream());
+        } catch (IOException e) {
+            //TODO: error
+        }
+        message = new RegistryMessage();
+        message.funct = "list";
+        try {
+            out.writeObject(message);
+            response = in.readObject();
+        } catch (IOException e) {
+            //TODO: second verse, same as the first
+        }
+        return response.regList;
 	}
 	
 	public static Remote440 lookup(String name) {
-		/* TODO: Make this work */
-		Remote440 foundObj = (Remote440) new RemoteObjectRef(); // Make Eclipse Happy
-		
-		return foundObj;
+		Socket socket;
+        ObjectInputStream in;
+        ObjectOutputStream out;
+        RegistryMessage message, response;
+        try {
+            this.socket = new Socket(this.registryHost,this.registryPort);
+            in = new ObjectInputStream(this.socket.getInputStream());
+            out = new ObjectOutputStream(this.socket.getOutputStream());
+        } catch (IOException e) {
+            //TODO: error
+        }
+        message = new RegistryMessage();
+        message.funct = "lookup";
+        message.objName = name;
+        try {
+            out.writeObject(message);
+            response = in.readObject();
+        } catch (IOException e) {
+            //TODO: Yep.
+        }
+        //TODO: make the right return value out of that
 	}
 	
 }

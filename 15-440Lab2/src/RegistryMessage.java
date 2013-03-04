@@ -10,6 +10,6 @@ public class RegistryMessage implements Serializable {
 	public String objHost;
 	public int objPort;
 	public String objName;
-	public String objInterfaces;
+	public String objInterface;
     public String[] regList;
 }
