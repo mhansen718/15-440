@@ -24,5 +24,11 @@ public class BasicTestsImpl implements BasicTests {
 		this.number = this.number + value;
 		return;
 	}
+	
+	@Override
+	public void div(int value) {
+		this.number = this.number / value;
+		return;
+	}
 
 }
