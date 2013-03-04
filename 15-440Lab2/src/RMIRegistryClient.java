@@ -16,7 +16,7 @@ public class RMIRegistryClient {
 		/* Create the proxy for all RMIs to this node */
 		try {
 			this.myProxy = new RMIProxy(InetAddress.getLocalHost().getHostName());
-			this.localProxy = new Thread(myProxy);
+			this.localProxy = new Thread(this.myProxy);
 			localProxy.start();
 		} catch (Exception excpt) {
 			System.out.println("Error: Failed to set up Proxy for RMI");
