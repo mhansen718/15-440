@@ -41,7 +41,7 @@ public class RMIRegistryClient {
         ObjectOutputStream out;
         RegistryMessage message;
 		try {
-            this.socket = new Socket(this.registryHost,this.registryPort);
+            socket = new Socket(this.registryHost,this.registryPort);
             out = new ObjectOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
             //TODO: error
@@ -57,6 +57,8 @@ public class RMIRegistryClient {
         } catch (IOException e) {
             //TODO: you know by now
         }
+        out.close();
+        socket.close();
         return;
     }
     

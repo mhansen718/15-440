@@ -2,6 +2,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.AlreadyBoundException;
 
 public class RMIRegistryServer {
 
@@ -33,7 +34,7 @@ public class RMIRegistryServer {
     private void processRequest(Socket socket) {
         ObjectOutputStream out;
         ObjectInputStream in;
-        RegistryMessage message;
+        RegistryMessage message, response;
         
         out = new ObjectOutputStream(this.socket.getOutputStream());
         in = new ObjectInputStream(this.socket.getInputStream());
@@ -45,18 +46,18 @@ public class RMIRegistryServer {
         }
         
         if (message.funct == "list") {
-            RegistryMessage response = new RegistryMessage();
+            response = new RegistryMessage();
             response.regList = list();
             try {
                 out.writeObject(response);
-            } catch (exception e) {  //TODO: errors
+            } catch (IOException e) {  //TODO: errors
                 
             }
             return;
         } else if (message.funct == "lookup") {
             try {
                 out.writeObject(lookup(message.objName));
-            } catch (exception e) { // TODO: errors
+            } catch (IOException e) { // TODO: errors
                 
             }
         }
@@ -65,13 +66,23 @@ public class RMIRegistryServer {
         entry.port = message.objPort;
         entry.interfaceName = message.objInterface;
         if (message.funct == "bind") {
-            bind(message.objName,entry);
+            try {
+                bind(message.objName,entry);
+            } catch (AlreadyBoundException e) {
+                response = new RegistryMessage();
+                response.error = e;
+                out.writeObject(response);
+            }
         } else if (message.funct == "rebind") {
             rebind(message.objName,entry);
         } else {
-            //TODO: No valid command
+            response = new RegistryMessage();
+            response.error = new RemoteException("Invalid Command");
+            out.writeObject(response);
         }
         try {
+            out.close();
+            in.close();
             socket.close();
         } catch (IOException e) {
             //TODO: Well fuck, you failed to close a socket
@@ -80,9 +91,9 @@ public class RMIRegistryServer {
     }
     
     //TODO: make sure name and entry aren't null in both
-    private void bind(String name, RegistryEntry entry) {
+    private void bind(String name, RegistryEntry entry) throws AlreadyBoundException {
         if (this.registry.containsKey(name)) {
-            return;  //TODO: what do we send back on this failure?
+            throw AlreadyBoundException;
         }
         this.registry.put(name, entry)
         return;
@@ -96,7 +107,8 @@ public class RMIRegistryServer {
     private RegistryMessage lookup(String name) {
         RegistryMessage response = new RegistryMessage();
         if ((RegistryEntry entry = this.registry.get(name)) == null) {
-            return response;  //TODO: objectnotfound error
+            response.error = NotBoundException;
+            return response;
         }
         response.objName = name;
         response.objHost = entry.host;
