@@ -40,7 +40,7 @@ public class RMIRegistryServer {
         in = new ObjectInputStream(this.socket.getInputStream());
         
         try {
-            message = in.readObject();
+            message = (RegistryMessage) in.readObject();
         } catch (IOException e) {
             //TODO: Stuff
         }
