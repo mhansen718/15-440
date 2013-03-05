@@ -57,11 +57,15 @@ public class RMIRegistryServer {
         if (message.funct == "bind") {
             try {
                 bind(message.objName,entry);
-            } catch (AlreadyBoundException e) {
+            } catch (Exception e) {
                 response.error = e;
             }
         } else if (message.funct == "rebind") {
-            rebind(message.objName,entry);
+            try {
+                rebind(message.objName,entry);
+            } catch (NullPointerException e) {
+                response.error = e;
+            }
         } else {
             response.error = new RemoteException("Invalid Command");
         }
@@ -81,17 +85,24 @@ public class RMIRegistryServer {
         return;
     }
     
-    //TODO: make sure name and entry aren't null in both
-    private void bind(String name, RegistryEntry entry) throws AlreadyBoundException {
+    private void bind(String name, RegistryEntry entry) throws Exception {
         if (this.registry.containsKey(name)) {
             throw AlreadyBoundException;
         }
-        this.registry.put(name, entry)
+        try {
+            this.registry.put(name, entry);
+        } catch (NullPointerException e) {
+            throw e;
+        }
         return;
     }
     
     private void rebind(String name, RegistryEntry entry) {
-        this.registry.put(name, entry)
+        try {
+            this.registry.put(name, entry);
+        } catch (NullPointerException e) {
+            throw e;
+        }
         return;
     }
     
