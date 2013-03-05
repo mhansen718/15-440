@@ -32,8 +32,6 @@ public class RMIProxy implements Runnable {
 	public void addObject(String name, Object newObj) {
 		/* This function simply adds a new object to the set. If it is in the set already, remap */
 		this.localObjs.put(name, newObj);
-		System.out.println(newObj.getClass().getName());
-		System.out.println(this.localObjs.toString());
 		return;
 	}
 	
@@ -54,7 +52,7 @@ public class RMIProxy implements Runnable {
     
     private void processRequest(Socket socket) {
         RMIMessage message;
-        System.out.println("got connection");
+        
         try {
         	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             message = (RMIMessage) in.readObject();
@@ -63,7 +61,6 @@ public class RMIProxy implements Runnable {
         }
         
         try {
-        	System.out.println("Starting now");
         	Thread slave = new Thread(new RMIProxySlave(this, message, socket));
         	slave.start();
         } catch (Exception e) {

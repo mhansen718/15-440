@@ -28,7 +28,7 @@ public class RMIProxySlave implements Runnable {
 		Object returnObj;
 		Object[] trueArgs = new Object[message.args.length];
 		int idx = 0;
-		System.out.println("Starting up");
+		
 		returnMessage.name = message.name;
 		returnMessage.methodName = message.methodName;
 		returnMessage.parameterTypes = message.parameterTypes;
@@ -47,10 +47,8 @@ public class RMIProxySlave implements Runnable {
 			} else {
 				trueArgs[idx] = arg;
 			}
-			System.out.println("Arg: " + arg.toString());
 			idx++;
 		}
-		System.out.println("Finding object locally....");
 		
 		/* Try to find the object, if we dont know about it, return a Remote Exception */
 		foundObj = this.master.findObject(message.name);
@@ -60,15 +58,12 @@ public class RMIProxySlave implements Runnable {
 			return;
 		}
 
-		System.out.println("Trying to do the method");
 		try {
 			/* Revive the method */
 			method = (foundObj.getClass()).getMethod(message.methodName, message.parameterTypes);
-			System.out.println(method.getName());
 			try {
 				returnObj = method.invoke(foundObj, trueArgs);
 			} catch(InvocationTargetException excpt) {
-				System.out.println("Our method threw an exception: " + excpt);
 				returnMessage.exception = (Exception) excpt.getCause();
 				sendMessage(returnMessage);
 				return;
@@ -78,13 +73,8 @@ public class RMIProxySlave implements Runnable {
 				return;
 			}
 			
-			if (returnObj != null) {
-				System.out.println("RETURN: " + returnObj.toString());
-			}
-			
 			if (!(returnObj == null) && Proxy.isProxyClass(returnObj.getClass()) && 
 					(Proxy.getInvocationHandler(returnObj)).getClass().equals(RMIProxyHandler.class)) {
-	        			System.out.println("Its a reference!, make a new one!");
 	        			newRemote = ((RMIProxyHandler) Proxy.getInvocationHandler(returnObj)).makeRemoteObjectRef();
 	        			returnMessage.returnValue = newRemote;
 	        			returnMessage.exception = null;
@@ -106,7 +96,6 @@ public class RMIProxySlave implements Runnable {
 			}
 		} catch (Exception excpt) {
 			/* If theres some unexpected problem during invocation and packaging */
-			System.out.println("BIG ERROR? " + excpt);
 			returnMessage.exception = new RemoteException();
 		}
 		
@@ -115,7 +104,6 @@ public class RMIProxySlave implements Runnable {
 	}
 		
 	private void sendMessage(RMIMessage message) {
-		System.out.println("Sending a response " + message.name);
         try {
         	ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
             out.writeObject(message);

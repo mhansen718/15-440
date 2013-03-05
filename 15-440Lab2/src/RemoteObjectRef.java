@@ -20,7 +20,7 @@ public class RemoteObjectRef implements Serializable {
 	}
 
 	public Object localise(RMIProxy localTable) throws Exception {
-		/* Create a proxy for the object, this proxy will handle rmis */
+		/* If the class is an interface, use itself. Otherwiese, get its interfaces */
 		Class<?>[] interfaces;
 		if (this.objClass.isInterface()) {
 			interfaces = new Class<?>[] { this.objClass };
@@ -28,11 +28,7 @@ public class RemoteObjectRef implements Serializable {
 			interfaces = this.objClass.getInterfaces();
 		}
 		
-		System.out.println("Making new proxy, inferfaces: ");
-		for (Class<?> c : this.objClass.getInterfaces()) {
-			System.out.println(c.toString());
-		}
-		
+		/* Create a proxy for the object, this proxy will handle rmis */
 		return Proxy.newProxyInstance(
 				this.objClass.getClassLoader(),
 				interfaces, 
