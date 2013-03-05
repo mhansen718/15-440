@@ -35,6 +35,12 @@ public class RMIProxy implements Runnable {
 		return;
 	}
 	
+    public void removeObject(String name) {
+        /* This function removes an object from the set. */
+        this.localObjs.remove(name);
+        return;
+    }
+    
 	public Object findObject(String name) {
 		/* Finds and returns an entry of an object with the given name. If the object does exist, return null */
 		return this.localObjs.get(name);

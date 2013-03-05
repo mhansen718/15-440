@@ -93,6 +93,12 @@ public class RMIRegistryServer {
             } catch (NullPointerException e) {
                 response.error = e;
             }
+        } else if (message.funct.equals("unbind")) {
+            try {
+                unbind(message.objName);
+            } catch (Exception e) {
+                response.error = e;
+            }
         } else {
             response.error = new RemoteException("Invalid Command");
         }
@@ -124,7 +130,7 @@ public class RMIRegistryServer {
         return;
     }
     
-    private void rebind(String name, RegistryEntry entry) {
+    private void rebind(String name, RegistryEntry entry) throws NullPointerException {
         try {
             this.registry.put(name, entry);
         } catch (NullPointerException e) {
@@ -149,5 +155,17 @@ public class RMIRegistryServer {
     
     private String[] list() {
         return (this.registry.keySet()).toArray(new String[0]);
+    }
+    
+    private void unbind(String name) throws Exception {
+        if (!this.registry.containsKey(name)) {
+            throw new NotBoundException();
+        }
+        try {
+            this.registry.remove(name);
+        } catch (NullPointerException e) {
+            throw e;
+        }
+        return;
     }
 }

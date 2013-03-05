@@ -79,12 +79,14 @@ public class RMIRegistryClient {
         } catch (IOException e) {
             throw e;
         }
-        if (response.error != null) {
-            throw response.error;
-        }
+        
         in.close();
         out.close();
         socket.close();
+        
+        if (response.error != null) {
+            throw response.error;
+        }
         
         /* add to local list */
         myProxy.addObject(name, obj);
@@ -114,12 +116,52 @@ public class RMIRegistryClient {
             throw e;
         }
         
+        in.close();
+        out.close();
+        socket.close();
+        
         if (response.error != null) {
             throw response.error;
         } else {
             return response.regList;
         }
 	}
+    
+    public void unbind(String name) {
+        Socket socket;
+        ObjectInputStream in;
+        ObjectOutputStream out;
+        RegistryMessage message, response;
+        
+        try {
+            socket = new Socket(this.registryHost,this.registryPort);
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
+        } catch (Exception e) {
+            throw e;
+        }
+        
+        message = new RegistryMessage();
+        message.funct = "unbind";
+        
+        try {
+            out.writeObject(message);
+            response = (RegistryMessage) in.readObject();
+        } catch (IOException e) {
+            throw e;
+        }
+        
+        in.close();
+        out.close();
+        socket.close();
+        
+        if (response.error != null) {
+            throw response.error;
+        }
+        
+        myProxy.removeObject(name);
+        return;
+    }
 	
 	public Object lookup(String name) throws Exception {
 		Socket socket;
@@ -146,6 +188,11 @@ public class RMIRegistryClient {
         } catch (IOException e) {
             throw e;
         }
+        
+        in.close();
+        out.close();
+        socket.close();
+        
         if (response.error != null) {
             throw response.error;
         } else {
