@@ -70,17 +70,18 @@ public class RMIRegistryServer {
             return;
         }
         
+        RegistryEntry entry = new RegistryEntry();
+        entry.host = message.objHost;
+        entry.port = message.objPort;
+        
         response = new RegistryMessage();
         response.error = null;
+        
         if (message.funct.equals("list")) {
             response.regList = list();
         } else if (message.funct.equals("lookup")) {
             response = lookup(message.objName);
-        }
-        RegistryEntry entry = new RegistryEntry();
-        entry.host = message.objHost;
-        entry.port = message.objPort;
-        if (message.funct.equals("bind")) {
+        } else if (message.funct.equals("bind")) {
             try {
                 bind(message.objName,entry);
             } catch (Exception e) {
