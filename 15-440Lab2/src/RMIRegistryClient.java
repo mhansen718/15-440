@@ -143,6 +143,7 @@ public class RMIRegistryClient {
         
         message = new RegistryMessage();
         message.funct = "unbind";
+        message.objName = name;
         
         try {
             out.writeObject(message);
