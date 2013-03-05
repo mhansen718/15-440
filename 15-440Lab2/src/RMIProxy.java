@@ -53,7 +53,7 @@ public class RMIProxy implements Runnable {
     
     private void processRequest(Socket socket) {
         RMIMessage message;
-        
+        System.out.println("got connection");
         try {
         	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             message = (RMIMessage) in.readObject();
@@ -62,6 +62,7 @@ public class RMIProxy implements Runnable {
         }
         
         try {
+        	System.out.println("Starting now");
         	Thread slave = new Thread(new RMIProxySlave(this, message, socket));
         	slave.start();
         } catch (Exception e) {

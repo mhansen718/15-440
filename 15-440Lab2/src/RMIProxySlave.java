@@ -26,7 +26,7 @@ public class RMIProxySlave implements Runnable {
 		Object returnObj;
 		Object[] trueArgs = new Object[message.args.length];
 		int idx = 0;
-		
+		System.out.println("Starting up");
 		returnMessage.name = message.name;
 		returnMessage.methodName = message.methodName;
 		returnMessage.parameterTypes = message.parameterTypes;
@@ -48,6 +48,7 @@ public class RMIProxySlave implements Runnable {
 			}
 			idx++;
 		}
+		System.out.println("Finding object locally....");
 		
 		/* Try to find the object, if we dont know about it, return a Remote Exception */
 		foundObj = this.master.findObject(message.name);
@@ -57,6 +58,7 @@ public class RMIProxySlave implements Runnable {
 			return;
 		}
 
+		System.out.println("Trying to do the method");
 		try {
 			/* Revive the method */
 			method = message.cls.getMethod(message.methodName, message.parameterTypes);
@@ -87,6 +89,7 @@ public class RMIProxySlave implements Runnable {
 	}
 		
 	private void sendMessage(RMIMessage message) {
+		System.out.println("Sending a response for " + message.name);
         try {
         	ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
             out.writeObject(message);
