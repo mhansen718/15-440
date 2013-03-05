@@ -23,12 +23,14 @@ public class RMIRegistryServer {
         
 		if (args.length != 1) {
 			System.out.println(usage);
+			System.exit(-1);
 		}
 		
 		try {
 			port = Integer.parseInt(args[0]);
 		} catch (Exception excpt) {
 			System.out.println(usage);
+			System.exit(-1);
 		}
 		
         try {
