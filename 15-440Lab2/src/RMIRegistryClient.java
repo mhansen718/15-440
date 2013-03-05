@@ -149,8 +149,8 @@ public class RMIRegistryClient {
         if (response.error != null) {
             throw response.error;
         } else {
-            ref = new RemoteObjectRef(response.objHost,response.objPort,response.objName,response.objClass,myProxy);
-            return ref.localise();
+            ref = new RemoteObjectRef(response.objHost,response.objPort,response.objName,response.objClass);
+            return ref.localise(myProxy);
         }
 	}
 	

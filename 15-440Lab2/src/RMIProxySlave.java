@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +37,7 @@ public class RMIProxySlave implements Runnable {
 		for (Object arg : message.args) {
 			if (arg instanceof RemoteObjectRef) {
 				try {
-					trueArgs[idx] = ((RemoteObjectRef) arg).localise();
+					trueArgs[idx] = ((RemoteObjectRef) arg).localise(this.master);
 				} catch (Exception excpt) {
 					returnMessage.exception = excpt;
 					sendMessage(returnMessage);
@@ -79,7 +78,7 @@ public class RMIProxySlave implements Runnable {
 				/* If this class is a Remote440 object, package it up as a remote object reference with a unique name */
 				String newName = Integer.toString(returnObj.hashCode());
 				RemoteObjectRef newRemote = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
-						newName, method.getReturnType(), this.master);
+						newName, method.getReturnType());
 				this.master.addObject(newName, returnObj);
 				returnMessage.returnValue = newRemote;
 				returnMessage.exception = null;

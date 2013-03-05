@@ -48,7 +48,7 @@ public class RMIProxyHandler implements InvocationHandler {
         		if ((arg instanceof Remote440) && !(arg instanceof RemoteObjectDeref)) {
         			remoteArgName = Integer.toString(arg.hashCode());
         			remoteArg = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
-        					remoteArgName, arg.getClass(), this.master);
+        					remoteArgName, arg.getClass());
         			this.master.addObject(remoteArgName, arg);
         			trueArgs[idx] = remoteArg;
         		} else {
@@ -80,6 +80,7 @@ public class RMIProxyHandler implements InvocationHandler {
             in = new ObjectInputStream(socket.getInputStream());
             received = (RMIMessage) in.readObject();
         } catch (Exception e) {
+        	System.out.println("OH NO! " + e);
             throw new RemoteException("Communication failure");
         }
         System.out.println("I got it!!!");
@@ -90,7 +91,7 @@ public class RMIProxyHandler implements InvocationHandler {
 		
 		/* If no exception, localise remote references or just pass the value through */
 		if (Remote440.class.isAssignableFrom(method.getReturnType())) {
-			returnObj = ((RemoteObjectRef) received.returnValue).localise();
+			returnObj = ((RemoteObjectRef) received.returnValue).localise(this.master);
 		} else {
 			returnObj = received.returnValue;
 		}

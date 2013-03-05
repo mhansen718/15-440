@@ -9,23 +9,21 @@ public class RemoteObjectRef implements Serializable {
 	private int objPort;
 	private String objName;
 	private Class<?> objClass;
-	private RMIProxy master;
 	
-	public RemoteObjectRef(String host, int port, String name, Class<?> cls, RMIProxy master) {
+	public RemoteObjectRef(String host, int port, String name, Class<?> cls) {
 		super();
 		this.objHost = host;
 		this.objPort = port;
 		this.objName = name;
 		this.objClass = cls;
-		this.master = master;
 	}
 
-	public Object localise() throws Exception {
+	public Object localise(RMIProxy localTable) throws Exception {
 		/* Create a proxy for the object, this proxy will handle rmis */
 		return RemoteObjectDeref.newProxyInstance(
 				this.objClass.getClassLoader(),
 				new Class<?>[] { this.objClass.getInterfaces()[0] }, 
-				new RMIProxyHandler(this.objHost, this.objPort, this.objName, this.objClass, this.master));
+				new RMIProxyHandler(this.objHost, this.objPort, this.objName, this.objClass, localTable));
 	}
 	
 }
