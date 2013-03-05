@@ -73,6 +73,7 @@ public class RMIRegistryServer {
         RegistryEntry entry = new RegistryEntry();
         entry.host = message.objHost;
         entry.port = message.objPort;
+        entry.objClass = message.objClass;
         
         response = new RegistryMessage();
         response.error = null;
