@@ -39,7 +39,7 @@ public class TestRMIServer {
 			}
 			
 			try {
-				BasicTests fail = (BasicTests) myRMI.unbind("FAIL");
+				myRMI.unbind("FAIL");
 				System.out.println("Somehow, 'FAIL' was unbound.....");
 			} catch (NotBoundException excpt) {
 				System.out.println("An unbind on a non-bound object failed: GOOD " + excpt);
@@ -50,7 +50,6 @@ public class TestRMIServer {
 				System.out.println(obj);
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			System.out.println("Failed to do RMI: " + e);
 			e.printStackTrace();
 		}
