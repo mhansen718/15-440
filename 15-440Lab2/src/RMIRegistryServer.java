@@ -46,6 +46,7 @@ public class RMIRegistryServer {
         }
         
         response = new RegistryMessage();
+        response.error = null;
         if (message.funct == "list") {
             response.regList = list();
         } else if (message.funct == "lookup") {

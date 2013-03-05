@@ -86,5 +86,4 @@ public class RMIProxyHandler implements InvocationHandler {
 		
 		return returnObj;
 	}
-
 }
