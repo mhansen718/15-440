@@ -19,6 +19,10 @@ public class TestRMIServer {
 			System.out.println("Bound 2!");
 			myRMI.rebind("basics", basic);
 			System.out.println("All bound!");
+			myRMI.bind("me2", basic);
+			System.out.println("Bind for unbinding...");
+			myRMI.unbind("me2");
+			System.out.println("Unbound!");
 			
 			try {
 				myRMI.bind("adv", basic);
@@ -32,6 +36,13 @@ public class TestRMIServer {
 				System.out.println("Somehow, 'FAIL' was found.....");
 			} catch (NotBoundException excpt) {
 				System.out.println("A lookup on a non-bound object failed: GOOD " + excpt);
+			}
+			
+			try {
+				BasicTests fail = (BasicTests) myRMI.unbind("FAIL");
+				System.out.println("Somehow, 'FAIL' was unbound.....");
+			} catch (NotBoundException excpt) {
+				System.out.println("An unbind on a non-bound object failed: GOOD " + excpt);
 			}
 			
 			System.out.println("Listing Bonds:");
