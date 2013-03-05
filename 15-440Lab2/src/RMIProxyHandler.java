@@ -74,6 +74,7 @@ public class RMIProxyHandler implements InvocationHandler {
 			socket = new Socket(this.host,this.port);
 			System.out.println("Connected!!!");
 			out = new ObjectOutputStream(socket.getOutputStream());
+			out.flush();
 			in = new ObjectInputStream(socket.getInputStream());
 		} catch (Exception excpt) {
 			throw new RemoteException("Communication failure");
