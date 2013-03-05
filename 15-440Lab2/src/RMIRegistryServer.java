@@ -5,11 +5,9 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.net.InetAddress;
 
 public class RMIRegistryServer {
 
@@ -77,6 +75,7 @@ public class RMIRegistryServer {
         response = new RegistryMessage();
         response.error = null;
         
+        System.out.println("Registry received a " + message.funct + " request");
         if (message.funct.equals("list")) {
             response.regList = list();
         } else if (message.funct.equals("lookup")) {
