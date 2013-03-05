@@ -82,8 +82,12 @@ public class RMIRegistryClient {
         if (response.error != null) {
             throw response.error;
         }
+        in.close();
         out.close();
         socket.close();
+        
+        /* add to local list */
+        myProxy.addObject(name, obj);
         return;
     }
     

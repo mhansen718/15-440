@@ -33,6 +33,7 @@ public class RMIProxy implements Runnable {
 	public void addObject(String name, Object newObj) {
 		/* This function simply adds a new object to the set. If it is in the set already, remap */
 		this.localObjs.put(name, newObj);
+		System.out.println(this.localObjs.toString());
 		return;
 	}
 	

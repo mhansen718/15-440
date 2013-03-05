@@ -64,7 +64,10 @@ public class RMIProxySlave implements Runnable {
 			method = message.cls.getMethod(message.methodName, message.parameterTypes);
 			returnObj = method.invoke(foundObj, message.args);
 			
-			if (Remote440.class.isAssignableFrom(method.getReturnType())) {
+			if (returnObj != null) {
+				System.out.println("RETURN: " + returnObj.toString());
+			}
+			if (returnObj instanceof Remote440) {
 				/* If this class is a Remote440 object, package it up as a remote object reference with a unique name */
 				String newName = Integer.toString(returnObj.hashCode());
 				RemoteObjectRef newRemote = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
@@ -72,7 +75,7 @@ public class RMIProxySlave implements Runnable {
 				this.master.addObject(newName, returnObj);
 				returnMessage.returnValue = newRemote;
 				returnMessage.exception = null;
-			} else if (Serializable.class.isAssignableFrom(method.getReturnType())) {
+			} else if ((returnObj instanceof Serializable) || (returnObj == null)) {
 				/* If this class is a Remote440 object, package it up as a whole object */
 				returnMessage.returnValue = returnObj;
 				returnMessage.exception = null;
@@ -89,7 +92,7 @@ public class RMIProxySlave implements Runnable {
 	}
 		
 	private void sendMessage(RMIMessage message) {
-		System.out.println("Sending a response for " + message.name);
+		System.out.println("Sending a response " + message.name);
         try {
         	ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
             out.writeObject(message);
