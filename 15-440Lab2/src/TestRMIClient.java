@@ -1,7 +1,7 @@
 
 public class TestRMIClient {
 
-	public void main(String[] args) {
+	public static void main(String[] args) {
 		/* A simple test of various RMI features */
 		RMIRegistryClient myRMI;
 		try {

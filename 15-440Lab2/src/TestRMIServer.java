@@ -1,7 +1,7 @@
 
 public class TestRMIServer {
 
-	public void main(String[] args) {
+	public static void main(String[] args) {
 		/* A host for the objects TestRMIClient will call on */
 		BasicTestsImpl basic = new BasicTestsImpl("Hi", 4);
 		AdvancedTestsImpl adv = new AdvancedTestsImpl();
