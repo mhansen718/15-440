@@ -2,6 +2,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.Socket;
 import java.rmi.RemoteException;
 
@@ -22,6 +23,7 @@ public class RMIProxySlave implements Runnable {
 	public void run() {
 		RMIMessage returnMessage = new RMIMessage();
 		Method method;
+		RemoteObjectRef newRemote;
 		Object foundObj;
 		Object returnObj;
 		Object[] trueArgs = new Object[message.args.length];
@@ -79,10 +81,17 @@ public class RMIProxySlave implements Runnable {
 			if (returnObj != null) {
 				System.out.println("RETURN: " + returnObj.toString());
 			}
-			if (returnObj instanceof Remote440) {
+			
+			if (!(returnObj == null) && Proxy.isProxyClass(returnObj.getClass()) && 
+					(Proxy.getInvocationHandler(returnObj)).getClass().equals(RMIProxyHandler.class)) {
+	        			System.out.println("Its a reference!, make a new one!");
+	        			newRemote = ((RMIProxyHandler) Proxy.getInvocationHandler(returnObj)).makeRemoteObjectRef();
+	        			returnMessage.returnValue = newRemote;
+	        			returnMessage.exception = null;
+			} else if (returnObj instanceof Remote440) {
 				/* If this class is a Remote440 object, package it up as a remote object reference with a unique name */
 				String newName = Integer.toString(returnObj.hashCode());
-				RemoteObjectRef newRemote = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
+				newRemote = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
 						newName, method.getReturnType());
 				this.master.addObject(newName, returnObj);
 				returnMessage.returnValue = newRemote;

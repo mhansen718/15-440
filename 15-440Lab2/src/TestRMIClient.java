@@ -55,6 +55,9 @@ public class TestRMIClient {
 			adv.changeNumber(newTest, 10);
 			System.out.println("   Remotely change our reference to a remote object (42->10):");
 			System.out.println(newTest.toString());
+			newTest = adv.giveBack(newTest);
+			System.out.println("   Pass the remote reference around:");
+			System.out.println(newTest.toString());
 			adv.changeNumber(localTest, 55);
 			System.out.println("   Remotely change a local object (22->55):");
 			System.out.println(localTest.toString());

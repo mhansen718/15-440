@@ -25,6 +25,11 @@ public class AdvancedTestsImpl implements AdvancedTests {
 	}
 
 	@Override
+	public BasicTests giveBack(BasicTests tests) {
+		return tests;
+	}
+	
+	@Override
 	public Shipper getShipper() {
 		return this.ship;
 	}
@@ -44,6 +49,5 @@ public class AdvancedTestsImpl implements AdvancedTests {
 	public void giveGoods(Shipped goods) {
 		this.goods = goods;
 	}
-	
 	
 }
