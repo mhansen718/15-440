@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Socket;
 import java.rmi.RemoteException;
@@ -62,7 +63,14 @@ public class RMIProxySlave implements Runnable {
 		try {
 			/* Revive the method */
 			method = message.cls.getMethod(message.methodName, message.parameterTypes);
-			returnObj = method.invoke(foundObj, message.args);
+			try {
+				returnObj = method.invoke(foundObj, message.args);
+			} catch(InvocationTargetException excpt) {
+				System.out.println("Our method threw an exception: " + excpt);
+				returnMessage.exception = (Exception) excpt.getCause();
+				sendMessage(returnMessage);
+				return;
+			}
 			
 			if (returnObj != null) {
 				System.out.println("RETURN: " + returnObj.toString());
@@ -84,7 +92,8 @@ public class RMIProxySlave implements Runnable {
 				returnMessage.exception = new RemoteException();
 			}
 		} catch (Exception excpt) {
-			returnMessage.exception = excpt;
+			/* If theres some unexpected problem during invocation and packaging */
+			returnMessage.exception = new RemoteException();
 		}
 		
 		sendMessage(returnMessage);
@@ -96,7 +105,8 @@ public class RMIProxySlave implements Runnable {
         try {
         	ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
             out.writeObject(message);
-        } catch (IOException e) {
+        } catch (Exception e) {
+        	/* Any problems here, we just have to give up.... */
             return;
         }
 		return;

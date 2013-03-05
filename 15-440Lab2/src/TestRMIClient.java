@@ -1,3 +1,6 @@
+import java.rmi.RemoteException;
+import java.rmi.NotBoundException;
+import java.rmi.AlreadyBoundException;
 
 public class TestRMIClient {
 
