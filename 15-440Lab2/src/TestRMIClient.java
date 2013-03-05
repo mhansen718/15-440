@@ -11,7 +11,7 @@ public class TestRMIClient {
 			try {
 				basic = (BasicTests) myRMI.lookup("basic");
 			} catch (Exception e) {
-				System.out.println("Failed to lookup the object!");
+				System.out.println("Failed to lookup the object! " + e);
 				return;
 			}
 
@@ -39,7 +39,7 @@ public class TestRMIClient {
 			try {
 				adv = (AdvancedTests) myRMI.lookup("adv");
 			} catch (Exception e) {
-				System.out.println("Failed to lookup the object!");
+				System.out.println("Failed to lookup the object! " + e);
 				return;
 			}
 
