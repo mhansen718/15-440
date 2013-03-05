@@ -61,12 +61,17 @@ public class RMIProxySlave implements Runnable {
 		System.out.println("Trying to do the method");
 		try {
 			/* Revive the method */
-			method = message.cls.getMethod(message.methodName, message.parameterTypes);
+			method = foundObj.getClass().getMethod(message.methodName, message.parameterTypes);
+			System.out.println(method.getName());
 			try {
 				returnObj = method.invoke(foundObj, message.args);
 			} catch(InvocationTargetException excpt) {
 				System.out.println("Our method threw an exception: " + excpt);
 				returnMessage.exception = (Exception) excpt.getCause();
+				sendMessage(returnMessage);
+				return;
+			} catch(IllegalArgumentException excpt) {
+				returnMessage.exception = excpt;
 				sendMessage(returnMessage);
 				return;
 			}
@@ -92,6 +97,7 @@ public class RMIProxySlave implements Runnable {
 			}
 		} catch (Exception excpt) {
 			/* If theres some unexpected problem during invocation and packaging */
+			System.out.println("BIG ERROR? " + excpt);
 			returnMessage.exception = new RemoteException();
 		}
 		

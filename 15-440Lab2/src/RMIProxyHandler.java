@@ -3,12 +3,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.Socket;
 import java.rmi.RemoteException;
 
 
 public class RMIProxyHandler implements InvocationHandler {
-
+	
 	private String host;
 	private int port;
 	private String name;
@@ -22,6 +23,11 @@ public class RMIProxyHandler implements InvocationHandler {
 		this.name = name;
 		this.cls = cls;
 		this.master = master;
+	}
+	
+	public RemoteObjectRef makeRemoteObjectRef() {
+		RemoteObjectRef ref = new RemoteObjectRef(this.host, this.port, this.name, this.cls);
+		return ref;
 	}
 	
 	@Override
@@ -45,7 +51,14 @@ public class RMIProxyHandler implements InvocationHandler {
         		if (!(arg instanceof Serializable)) {
         			throw new RemoteException();
         		}
-        		if ((arg instanceof Remote440) && !(arg instanceof RemoteObjectDeref)) {
+        		
+        		if (Proxy.isProxyClass(arg.getClass()) && 
+				(Proxy.getInvocationHandler(arg)).getClass().equals(RMIProxyHandler.class)) {
+        			System.out.println("Its a reference!, make a new one!");
+        			remoteArg = ((RMIProxyHandler) Proxy.getInvocationHandler(arg)).makeRemoteObjectRef();
+        			trueArgs[idx] = remoteArg;
+        		} else if (arg instanceof Remote440) {
+        			System.out.println("Packing....");
         			remoteArgName = Integer.toString(arg.hashCode());
         			remoteArg = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
         					remoteArgName, arg.getClass());

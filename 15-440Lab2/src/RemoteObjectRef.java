@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.lang.reflect.Proxy;
 
 
 public class RemoteObjectRef implements Serializable {
@@ -20,9 +21,21 @@ public class RemoteObjectRef implements Serializable {
 
 	public Object localise(RMIProxy localTable) throws Exception {
 		/* Create a proxy for the object, this proxy will handle rmis */
-		return RemoteObjectDeref.newProxyInstance(
+		Class<?>[] interfaces;
+		if (this.objClass.isInterface()) {
+			interfaces = new Class<?>[] { this.objClass };
+		} else {
+			interfaces = this.objClass.getInterfaces();
+		}
+		
+		System.out.println("Making new proxy, inferfaces: ");
+		for (Class<?> c : this.objClass.getInterfaces()) {
+			System.out.println(c.toString());
+		}
+		
+		return Proxy.newProxyInstance(
 				this.objClass.getClassLoader(),
-				new Class<?>[] { this.objClass.getInterfaces()[0] }, 
+				interfaces, 
 				new RMIProxyHandler(this.objHost, this.objPort, this.objName, this.objClass, localTable));
 	}
 	
