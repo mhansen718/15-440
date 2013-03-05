@@ -20,6 +20,20 @@ public class TestRMIServer {
 			myRMI.rebind("basics", basic);
 			System.out.println("All bound!");
 			
+			try {
+				myRMI.bind("adv", basic);
+				System.out.println("Somehow, 'adv' was bound again....");
+			} catch (AlreadyBoundException excpt) {
+				System.out.println("A bind failed on an already bound thing: GOOD " + excpt);
+			}
+			
+			try {
+				BasicTests fail = (BasicTests) myRMI.lookup("FAIL");
+				System.out.println("Somehow, 'FAIL' was found.....");
+			} catch (NotBoundException excpt) {
+				System.out.println("A lookup on a non-bound object failed: GOOD " + excpt);
+			}
+			
 			System.out.println("Listing Bonds:");
 			for (String obj : myRMI.list()) {
 				System.out.println(obj);

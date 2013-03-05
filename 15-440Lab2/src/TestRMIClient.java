@@ -89,5 +89,6 @@ public class TestRMIClient {
 			System.out.println("Failed to do RMI: " + e);
 			e.printStackTrace();
 		}
+		return;
 	}
 }
