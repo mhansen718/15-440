@@ -1,3 +1,7 @@
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -41,23 +45,27 @@ public class RMIProxy implements Runnable {
         while (true) {
             try {
                 processRequest(proxySocket.accept());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 continue;
             }
         }
 	}
     
     private void processRequest(Socket socket) {
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
         RMIMessage message;
         
         try {
+        	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             message = (RMIMessage) in.readObject();
-        } catch (IOException e) {
+        } catch (Exception e) {
             return;
         }
         
-        Thread slave = new Thread(new RMIProxySlave(this, message, socket));
-        slave.start();
+        try {
+        	Thread slave = new Thread(new RMIProxySlave(this, message, socket));
+        	slave.start();
+        } catch (Exception e) {
+        	return;
+        }
     }
 }
