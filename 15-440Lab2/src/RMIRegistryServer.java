@@ -24,7 +24,8 @@ public class RMIRegistryServer {
             try {
                 processRequest(registrySocket.accept());
             } catch (IOException e) {
-                //TODO: Something here
+                System.err.println("Accept error");
+                continue;
             }
         }
 	}
@@ -40,7 +41,8 @@ public class RMIRegistryServer {
         try {
             message = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            //TODO: Stuff
+            System.err.println("Failed to receive message from client");
+            return;
         }
         
         response = new RegistryMessage();
@@ -66,14 +68,15 @@ public class RMIRegistryServer {
         try {
             out.writeObject(response);
         } catch (IOException e) {
-            //TODO: Internal error
+            System.err.println("Failed to communicate with client");
+            return;
         }
         try {
             out.close();
             in.close();
             socket.close();
         } catch (IOException e) {
-            //TODO: Well fuck, you failed to close a socket
+            System.err.println("How did you fail to close a socket?");
         }
         return;
     }

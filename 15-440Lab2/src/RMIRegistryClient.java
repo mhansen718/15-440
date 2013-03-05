@@ -56,7 +56,7 @@ public class RMIRegistryClient {
             socket = new Socket(this.registryHost,this.registryPort);
             out = new ObjectOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
-            System.err.println("Failed to open connection to server");
+            throw e;
         }
         message = new RegistryMessage();
         message.funct = funct;
@@ -68,8 +68,7 @@ public class RMIRegistryClient {
             out.writeObject(message);
             response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            System.err.println("Failed to communicate with server");
-            return;
+            throw e;
         }
         if (response.error) {
             throw response.error;
@@ -89,8 +88,7 @@ public class RMIRegistryClient {
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            System.err.println("Failed to open connection to server");
-            return;
+            throw e;
         }
         message = new RegistryMessage();
         message.funct = "list";
@@ -98,8 +96,7 @@ public class RMIRegistryClient {
             out.writeObject(message);
             response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            System.err.println("Failed to communicate with server");
-            return;
+            throw e;
         }
         if (response.error) {
             throw response.error;
@@ -119,8 +116,7 @@ public class RMIRegistryClient {
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            System.err.println("Failed to open connection to server");
-            return;
+            throw e;
         }
         message = new RegistryMessage();
         message.funct = "lookup";
@@ -129,8 +125,7 @@ public class RMIRegistryClient {
             out.writeObject(message);
             response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            System.err.println("Failed to communicate with server");
-            return;
+            throw e;
         }
         if (response.error) {
             throw response.error;
