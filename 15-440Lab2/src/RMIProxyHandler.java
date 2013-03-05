@@ -1,6 +1,9 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.net.Socket;
 import java.rmi.RemoteException;
 
 
@@ -68,7 +71,7 @@ public class RMIProxyHandler implements InvocationHandler {
         try {
             out.writeObject(sent);
             received = (RMIMessage) in.readObject();
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RemoteException("Communication failure");
         }
         

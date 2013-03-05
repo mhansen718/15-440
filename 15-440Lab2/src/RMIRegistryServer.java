@@ -1,8 +1,12 @@
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.AlreadyBoundException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 public class RMIRegistryServer {
 
@@ -35,12 +39,11 @@ public class RMIRegistryServer {
         ObjectInputStream in;
         RegistryMessage message, response;
         
-        out = new ObjectOutputStream(this.socket.getOutputStream());
-        in = new ObjectInputStream(this.socket.getInputStream());
-        
         try {
+        	out = new ObjectOutputStream(socket.getOutputStream());
+        	in = new ObjectInputStream(socket.getInputStream());
             message = (RegistryMessage) in.readObject();
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Failed to receive message from client");
             return;
         }
@@ -88,7 +91,7 @@ public class RMIRegistryServer {
     
     private void bind(String name, RegistryEntry entry) throws Exception {
         if (this.registry.containsKey(name)) {
-            throw AlreadyBoundException;
+            throw new AlreadyBoundException();
         }
         try {
             this.registry.put(name, entry);
@@ -109,8 +112,9 @@ public class RMIRegistryServer {
     
     private RegistryMessage lookup(String name) {
         RegistryMessage response = new RegistryMessage();
-        if ((RegistryEntry entry = this.registry.get(name)) == null) {
-            response.error = NotBoundException;
+        RegistryEntry entry = new RegistryEntry();
+        if ((entry = this.registry.get(name)) == null) {
+            response.error = new NotBoundException();
             return response;
         }
         response.objName = name;
@@ -121,6 +125,6 @@ public class RMIRegistryServer {
     }
     
     private String[] list() {
-        return (this.registry.keySet()).toArray();
+        return (String[]) (this.registry.keySet()).toArray();
     }
 }
