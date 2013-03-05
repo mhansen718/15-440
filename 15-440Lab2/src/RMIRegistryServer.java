@@ -23,10 +23,9 @@ public class RMIRegistryServer {
         while (true) {
             try {
                 processRequest(registrySocket.accept());
-                out = new ObjectOutputStream(this.socket.getOutputStream());
-                in = new ObjectInputStream(this.socket.getInputStream());
             } catch (IOException e) {
-                //TODO: Something here
+                System.err.println("Accept error");
+                continue;
             }
         }
 	}
@@ -42,24 +41,15 @@ public class RMIRegistryServer {
         try {
             message = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            //TODO: Stuff
+            System.err.println("Failed to receive message from client");
+            return;
         }
         
+        response = new RegistryMessage();
         if (message.funct == "list") {
-            response = new RegistryMessage();
             response.regList = list();
-            try {
-                out.writeObject(response);
-            } catch (IOException e) {  //TODO: errors
-                
-            }
-            return;
         } else if (message.funct == "lookup") {
-            try {
-                out.writeObject(lookup(message.objName));
-            } catch (IOException e) { // TODO: errors
-                
-            }
+            response = lookup(message.objName);
         }
         RegistryEntry entry = new RegistryEntry();
         entry.host = message.objHost;
@@ -67,39 +57,52 @@ public class RMIRegistryServer {
         if (message.funct == "bind") {
             try {
                 bind(message.objName,entry);
-            } catch (AlreadyBoundException e) {
-                response = new RegistryMessage();
+            } catch (Exception e) {
                 response.error = e;
-                out.writeObject(response);
             }
         } else if (message.funct == "rebind") {
-            rebind(message.objName,entry);
+            try {
+                rebind(message.objName,entry);
+            } catch (NullPointerException e) {
+                response.error = e;
+            }
         } else {
-            response = new RegistryMessage();
             response.error = new RemoteException("Invalid Command");
+        }
+        try {
             out.writeObject(response);
+        } catch (IOException e) {
+            System.err.println("Failed to communicate with client");
+            return;
         }
         try {
             out.close();
             in.close();
             socket.close();
         } catch (IOException e) {
-            //TODO: Well fuck, you failed to close a socket
+            System.err.println("How did you fail to close a socket?");
         }
         return;
     }
     
-    //TODO: make sure name and entry aren't null in both
-    private void bind(String name, RegistryEntry entry) throws AlreadyBoundException {
+    private void bind(String name, RegistryEntry entry) throws Exception {
         if (this.registry.containsKey(name)) {
             throw AlreadyBoundException;
         }
-        this.registry.put(name, entry)
+        try {
+            this.registry.put(name, entry);
+        } catch (NullPointerException e) {
+            throw e;
+        }
         return;
     }
     
     private void rebind(String name, RegistryEntry entry) {
-        this.registry.put(name, entry)
+        try {
+            this.registry.put(name, entry);
+        } catch (NullPointerException e) {
+            throw e;
+        }
         return;
     }
     

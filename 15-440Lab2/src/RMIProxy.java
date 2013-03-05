@@ -6,12 +6,14 @@ public class RMIProxy implements Runnable {
 	private ConcurrentHashMap<String, Object> localObjs;
 	private String myHost;
 	private int myPort;
+    private ServerSocket proxySocket;
 	
-	public RMIProxy(String host) {
+	public RMIProxy(String host, int port, ServerSocket proxySocket) {
 		super();
 		this.localObjs = new ConcurrentHashMap<String, Object>();
 		this.myHost = host;
-		this.myPort = 27000; /* Starting port */
+		this.myPort = port;
+        this.proxySocket = proxySocket;
 	}
 	
 	public String getHost() {
@@ -36,8 +38,26 @@ public class RMIProxy implements Runnable {
 	}
 	
 	public void run() {
-		/* TODO: Set up socket and listen */
-		
-		/* TODO: Unpack rmi and spawn thread to handle it */
+        while (true) {
+            try {
+                processRequest(proxySocket.accept());
+            } catch (IOException e) {
+                continue;
+            }
+        }
 	}
+    
+    private void processRequest(Socket socket) {
+        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+        RMIMessage message;
+        
+        try {
+            message = (RMIMessage) in.readObject();
+        } catch (IOException e) {
+            return;
+        }
+        
+        Thread slave = new Thread(new RMIProxySlave(this, message, socket));
+        slave.start();
+    }
 }

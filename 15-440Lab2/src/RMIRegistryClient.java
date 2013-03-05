@@ -12,18 +12,30 @@ public class RMIRegistryClient {
 	private int registryPort;
 	private RMIProxy myProxy;
 	
-	public RMIRegistryClient(String host, int port) {
+	public RMIRegistryClient(String host, int port) throws Exception {
 		super();
+        ServerSocket proxySocket;
 		this.registryHost = host;
 		this.registryPort = port;
 		
 		/* Create the proxy for all RMIs to this node */
+        for (int i = 27000; i<27010; i++) {
+            try {
+                proxySocket = new ServerSocket(port);
+                break;
+            } catch (IOException e) {
+                if (i == 27009) {
+                    throw IOException e;
+                }
+                continue;
+            }
+        }
 		try {
-			this.myProxy = new RMIProxy(InetAddress.getLocalHost().getHostName());
+			this.myProxy = new RMIProxy(InetAddress.getLocalHost().getHostName(), i, proxySocket);
 			this.localProxy = new Thread(this.myProxy);
 			localProxy.start();
 		} catch (Exception excpt) {
-			System.err.println("Error: Failed to set up Proxy for RMI");
+			throw excpt;
 		}
 	}
 	
@@ -39,12 +51,12 @@ public class RMIRegistryClient {
     private void bothBinds(String name, Remote440 obj, String funct) {
         Socket socket;
         ObjectOutputStream out;
-        RegistryMessage message;
+        RegistryMessage message, response;
 		try {
             socket = new Socket(this.registryHost,this.registryPort);
             out = new ObjectOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
-            System.err.println("Failed to open connection to server");
+            throw e;
         }
         message = new RegistryMessage();
         message.funct = funct;
@@ -54,16 +66,19 @@ public class RMIRegistryClient {
         message.objClass = obj.getClass();
         try {
             out.writeObject(message);
+            response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            System.err.println("Failed to send request");
-            return;
+            throw e;
+        }
+        if (response.error) {
+            throw response.error;
         }
         out.close();
         socket.close();
         return;
     }
     
-	public String[] list() {
+	public String[] list() throws Exception{
         Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
@@ -73,8 +88,7 @@ public class RMIRegistryClient {
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            System.err.println("Failed to open connection to server");
-            return;
+            throw e;
         }
         message = new RegistryMessage();
         message.funct = "list";
@@ -82,11 +96,10 @@ public class RMIRegistryClient {
             out.writeObject(message);
             response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            System.err.println("Failed to communicate with server");
-            return;
+            throw e;
         }
         if (response.error) {
-            System.err.println(response.error);
+            throw response.error;
         } else {
             return response.regList;
         }
@@ -103,8 +116,7 @@ public class RMIRegistryClient {
             in = new ObjectInputStream(socket.getInputStream());
             out = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            System.err.println("Failed to open connection to server");
-            return;
+            throw e;
         }
         message = new RegistryMessage();
         message.funct = "lookup";
@@ -113,11 +125,10 @@ public class RMIRegistryClient {
             out.writeObject(message);
             response = (RegistryMessage) in.readObject();
         } catch (IOException e) {
-            System.err.println("Failed to communicate with server");
-            return;
+            throw e;
         }
         if (response.error) {
-            System.err.println(response.error);
+            throw response.error;
         } else {
             ref = new RemoteObjectRef(response.objHost,response.objPort,response.objName,response.objClass,myProxy);
             return ref.localise();

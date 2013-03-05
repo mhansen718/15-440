@@ -7,11 +7,13 @@ public class RMIProxySlave implements Runnable {
 
 	private RMIMessage message;
 	private RMIProxy master;
+    private Socket socket;
 	
-	public RMIProxySlave(RMIProxy master, RMIMessage message) {
+	public RMIProxySlave(RMIProxy master, RMIMessage message, Socket socket) {
 		super();
 		this.master = master;
 		this.message = message;
+        this.socket = socket;
 	}
 	
 	public void run() {
@@ -82,7 +84,12 @@ public class RMIProxySlave implements Runnable {
 	}
 		
 	private void sendMessage(RMIMessage message) {
-		/* TODO: Make this method send the message back to the rmi caller */
+		ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
+        try {
+            out.writeObject(message);
+        } catch (IOException e) {
+            return;
+        }
 		return;
 	}
 }
