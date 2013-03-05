@@ -9,7 +9,6 @@ public class RMIMessage implements Serializable {
 	public String name;
 	public String methodName;
 	public Class<?>[] parameterTypes;
-	public Class<?> cls;
 	public Object[] args;
 	public Object returnValue;
 	public Exception exception;

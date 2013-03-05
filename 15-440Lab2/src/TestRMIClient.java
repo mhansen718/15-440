@@ -38,6 +38,7 @@ public class TestRMIClient {
 
 			AdvancedTests adv;
 			BasicTests newTest;
+			BasicTestsImpl localTest = new BasicTestsImpl("Mine", 22);
 			Shipper ship = null;
 			Shipped cargo = null;
 			try {
@@ -49,9 +50,14 @@ public class TestRMIClient {
 
 			/* Pass-by-Ref */
 			newTest = adv.makeNewTests("Hello, Advanced!", 42);
+			System.out.println("   Remotely created this object:");
 			System.out.println(newTest.toString());
 			adv.changeNumber(newTest, 10);
+			System.out.println("   Remotely change our reference to a remote object (42->10):");
 			System.out.println(newTest.toString());
+			adv.changeNumber(localTest, 55);
+			System.out.println("   Remotely change a local object (22->55):");
+			System.out.println(localTest.toString());
 
 			/* Pass-by-Value */
 			ship = adv.getShipper();
@@ -77,6 +83,8 @@ public class TestRMIClient {
 			} catch (Exception excpt) {
 				System.out.println("   It failed, YAY!!!!");
 			}
+			
+			System.out.println("Thats all my tests, check these values to ensure correctness");
 		} catch (Exception e) {
 			System.out.println("Failed to do RMI: " + e);
 			e.printStackTrace();

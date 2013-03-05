@@ -48,10 +48,6 @@ public class RMIProxyHandler implements InvocationHandler {
         if (args != null) {
         	trueArgs = new Object[args.length];
         	for (Object arg : args) {
-        		if (!(arg instanceof Serializable)) {
-        			throw new RemoteException();
-        		}
-        		
         		if (Proxy.isProxyClass(arg.getClass()) && 
 				(Proxy.getInvocationHandler(arg)).getClass().equals(RMIProxyHandler.class)) {
         			System.out.println("Its a reference!, make a new one!");
@@ -64,8 +60,10 @@ public class RMIProxyHandler implements InvocationHandler {
         					remoteArgName, arg.getClass());
         			this.master.addObject(remoteArgName, arg);
         			trueArgs[idx] = remoteArg;
-        		} else {
+        		} else if (arg instanceof Serializable) {
         			trueArgs[idx] = arg;
+        		} else {
+        			throw new RemoteException();
         		}
         		idx++;
         	}
@@ -77,7 +75,6 @@ public class RMIProxyHandler implements InvocationHandler {
 		sent.name = this.name;
 		sent.methodName = method.getName();
 		sent.parameterTypes = method.getParameterTypes();
-		sent.cls = this.cls;
 		sent.args = trueArgs;
 		sent.returnValue = null;
 		sent.exception = null;

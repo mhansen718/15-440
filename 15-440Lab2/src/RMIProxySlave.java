@@ -30,7 +30,6 @@ public class RMIProxySlave implements Runnable {
 		returnMessage.name = message.name;
 		returnMessage.methodName = message.methodName;
 		returnMessage.parameterTypes = message.parameterTypes;
-		returnMessage.cls = message.cls;
 		returnMessage.args = message.args;
 		
 		/* Localise Any Remote Objects */
@@ -46,6 +45,7 @@ public class RMIProxySlave implements Runnable {
 			} else {
 				trueArgs[idx] = arg;
 			}
+			System.out.println("Arg: " + arg.toString());
 			idx++;
 		}
 		System.out.println("Finding object locally....");
@@ -61,7 +61,7 @@ public class RMIProxySlave implements Runnable {
 		System.out.println("Trying to do the method");
 		try {
 			/* Revive the method */
-			method = foundObj.getClass().getMethod(message.methodName, message.parameterTypes);
+			method = (foundObj.getClass()).getMethod(message.methodName, message.parameterTypes);
 			System.out.println(method.getName());
 			try {
 				returnObj = method.invoke(foundObj, trueArgs);
