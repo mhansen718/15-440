@@ -147,6 +147,6 @@ public class RMIRegistryServer {
     }
     
     private String[] list() {
-        return (String[]) (this.registry.keySet()).toArray();
+        return (this.registry.keySet()).toArray(new String[0]);
     }
 }
