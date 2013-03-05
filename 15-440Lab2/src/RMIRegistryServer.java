@@ -2,27 +2,47 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.net.InetAddress;
 
 public class RMIRegistryServer {
 
 	private ConcurrentHashMap<String, RegistryEntry> registry;
     private ServerSocket registrySocket = null;
     private int port;
+    private final String usage = "java RMIRegistryServer [port]";
 	
 	public void main(String args[]) {
 		this.registry = new ConcurrentHashMap<String, RegistryEntry>();
         
+		if (args.length != 1) {
+			System.out.println(usage);
+		}
+		
+		try {
+			port = Integer.parseInt(args[0]);
+		} catch (Exception excpt) {
+			System.out.println(usage);
+		}
+		
         try {
             this.registrySocket = new ServerSocket(port);
         } catch (IOException e) {
             System.err.println("Could not listen on port: " + this.port);
             System.exit(-1);
         }
+        
+        System.out.println("RMI Registry Server Initialized!");
+        try {
+			System.out.println(" Registry@" + InetAddress.getLocalHost().getHostName() + ":" + port);
+		} catch (Exception e) {
+		}
         
         while (true) {
             try {
