@@ -29,8 +29,8 @@ public class RMIProxyHandler implements InvocationHandler {
 			throws Throwable { 
 		RMIMessage sent = new RMIMessage();
 		RMIMessage received;
+		Object[] trueArgs;
 		Object returnObj;
-		Object[] trueArgs = new Object[args.length];
 		int idx = 0;
 		RemoteObjectRef remoteArg;
 		String remoteArgName;
@@ -39,21 +39,26 @@ public class RMIProxyHandler implements InvocationHandler {
         ObjectInputStream in;
 		
 		/* Ensure all wanted arguments are serializable */
-		for (Object arg : args) {
-			if (!(arg instanceof Serializable)) {
-				throw new RemoteException();
-			}
-			if ((arg instanceof Remote440) && !(arg instanceof RemoteObjectDeref)) {
-				remoteArgName = Integer.toString(arg.hashCode());
-				remoteArg = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
-						remoteArgName, arg.getClass(), this.master);
-				this.master.addObject(remoteArgName, arg);
-				trueArgs[idx] = remoteArg;
-			} else {
-				trueArgs[idx] = arg;
-			}
-			idx++;
-		}
+        if (args != null) {
+        	trueArgs = new Object[args.length];
+        	for (Object arg : args) {
+        		if (!(arg instanceof Serializable)) {
+        			throw new RemoteException();
+        		}
+        		if ((arg instanceof Remote440) && !(arg instanceof RemoteObjectDeref)) {
+        			remoteArgName = Integer.toString(arg.hashCode());
+        			remoteArg = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
+        					remoteArgName, arg.getClass(), this.master);
+        			this.master.addObject(remoteArgName, arg);
+        			trueArgs[idx] = remoteArg;
+        		} else {
+        			trueArgs[idx] = arg;
+        		}
+        		idx++;
+        	}
+        } else {
+        	trueArgs = new Object[0];
+        }
 		
 		/* Load up message to send */
 		sent.name = this.name;
