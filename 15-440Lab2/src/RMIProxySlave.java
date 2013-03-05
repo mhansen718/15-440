@@ -64,7 +64,7 @@ public class RMIProxySlave implements Runnable {
 			method = foundObj.getClass().getMethod(message.methodName, message.parameterTypes);
 			System.out.println(method.getName());
 			try {
-				returnObj = method.invoke(foundObj, message.args);
+				returnObj = method.invoke(foundObj, trueArgs);
 			} catch(InvocationTargetException excpt) {
 				System.out.println("Our method threw an exception: " + excpt);
 				returnMessage.exception = (Exception) excpt.getCause();
