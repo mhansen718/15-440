@@ -6,9 +6,9 @@ public class TestRMIClient {
 
 	public static void main(String[] args) {
 		/* A simple test of various RMI features */
-		RMIRegistryClient myRMI;
+		RMI myRMI;
 		try {
-			myRMI = new RMIRegistryClient(args[0], Integer.parseInt(args[1]));
+			myRMI = new RMI(args[0], Integer.parseInt(args[1]));
 
 			BasicTests basic;
 			try {
