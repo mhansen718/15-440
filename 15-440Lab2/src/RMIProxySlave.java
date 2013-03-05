@@ -1,5 +1,8 @@
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.net.Socket;
 import java.rmi.RemoteException;
 
 
@@ -84,8 +87,8 @@ public class RMIProxySlave implements Runnable {
 	}
 		
 	private void sendMessage(RMIMessage message) {
-		ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
         try {
+        	ObjectOutputStream out = new ObjectOutputStream(this.socket.getOutputStream());
             out.writeObject(message);
         } catch (IOException e) {
             return;

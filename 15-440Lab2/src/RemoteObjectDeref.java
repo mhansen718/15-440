@@ -5,8 +5,8 @@ public class RemoteObjectDeref extends Proxy {
 
 	private static final long serialVersionUID = 5763167076752693817L;
 
-	protected RemoteObjectDeref(InvocationHandler arg0) {
-		super(arg0);
+	protected RemoteObjectDeref(InvocationHandler inv) {
+		super(inv);
 	}
 
 }
