@@ -127,7 +127,7 @@ public class RMIRegistryClient {
         }
 	}
     
-    public void unbind(String name) {
+    public void unbind(String name) throws Exception {
         Socket socket;
         ObjectInputStream in;
         ObjectOutputStream out;
