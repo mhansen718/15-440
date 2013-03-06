@@ -58,7 +58,7 @@ public class RMIProxyHandler implements InvocationHandler {
         					remoteArgName, arg.getClass());
         			this.master.addObject(remoteArgName, arg);
         			trueArgs[idx] = remoteArg;
-        		} else if (arg instanceof Serializable) {
+        		} else if ((arg instanceof Serializable) || (arg == null)) {
         			trueArgs[idx] = arg;
         		} else {
         			throw new RemoteException();
