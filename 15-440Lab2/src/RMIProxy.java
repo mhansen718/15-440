@@ -59,6 +59,7 @@ public class RMIProxy implements Runnable {
     private void processRequest(Socket socket) {
         RMIMessage message;
         
+        /* Open socket and listen for message */
         try {
         	ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             message = (RMIMessage) in.readObject();
@@ -66,6 +67,7 @@ public class RMIProxy implements Runnable {
             return;
         }
         
+        /* Spawn slave and give it the message and socket to send result back */
         try {
         	Thread slave = new Thread(new RMIProxySlave(this, message, socket));
         	slave.start();

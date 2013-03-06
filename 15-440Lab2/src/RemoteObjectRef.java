@@ -20,7 +20,7 @@ public class RemoteObjectRef implements Serializable {
 	}
 
 	public Object localise(RMIProxy localTable) throws Exception {
-		/* If the class is an interface, use itself. Otherwiese, get its interfaces */
+		/* If the class is an interface, use itself. Otherwise, get its interfaces */
 		Class<?>[] interfaces;
 		if (this.objClass.isInterface()) {
 			interfaces = new Class<?>[] { this.objClass };

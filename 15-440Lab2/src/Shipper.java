@@ -7,6 +7,7 @@ public class Shipper implements Serializable {
 	
 	public String[] cargo = {"Goats", "Cheese", "Rugs", "Gold"};
 	
+	/* A class we cant have remote refs to, but can sent by value */
 	public String toString() {
 		String returnString = "   Cargo: ";
 		for (String s : cargo) {

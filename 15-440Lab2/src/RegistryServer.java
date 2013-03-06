@@ -1,7 +1,7 @@
 
 public class RegistryServer {
 
-	/* Wrapper for the RMIRegistry Server */
+	/* Wrapper for the RMIRegistryServer */
 	public static void main(String[] args) {
 		RMIRegistryServer server = new RMIRegistryServer();
 		

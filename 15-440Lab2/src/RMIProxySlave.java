@@ -59,7 +59,7 @@ public class RMIProxySlave implements Runnable {
 		}
 
 		try {
-			/* Revive the method */
+			/* Revive and invoke the method */
 			method = (foundObj.getClass()).getMethod(message.methodName, message.parameterTypes);
 			try {
 				returnObj = method.invoke(foundObj, trueArgs);
@@ -75,11 +75,12 @@ public class RMIProxySlave implements Runnable {
 			
 			if (!(returnObj == null) && Proxy.isProxyClass(returnObj.getClass()) && 
 					(Proxy.getInvocationHandler(returnObj)).getClass().equals(RMIProxyHandler.class)) {
-	        			newRemote = ((RMIProxyHandler) Proxy.getInvocationHandler(returnObj)).makeRemoteObjectRef();
-	        			returnMessage.returnValue = newRemote;
-	        			returnMessage.exception = null;
+				/* If the return object is a remote object ref, rereference and put in message */
+				newRemote = ((RMIProxyHandler) Proxy.getInvocationHandler(returnObj)).makeRemoteObjectRef();
+				returnMessage.returnValue = newRemote;
+				returnMessage.exception = null;
 			} else if (returnObj instanceof Remote440) {
-				/* If this class is a Remote440 object, package it up as a remote object reference with a unique name */
+				/* If the return value is a Remote440 object, package it up as a remote object reference with a unique name */
 				String newName = Integer.toString(returnObj.hashCode());
 				newRemote = new RemoteObjectRef(this.master.getHost(), this.master.getPort(), 
 						newName, method.getReturnType());
@@ -87,7 +88,7 @@ public class RMIProxySlave implements Runnable {
 				returnMessage.returnValue = newRemote;
 				returnMessage.exception = null;
 			} else if ((returnObj instanceof Serializable) || (returnObj == null)) {
-				/* If this class is a Remote440 object, package it up as a whole object */
+				/* If the return value is Serializable object, package it up as a whole object */
 				returnMessage.returnValue = returnObj;
 				returnMessage.exception = null;
 			} else {

@@ -26,6 +26,7 @@ public class RMIProxyHandler implements InvocationHandler {
 	}
 	
 	public RemoteObjectRef makeRemoteObjectRef() {
+		/* Make a remote object ref to the object pointed to by this proxy */
 		RemoteObjectRef ref = new RemoteObjectRef(this.host, this.port, this.name, this.cls);
 		return ref;
 	}
@@ -44,7 +45,7 @@ public class RMIProxyHandler implements InvocationHandler {
         ObjectOutputStream out;
         ObjectInputStream in;
 		
-		/* Ensure all wanted arguments are serializable */
+		/* Ensure all wanted arguments are serializable, and convert any that can to remote object refs */
         if (args != null) {
         	trueArgs = new Object[args.length];
         	for (Object arg : args) {
