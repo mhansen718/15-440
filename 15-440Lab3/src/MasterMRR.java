@@ -1,9 +1,12 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class MasterMRR {
+	
+	private ConcurrentLinkedQueue<Peon> peons;
 
 	public void main(String args[]) {
 		RandomAccessFile config = null;
