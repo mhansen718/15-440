@@ -1,15 +1,15 @@
 
-public class Job440 {
+public class JobMRR {
 
-	private Configuration440<?, ?, ?, ?> config;
+	private ConfigurationMRR<?, ?, ?, ?> config;
 	private String jobName;
 	
-	public Job440(Configuration440<?, ?, ?, ?> config) {
+	public JobMRR(ConfigurationMRR<?, ?, ?, ?> config) {
 		super();
 		this.config = config;
 	}
 	
-	public Job440(Configuration440<?, ?, ?, ?> config, String name) {
+	public JobMRR(ConfigurationMRR<?, ?, ?, ?> config, String name) {
 		super();
 		this.config = config;
 		this.jobName = name;
