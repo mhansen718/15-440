@@ -5,7 +5,7 @@ import java.io.RandomAccessFile;
 
 public class MasterMRR {
 
-	public static void main(String args[]) {
+	public void main(String args[]) {
 		RandomAccessFile config = null;
 		String configLineRead = null;
 		

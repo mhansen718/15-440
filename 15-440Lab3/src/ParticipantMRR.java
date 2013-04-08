@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ParticipantMRR {
     
@@ -11,6 +12,7 @@ public class ParticipantMRR {
     Socket socket;
     ObjectInputStream in;
     ObjectOutputStream out;
+    ConcurrentLinkedQueue<JobEntry> jobs;
     
     public void main(String args[]) {
         this.processors = Runtime.getRuntime().availableProcessors();
