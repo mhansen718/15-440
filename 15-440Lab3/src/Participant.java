@@ -1,3 +1,8 @@
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
 public class Participant {
     
     private int processors;
@@ -8,7 +13,7 @@ public class Participant {
     ObjectOutputStream out;
     
     public void main(String args[]) {
-        this.processors = Runtime.availableProcessors();
+        this.processors = Runtime.getRuntime().availableProcessors();
         
         this.host = args[0];
         
