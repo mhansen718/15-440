@@ -23,14 +23,24 @@ public class MasterMRR {
 		}
 		
 		/* Read the lines of the file and parse the information */
-		do {
+		try {
+			configLineRead = config.readLine();
+		} catch (IOException e) {
+			System.out.println(" MasterMRR: Failed to read config file");
+			System.exit(-2);
+		}
+		
+		while (configLineRead != null) {
+			// TODO Make this parse the stuff we need
+			
 			try {
 				configLineRead = config.readLine();
 			} catch (IOException e) {
 				System.out.println(" MasterMRR: Failed to read config file");
 				System.exit(-2);
 			}
-			
-		} while (configLineRead != null);
+		}
+		
+		// TODO connect, listen dispatch jobs and stuff :(
 	}
 }
