@@ -5,5 +5,5 @@ public class Peon {
 	public String host;
 	public int port;
 	public int power;
-	public int load;
+
 }
