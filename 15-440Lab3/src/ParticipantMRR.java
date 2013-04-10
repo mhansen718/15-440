@@ -3,6 +3,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ParticipantMRR {
@@ -10,13 +11,15 @@ public class ParticipantMRR {
     private int processors;
     private String host;
     private int port;
-    Socket socket;
-    ObjectInputStream in;
-    ObjectOutputStream out;
-    ConcurrentLinkedQueue<JobEntry> jobs;
-    HashSet<Thread> minions;
+    private Socket socket;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private ConcurrentLinkedQueue<JobEntry> jobs;
+    private HashSet<Thread> minions;
     
     public void main(String args[]) {
+    	Iterator<Thread> minion;
+    	
         this.processors = Runtime.getRuntime().availableProcessors();
         
         this.host = args[0];
@@ -37,7 +40,18 @@ public class ParticipantMRR {
             System.exit(-1);
         }
         
-        
+        /* Run the main loop */
+        while (true) {
+        	/* check the minions, removing the dead and adding more if needed */
+        	minion = this.minions.iterator();
+        	
+        	// TODO: 
+        }
     }
+    
+    public ConcurrentLinkedQueue<JobEntry> getJobs() {
+    	return this.jobs;
+    }
+    
     
 }

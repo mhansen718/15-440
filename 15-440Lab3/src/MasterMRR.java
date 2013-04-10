@@ -12,6 +12,9 @@ public class MasterMRR {
 	public void main(String args[]) {
 		RandomAccessFile config = null;
 		String configLineRead = null;
+		String[] configParse = null;
+		String configParameter = null;
+		String configValue = null;
 		
 		/* Check arguments and print usage if incorrect */
 		if (args.length != 1) {
@@ -35,8 +38,26 @@ public class MasterMRR {
 		}
 		
 		while (configLineRead != null) {
-			// TODO Make this parse the stuff we need
-			
+			/* Parse the line and case over the parameters that should be in the config file */
+			configParse = configLineRead.split("=");
+			configParameter = configParse[0].toLowerCase();
+			configValue = configParse[1];
+			switch (configParameter) {
+			case "participants":
+				try {
+					for (String part : configValue.split(", ")) {
+						Peon newPeon = new Peon();
+						newPeon.host = part.split(":")[0];
+						newPeon.port = Integer.parseInt(part.split(":")[1]);
+					}
+				} catch (Exception excpt) {
+					System.out.println(" MasterMRR: Failed to parse participant list in config file, please check the form");
+					System.exit(-4);
+				}
+				// TODO: Add more parameters if needed ...
+
+			}
+
 			try {
 				configLineRead = config.readLine();
 			} catch (IOException e) {
