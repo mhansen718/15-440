@@ -45,6 +45,10 @@ public class MasterMRR {
 			}
 		}
 		
+		/* Create and start UI */
+		Thread UI = new Thread(new UserInterface(this));
+		UI.start();
+		
 		// TODO connect, listen dispatch jobs and stuff :(
 	}
 	
