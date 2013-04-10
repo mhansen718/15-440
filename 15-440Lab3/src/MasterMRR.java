@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class MasterMRR {
 	
 	private ConcurrentLinkedQueue<Peon> peons;
+	private ConcurrentLinkedQueue<JobEntry> jobs;
 
 	public void main(String args[]) {
 		RandomAccessFile config = null;
@@ -45,5 +46,15 @@ public class MasterMRR {
 		}
 		
 		// TODO connect, listen dispatch jobs and stuff :(
+	}
+	
+	public ConcurrentLinkedQueue<Peon> getPeons() {
+		/* Give out the partitipant list */
+		return this.peons;
+	}
+	
+	public ConcurrentLinkedQueue<JobEntry> getJobs() {
+		/* Give out the jobs list */
+		return this.jobs;
 	}
 }

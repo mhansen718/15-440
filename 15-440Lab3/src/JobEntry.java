@@ -7,4 +7,7 @@ public class JobEntry implements Serializable{
 	/* Container and message class between Master and Participants */
 	public String jobName;
 	
+	public String toString() {
+		return this.jobName;
+	}
 }
