@@ -13,6 +13,12 @@ public class MasterMRR {
 	private ConcurrentLinkedQueue<JobEntry> jobs;
 	private String user;
 	private int listenPort;
+	
+	public MasterMRR() {
+		super();
+		this.peons = new ConcurrentLinkedQueue<Peon>();
+		this.jobs = new ConcurrentLinkedQueue<JobEntry>();
+	}
 
 	public void main(String args[]) {
 		RandomAccessFile config = null;
