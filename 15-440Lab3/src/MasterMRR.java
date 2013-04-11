@@ -1,6 +1,8 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -9,6 +11,8 @@ public class MasterMRR {
 	
 	private ConcurrentLinkedQueue<Peon> peons;
 	private ConcurrentLinkedQueue<JobEntry> jobs;
+	private String user;
+	private int listenPort;
 
 	public void main(String args[]) {
 		RandomAccessFile config = null;
@@ -17,6 +21,7 @@ public class MasterMRR {
 		String configParameter = null;
 		String configValue = null;
 		Iterator<Peon> peon;
+		InetAddress participantAddress = null;
 		
 		/* Check arguments and print usage if incorrect */
 		if (args.length != 1) {
@@ -51,11 +56,19 @@ public class MasterMRR {
 						Peon newPeon = new Peon();
 						newPeon.host = part.split(":")[0];
 						newPeon.port = Integer.parseInt(part.split(":")[1]);
+						newPeon.isDead = true;
 					}
 				} catch (Exception excpt) {
 					System.out.println(" MasterMRR: Failed to parse participant list in config file, please check the form");
 					System.exit(-4);
 				}
+				break;
+			case "username":
+				this.user = configValue;
+				break;
+			case "listen_port":
+				this.listenPort = Integer.parseInt(configValue);
+				break;
 				// TODO: Add more parameters if needed ...
 
 			}
@@ -76,9 +89,29 @@ public class MasterMRR {
 		while (UI.isAlive()) {
 			peon = this.peons.iterator();
 			while (peon.hasNext()) {
-				Peon p =peon.next();
+				Peon p = peon.next();
 				if (p.isDead) {
-					
+					/* If the peon is dead, see if it is reachable now and try
+					 * to restart the process if needed */
+					try {
+						participantAddress = InetAddress.getByName(p.host);
+					} catch (UnknownHostException excpt) {
+						/* No luck reaching the host, report the error but not much we can do */
+						System.out.println(" MasterMRR: Warning: host " + p.host + " could not be ressolved");
+					}
+					try {
+						if (participantAddress.isReachable(1000)) {
+							Runtime.getRuntime().exec("./ssh_work " + this.user + " " + p.host + " " + 
+									System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + Integer.toString(this.listenPort));
+							p.isDead = false;
+						}
+					} catch (IOException excpt) {
+						/* Had a problem doing the reachability test */
+						System.out.println(" MasterMRR: Warning: Failed to reconnect to participant " + p.host);
+					}
+				} else {
+					/* Ask the participant how its doing, and 
+					 * declare it dead if unreachable */
 				}
 			}
 			// TODO connect, listen dispatch jobs and stuff :(

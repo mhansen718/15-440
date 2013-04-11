@@ -65,7 +65,13 @@ public class ParticipantMRR {
         			this.minions.add(t);
         		}
         	}
-        	
+        	System.out.println("Running: minions are not at " + Integer.toString(this.minions.size()));
+        	try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	// TODO: add jobs to the queue when we get them */
         }
     }
