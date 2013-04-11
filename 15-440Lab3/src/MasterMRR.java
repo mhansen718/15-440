@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
@@ -15,6 +16,7 @@ public class MasterMRR {
 		String[] configParse = null;
 		String configParameter = null;
 		String configValue = null;
+		Iterator<Peon> peon;
 		
 		/* Check arguments and print usage if incorrect */
 		if (args.length != 1) {
@@ -72,6 +74,13 @@ public class MasterMRR {
 		
 		/* Run Main loop */
 		while (UI.isAlive()) {
+			peon = this.peons.iterator();
+			while (peon.hasNext()) {
+				Peon p =peon.next();
+				if (p.isDead) {
+					
+				}
+			}
 			// TODO connect, listen dispatch jobs and stuff :(
 		}
 	}
