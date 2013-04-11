@@ -4,7 +4,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class ParticipantMRR {
     
@@ -14,11 +14,13 @@ public class ParticipantMRR {
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private ConcurrentLinkedQueue<JobEntry> jobs;
+    private BlockingQueue<JobEntry> jobs;
     private HashSet<Thread> minions;
     
     public void main(String args[]) {
     	Iterator<Thread> minion;
+    	Thread t;
+    	int id;
     	
         this.processors = Runtime.getRuntime().availableProcessors();
         
@@ -43,14 +45,33 @@ public class ParticipantMRR {
         /* Run the main loop */
         while (true) {
         	/* check the minions, removing the dead and adding more if needed */
-        	minion = this.minions.iterator();
+        	this.processors = Runtime.getRuntime().availableProcessors();
         	
-        	// TODO: 
+        	/* Remove the dead minions from the list */
+        	minion = this.minions.iterator();
+        	while (minion.hasNext()) {
+        		t = minion.next();
+        		if (!(t.isAlive())) {
+        			minion.remove();
+        		}
+        	}
+        	
+        	/* Add new minions if there's room */
+        	if (this.processors > this.minions.size()) {
+        		id = this.minions.size() + 1;
+        		for (; id <= this.processors; id++) {
+        			t = new Thread(new ParticipantMinionMRR(this, id));
+        			t.start();
+        			this.minions.add(t);
+        		}
+        	}
+        	
+        	// TODO: add jobs to the queue when we get them */
         }
     }
     
-    public ConcurrentLinkedQueue<JobEntry> getJobs() {
-    	return this.jobs;
+    public JobEntry getNextJob() throws Exception {
+    	return this.jobs.take();
     }
     
     
