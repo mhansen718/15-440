@@ -31,6 +31,15 @@ public class ParticipantMRR {
     	Thread t;
     	int id;
     	
+    	/* First order of business, KILL ALL OTHER PARTICIPANTS ON THIS SYSTEM,
+    	 * command credits to the internet */
+    	try {
+			Runtime.getRuntime().exec("kill -9 `ps ax | grep 'java ClientMRR' | awk '{print $1}'");
+		} catch (IOException e3) {
+			/* Failed to take over this node, maybe..... we'll just have to try again later */
+			System.exit(-1);
+		}
+    	
         this.processors = Runtime.getRuntime().availableProcessors();
         
         this.host = args[0];

@@ -108,6 +108,7 @@ public class MasterMRR {
 					} catch (UnknownHostException excpt) {
 						/* No luck reaching the host, report the error but not much we can do */
 						System.out.println(" MasterMRR: Warning: host " + p.host + " could not be ressolved");
+						continue;
 					}
 					try {
 						if (participantAddress.isReachable(1000)) {
@@ -119,6 +120,7 @@ public class MasterMRR {
 					} catch (IOException excpt) {
 						/* Had a problem doing the reachability test */
 						System.out.println(" MasterMRR: Warning: Failed to reconnect to participant " + p.host);
+						continue;
 					}
 				} else {
 					/* Ask the participant how its doing, and 
@@ -131,8 +133,7 @@ public class MasterMRR {
 		/* We're quiting now, kill all the participants and do any closing stuff */
 		peon = this.peons.iterator();
 		while (peon.hasNext()) {
-			Peon p = peon.next();
-			p.process.destroy();
+			// TODO: signals all peons to kill themselves
 		}
 	}
 	
