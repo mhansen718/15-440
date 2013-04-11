@@ -57,6 +57,7 @@ public class MasterMRR {
 						newPeon.host = part.split(":")[0];
 						newPeon.port = Integer.parseInt(part.split(":")[1]);
 						newPeon.isDead = true;
+						this.peons.add(newPeon);
 					}
 				} catch (Exception excpt) {
 					System.out.println(" MasterMRR: Failed to parse participant list in config file, please check the form");
