@@ -70,7 +70,10 @@ public class MasterMRR {
 		Thread UI = new Thread(new UserInterface(this));
 		UI.start();
 		
-		// TODO connect, listen dispatch jobs and stuff :(
+		/* Run Main loop */
+		while (UI.isAlive()) {
+			// TODO connect, listen dispatch jobs and stuff :(
+		}
 	}
 	
 	public ConcurrentLinkedQueue<Peon> getPeons() {
