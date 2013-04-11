@@ -69,8 +69,6 @@ public class MasterMRR {
 			}
 				// TODO: Add more parameters if needed ...
 
-			}
-
 			try {
 				configLineRead = config.readLine();
 			} catch (IOException e) {
