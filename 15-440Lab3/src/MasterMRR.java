@@ -1,5 +1,8 @@
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -83,11 +86,15 @@ public class MasterMRR {
 				System.exit(-2);
 			}
 		}
+		try {
+			config.close();
+		} catch (IOException e) {
+			/* Failed to close the file, whatever will we do.... */
+		}
 		
 		/* Create and start UI */
 		Thread UI = new Thread(new UserInterface(this));
 		UI.start();
-		
 		/* Run Main loop */
 		while (UI.isAlive()) {
 			peon = this.peons.iterator();
@@ -104,7 +111,8 @@ public class MasterMRR {
 					}
 					try {
 						if (participantAddress.isReachable(1000)) {
-							Runtime.getRuntime().exec("./ssh_work " + this.user + " " + p.host + " " + 
+							System.out.println("Remote Starting on " + p.host);
+							p.process = Runtime.getRuntime().exec("./ssh_work " + this.user + " " + p.host + " " + 
 									System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + Integer.toString(this.listenPort));
 							p.isDead = false;
 						}
@@ -118,6 +126,13 @@ public class MasterMRR {
 				}
 			}
 			// TODO connect, listen dispatch jobs and stuff :(
+		}
+		
+		/* We're quiting now, kill all the participants and do any closing stuff */
+		peon = this.peons.iterator();
+		while (peon.hasNext()) {
+			Peon p = peon.next();
+			p.process.destroy();
 		}
 	}
 	

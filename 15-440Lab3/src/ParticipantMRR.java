@@ -1,7 +1,11 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
@@ -17,6 +21,11 @@ public class ParticipantMRR {
     private BlockingQueue<JobEntry> jobs;
     private HashSet<Thread> minions;
     
+    public ParticipantMRR() {
+    	super();
+    	this.minions = new HashSet<Thread>();
+    }
+    
     public void main(String args[]) {
     	Iterator<Thread> minion;
     	Thread t;
@@ -30,6 +39,7 @@ public class ParticipantMRR {
             this.port = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
             // Our script somehow failed to give a valid integer port... What!?
+        	System.out.println(":(");
             System.exit(-1);
         }
         
@@ -39,8 +49,19 @@ public class ParticipantMRR {
             this.in = new ObjectInputStream(this.socket.getInputStream());
         } catch (IOException e) {
             // Couldn't connect to master, no error because this process was created remotely
-            System.exit(-1);
+            // System.exit(-1);
         }
+        
+        RandomAccessFile mine = null;
+		try {
+			mine = new RandomAccessFile(System.getProperty("user.dir") + "/hi." + InetAddress.getLocalHost().getHostName() + ".txt", "rw");
+		} catch (FileNotFoundException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		} catch (UnknownHostException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
         
         /* Run the main loop */
         while (true) {
@@ -65,7 +86,14 @@ public class ParticipantMRR {
         			this.minions.add(t);
         		}
         	}
-        	System.out.println("Running: minions are not at " + Integer.toString(this.minions.size()));
+        	System.out.println("hi");
+        	try {
+				mine.write("Hello\n".getBytes());
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	
         	try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
