@@ -27,10 +27,10 @@ public class UserInterface implements Runnable {
     		} else if (inputString.equals("jobs")) {
                 job = master.getJobs().iterator();
     			if (master.getJobs().size() == 0) {
-    				System.out.println("No Running Local Processes");
+    				System.out.println("No Running Jobs");
     			} else {
     				/* Print out all local processes (in local processes set) */
-    				System.out.println("Local Running Processes");
+    				System.out.println("Running Jobs");
     	    		while (job.hasNext()) {
     	                JobEntry t = job.next();
     					System.out.println(t.toString());
