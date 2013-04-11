@@ -47,10 +47,10 @@ public class MasterMRR {
 		while (configLineRead != null) {
 			/* Parse the line and case over the parameters that should be in the config file */
 			configParse = configLineRead.split("=");
-			configParameter = configParse[0].toLowerCase();
+			configParameter = configParse[0];
 			configValue = configParse[1];
-			switch (configParameter) {
-			case "participants":
+			if (configParameter.equalsIgnoreCase("participants")) {
+				/* Loop through and get all the participants */
 				try {
 					for (String part : configValue.split(", ")) {
 						Peon newPeon = new Peon();
@@ -62,13 +62,11 @@ public class MasterMRR {
 					System.out.println(" MasterMRR: Failed to parse participant list in config file, please check the form");
 					System.exit(-4);
 				}
-				break;
-			case "username":
+			} else if (configParameter.equalsIgnoreCase("username")) {
 				this.user = configValue;
-				break;
-			case "listen_port":
+			} else if (configParameter.equalsIgnoreCase("listen_port")) {
 				this.listenPort = Integer.parseInt(configValue);
-				break;
+			}
 				// TODO: Add more parameters if needed ...
 
 			}
