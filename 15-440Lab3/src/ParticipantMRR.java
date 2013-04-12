@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 public class ParticipantMRR {
@@ -19,7 +19,7 @@ public class ParticipantMRR {
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private BlockingQueue<TaskEntry> tasks;
+    private LinkedBlockingQueue<TaskEntry> tasks;
     private HashSet<Integer> completedTasks;
     private HashSet<Thread> minions;
     private Semaphore completedTasksProtect;

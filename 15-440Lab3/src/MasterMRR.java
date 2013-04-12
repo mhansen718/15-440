@@ -7,12 +7,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 public class MasterMRR {
 	
 	private ConcurrentLinkedQueue<Peon> peons;
-	private ConcurrentHashMap<Integer, TaskEntry> tasks;
+	private LinkedBlockingQueue<TaskEntry> pendingTasks;
+	private int currentPower;
 	private HashSet<JobEntry> jobs;
 	private String user;
 	private int listenPort;
@@ -97,11 +99,16 @@ public class MasterMRR {
 		/* Create and start UI */
 		Thread UI = new Thread(new UserInterface(this));
 		UI.start();
+		
 		/* Run Main loop */
 		while (UI.isAlive()) {
 			peon = this.peons.iterator();
+			int pow = 0;
 			while (peon.hasNext()) {
 				Peon p = peon.next();
+				if (p.dead > 0) {
+					pow += p.power;
+				}
 				if (p.isDead) {
 					/* If the peon is dead, see if it is reachable now and try
 					 * to restart the process if needed */
@@ -143,24 +150,7 @@ public class MasterMRR {
 				}
 			}
 			
-			/* Now, find all the tasks that can be sent out and sent them out */
-			task = this.tasks.values().iterator();
-			while (task.hasNext()) {
-				TaskEntry t = task.next();
-				if (t.outstandingPrereqs.isEmpty()) {
-					if (t.postreqs.isEmpty()) {
-						/* This is a completed job, send word to the application */
-						for (JobEntry j : this.jobs) {
-							if (j.id == t.jobID) {
-								this.jobs.remove(j);
-								break;
-							}
-						}
-					} else {
-						/* Dispatch to the next participant */
-					}
-				}
-			}
+			
 			// TODO connect, listen dispatch jobs and stuff :(
 		}
 	}
@@ -173,5 +163,9 @@ public class MasterMRR {
 	
 	public HashSet<JobEntry> getJobs() {
 		return this.jobs;
+	}
+	
+	public int getCurrentPower() {
+		return this.currentPower;
 	}
 }

@@ -1,3 +1,4 @@
+import java.net.Socket;
 import java.util.HashMap;
 
 
@@ -7,7 +8,8 @@ public class Peon {
 	public String host;
 	public int port;
 	public int power;
-	public boolean isDead;
+	public int dead;
+	public Socket connection;
 	public HashMap<Integer, TaskEntry> tasks;
 
 }
