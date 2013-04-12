@@ -134,7 +134,7 @@ public class MasterMRR {
 					for (Integer i : peonUpdate.completedTasks) {
 						/* Update the outstanding prereqs of all task waiting to be executed, 
 						 * sending out completed jobs */
-						TaskEntry work = p.tasks.remove(i);
+						TaskEntry work = this.tasks.remove(i);
 						for (Integer j : work.postreqs) {
 							this.tasks.get(j).outstandingPrereqs.remove(work.id);
 						}
