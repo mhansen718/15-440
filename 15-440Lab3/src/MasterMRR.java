@@ -23,7 +23,7 @@ public class MasterMRR {
 	public MasterMRR() {
 		super();
 		this.peons = new ConcurrentLinkedQueue<Peon>();
-		this.tasks = new ConcurrentHashMap<Integer, TaskEntry>();
+		this.pendingTasks = new LinkedBlockingQueue<TaskEntry>();
 	}
 
 	public void main(String args[]) {
@@ -33,9 +33,8 @@ public class MasterMRR {
 		String configParameter = null;
 		String configValue = null;
 		Iterator<Peon> peon;
-		Iterator<JobEntry> job;
 		InetAddress participantAddress = null;
-		ThreadGroup handlers = new ThreadGroup("handlers");
+		HashSet<Thread> handlers = new HashSet<Thread>();
 		
 		/* Check arguments and print usage if incorrect */
 		if (args.length != 1) {
@@ -118,7 +117,8 @@ public class MasterMRR {
 					pow += p.power;
 				}
 				
-				Thread t = new Thread(handlers, new MasterPeonHandlerMRR(this, p));
+				Thread t = new Thread(new MasterPeonHandlerMRR(this, p));
+				handlers.add(t);
 				t.start();
 				
 				if (p.isDead) {
@@ -163,10 +163,14 @@ public class MasterMRR {
 			}
 			this.currentPower = pow;
 			
-			job
+			for (JobEntry j : this.jobs) {
+				// TODO: Spawn ahndlers to process the jobs
+			}
 			
-			
-			// TODO connect, listen dispatch jobs and stuff :(
+			/* Wait for all the ahndlers to terminate to prevent overlapping issues */
+			for (Thread t : handlers) {
+				t.join();
+			}
 		}
 	}
 	
