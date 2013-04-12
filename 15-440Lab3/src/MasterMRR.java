@@ -18,6 +18,7 @@ public class MasterMRR {
 	private HashSet<JobEntry> jobs;
 	private String user;
 	private int listenPort;
+	private int retries;
 	
 	public MasterMRR() {
 		super();
@@ -32,9 +33,9 @@ public class MasterMRR {
 		String configParameter = null;
 		String configValue = null;
 		Iterator<Peon> peon;
-		Iterator<TaskEntry> task;
+		Iterator<JobEntry> job;
 		InetAddress participantAddress = null;
-		ParticipantStatus peonUpdate = null;
+		ThreadGroup handlers = new ThreadGroup("handlers");
 		
 		/* Check arguments and print usage if incorrect */
 		if (args.length != 1) {
@@ -69,7 +70,7 @@ public class MasterMRR {
 						Peon newPeon = new Peon();
 						newPeon.host = part.split(":")[0];
 						newPeon.port = Integer.parseInt(part.split(":")[1]);
-						newPeon.isDead = true;
+						newPeon.dead = 0;
 						this.peons.add(newPeon);
 					}
 				} catch (Exception excpt) {
@@ -80,6 +81,8 @@ public class MasterMRR {
 				this.user = configValue;
 			} else if (configParameter.equalsIgnoreCase("listen_port")) {
 				this.listenPort = Integer.parseInt(configValue);
+			} else if (configParameter.equalsIgnoreCase("retries")) {
+				this.retries = Integer.parseInt(configValue);
 			}
 				// TODO: Add more parameters if needed ...
 
@@ -102,13 +105,22 @@ public class MasterMRR {
 		
 		/* Run Main loop */
 		while (UI.isAlive()) {
+			
+			/* Loop through all the peons and spawn threads to process their status' and give
+			 * them new jobs, etc */
 			peon = this.peons.iterator();
 			int pow = 0;
 			while (peon.hasNext()) {
 				Peon p = peon.next();
+				
+				/* Add its power to the next status of power */
 				if (p.dead > 0) {
 					pow += p.power;
 				}
+				
+				Thread t = new Thread(handlers, new MasterPeonHandlerMRR(this, p));
+				t.start();
+				
 				if (p.isDead) {
 					/* If the peon is dead, see if it is reachable now and try
 					 * to restart the process if needed */
@@ -149,13 +161,16 @@ public class MasterMRR {
 					p.isDead = true;
 				}
 			}
+			this.currentPower = pow;
+			
+			job
 			
 			
 			// TODO connect, listen dispatch jobs and stuff :(
 		}
 	}
 	
-	public void addTask(int id, TaskEntry task) {
+	public void addTask(TaskEntry task) {
 		/* Give out the jobs list */
 		this.tasks.put(id, task);
 		return;
@@ -168,4 +183,13 @@ public class MasterMRR {
 	public int getCurrentPower() {
 		return this.currentPower;
 	}
+	
+	public int getRetries() {
+		return this.retries;
+	}
+	
+	public String getUsername() {
+		return this.user;
+	}
 }
+

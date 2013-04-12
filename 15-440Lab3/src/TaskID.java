@@ -9,5 +9,10 @@ public class TaskID implements Serializable {
 	public long jobID;
 	public int start;
 	public int end;
+	
+	public boolean equals(TaskID other) {
+		return ((this.jobID == other.jobID) &&
+				(this.start == other.jobID));
+	}
 
 }

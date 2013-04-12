@@ -1,11 +1,13 @@
 
-public class MasterHandlerMRR implements Runnable {
+public class MasterPeonHandlerMRR implements Runnable {
 
 	MasterMRR master;
+	Peon peon;
 	
-	public MasterHandlerMRR(MasterMRR master) {
+	public MasterPeonHandlerMRR(MasterMRR master, Peon peon) {
 		super();
 		this.master = master;
+		this.peon = peon;
 	}
 	
 	@Override
