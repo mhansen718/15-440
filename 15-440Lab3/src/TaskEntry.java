@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.HashSet;
 
 public class TaskEntry implements Serializable{
 
@@ -7,7 +8,11 @@ public class TaskEntry implements Serializable{
 	/* Container and message class between Master and Participants */
 	public int id;
 	public String jobName;
+	public String host;
+	public int port;
 	public ConfigurationMRR<?,?,?,?> config;
+	public HashSet<Integer> outstandingPrereqs;
+	public HashSet<Integer> postreqs;
 	
 	public String toString() {
 		return this.jobName;

@@ -31,7 +31,9 @@ public class MasterMRR {
 		String configParameter = null;
 		String configValue = null;
 		Iterator<Peon> peon;
+		Iterator<TaskEntry> task;
 		InetAddress participantAddress = null;
+		ParticipantStatus peonUpdate = null;
 		
 		/* Check arguments and print usage if incorrect */
 		if (args.length != 1) {
@@ -114,7 +116,7 @@ public class MasterMRR {
 					try {
 						if (participantAddress.isReachable(1000)) {
 							System.out.println("Remote Starting on " + p.host);
-							p.process = Runtime.getRuntime().exec("./ssh_work " + this.user + " " + p.host + " " + 
+							Runtime.getRuntime().exec("./ssh_work " + this.user + " " + p.host + " " + 
 									System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + Integer.toString(this.listenPort));
 							p.isDead = false;
 						}
@@ -126,6 +128,32 @@ public class MasterMRR {
 				} else {
 					/* Ask the participant how its doing, and 
 					 * declare it dead if unreachable */
+					// TODO: Talk to participant and get status
+					/* If the participant responded, update its status */
+					p.power = peonUpdate.power;
+					for (Integer i : peonUpdate.completedTasks) {
+						/* Update the outstanding prereqs of all task waiting to be executed, 
+						 * sending out completed jobs */
+						TaskEntry work = p.tasks.remove(i);
+						for (Integer j : work.postreqs) {
+							this.tasks.get(j).outstandingPrereqs.remove(work.id);
+						}
+					}
+					/* Else, the partipicant is unreachible, declare it dead */
+					p.isDead = true;
+				}
+			}
+			
+			/* Now, find all the tasks that can be sent out and sent them out */
+			task = this.tasks.values().iterator();
+			while (task.hasNext()) {
+				TaskEntry t = task.next();
+				if (t.outstandingPrereqs.isEmpty()) {
+					if (t.postreqs.isEmpty()) {
+						/* This is a completed job, send word to the application */
+					} else {
+						/* Dispatch to the next participant */
+					}
 				}
 			}
 			// TODO connect, listen dispatch jobs and stuff :(
