@@ -31,7 +31,7 @@ public class UserInterface implements Runnable {
     			} else {
     				/* Print out all local processes (in local processes set) */
     				System.out.println("Running Jobs");
-    				System.out.println("Name      Host:Port       Tasks");
+    				System.out.println("JobID    Name      Host:Port       Tasks");
     	    		while (job.hasNext()) {
     	                JobEntry t = job.next();
     					System.out.println(t.toString());

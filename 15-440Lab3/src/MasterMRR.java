@@ -1,8 +1,5 @@
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -153,6 +150,12 @@ public class MasterMRR {
 				if (t.outstandingPrereqs.isEmpty()) {
 					if (t.postreqs.isEmpty()) {
 						/* This is a completed job, send word to the application */
+						for (JobEntry j : this.jobs) {
+							if (j.id == t.jobID) {
+								this.jobs.remove(j);
+								break;
+							}
+						}
 					} else {
 						/* Dispatch to the next participant */
 					}

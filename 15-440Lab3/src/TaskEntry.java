@@ -8,6 +8,7 @@ public class TaskEntry implements Serializable{
 	/* Container and message class between Master and Participants */
 	public int id;
 	public String jobName;
+	public int jobID;
 	public String host;
 	public int port;
 	public ConfigurationMRR<?,?,?,?> config;
