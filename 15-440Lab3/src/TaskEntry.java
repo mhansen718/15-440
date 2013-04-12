@@ -14,7 +14,4 @@ public class TaskEntry implements Serializable{
 	public HashSet<Integer> outstandingPrereqs;
 	public HashSet<Integer> postreqs;
 	
-	public String toString() {
-		return this.jobName;
-	}
 }

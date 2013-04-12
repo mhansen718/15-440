@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -15,6 +16,7 @@ public class MasterMRR {
 	
 	private ConcurrentLinkedQueue<Peon> peons;
 	private ConcurrentHashMap<Integer, TaskEntry> tasks;
+	private HashSet<JobEntry> jobs;
 	private String user;
 	private int listenPort;
 	
@@ -164,5 +166,9 @@ public class MasterMRR {
 		/* Give out the jobs list */
 		this.tasks.put(id, task);
 		return;
+	}
+	
+	public HashSet<JobEntry> getJobs() {
+		return this.jobs;
 	}
 }
