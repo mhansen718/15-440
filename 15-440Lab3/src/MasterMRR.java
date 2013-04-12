@@ -7,20 +7,21 @@ import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class MasterMRR {
 	
 	private ConcurrentLinkedQueue<Peon> peons;
-	private ConcurrentLinkedQueue<JobEntry> jobs;
+	private ConcurrentHashMap<Integer, TaskEntry> tasks;
 	private String user;
 	private int listenPort;
 	
 	public MasterMRR() {
 		super();
 		this.peons = new ConcurrentLinkedQueue<Peon>();
-		this.jobs = new ConcurrentLinkedQueue<JobEntry>();
+		this.tasks = new ConcurrentHashMap<Integer, TaskEntry>();
 	}
 
 	public void main(String args[]) {
@@ -129,21 +130,11 @@ public class MasterMRR {
 			}
 			// TODO connect, listen dispatch jobs and stuff :(
 		}
-		
-		/* We're quiting now, kill all the participants and do any closing stuff */
-		peon = this.peons.iterator();
-		while (peon.hasNext()) {
-			// TODO: signals all peons to kill themselves
-		}
 	}
 	
-	public ConcurrentLinkedQueue<Peon> getPeons() {
-		/* Give out the partitipant list */
-		return this.peons;
-	}
-	
-	public ConcurrentLinkedQueue<JobEntry> getJobs() {
+	public void addTask(int id, TaskEntry task) {
 		/* Give out the jobs list */
-		return this.jobs;
+		this.tasks.put(id, task);
+		return;
 	}
 }

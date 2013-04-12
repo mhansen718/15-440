@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Semaphore;
 
 public class ParticipantMRR {
     
@@ -18,12 +19,16 @@ public class ParticipantMRR {
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    private BlockingQueue<JobEntry> jobs;
+    private BlockingQueue<TaskEntry> tasks;
+    private HashSet<Integer> completedTasks;
     private HashSet<Thread> minions;
+    private Semaphore completedTasksProtect;
     
     public ParticipantMRR() {
     	super();
     	this.minions = new HashSet<Thread>();
+    	this.completedTasks = new HashSet<Integer>();
+    	this.completedTasksProtect = new Semaphore(1);
     }
     
     public void main(String args[]) {
@@ -95,7 +100,7 @@ public class ParticipantMRR {
         			this.minions.add(t);
         		}
         	}
-        	System.out.println("hi");
+        	
         	try {
 				mine.write("Hello\n".getBytes());
 			} catch (Exception e1) {
@@ -113,8 +118,16 @@ public class ParticipantMRR {
         }
     }
     
-    public JobEntry getNextJob() throws Exception {
-    	return this.jobs.take();
+    public void completeTask(int id) {
+    	/* Acquire the semphore and add the task to the completed tasks list */
+    	this.completedTasksProtect.acquireUninterruptibly();
+    	this.completedTasks.add(id);
+    	this.completedTasksProtect.release();
+    }
+    
+    public TaskEntry getNextTask() throws Exception {
+    	/* Takes the next task off the queue */
+    	return this.tasks.take();
     }
     
     

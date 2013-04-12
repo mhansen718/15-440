@@ -11,7 +11,7 @@ public class ParticipantMinionMRR implements Runnable {
 	}
 	
 	public void run() {
-		JobEntry currentJob = null;
+		TaskEntry currentTask = null;
 		
 		/* Main loop */
 		while (true) {
@@ -22,13 +22,16 @@ public class ParticipantMinionMRR implements Runnable {
 			
 			/* Get the next job off the queue, if none, just sit and wait */
 			try {
-				currentJob = this.master.getNextJob();
+				currentTask = this.master.getNextTask();
 			} catch (Exception excpt) {
 				/* Failed to get the job, sadly, not much we can do :( */
 				return;
 			}
 			
 			// TODO: Do the job, thats your part...
+			
+			/* Add the job to the completed work list */
+			master.completeTask(currentTask.id);
 		}
 	}
 
