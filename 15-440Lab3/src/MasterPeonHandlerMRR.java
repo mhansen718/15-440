@@ -66,7 +66,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 				peon.power = peonStatus.power;
 				for (TaskID id : peonStatus.completedTasks) {
 					peon.runningTasks.remove(id);
-					/* Update the job's lists */
+					/* Update the jobs lists */
 					JobEntry j = this.master.findJob(id.jobID);
 					j.runningTasks.remove(id);
 					j.completeTasks.add(id);

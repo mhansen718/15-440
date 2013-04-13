@@ -1,4 +1,4 @@
-import java.util.HashSet;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 public class JobEntry {
@@ -8,8 +8,8 @@ public class JobEntry {
 	public String host;
 	public int port;
 	public ConfigurationMRR<?,?,?,?> config;
-	public HashSet<TaskID> runningTasks;
-	public HashSet<TaskID> completeTasks;
+	public ConcurrentLinkedQueue<TaskID> runningTasks;
+	public ConcurrentLinkedQueue<TaskID> completeTasks;
 	
 	public String toString() {
 		return Long.toString(id) + "  " + name + "  " + host + ":" + Integer.toString(port) + "  " + runningTasks.toString(); 
