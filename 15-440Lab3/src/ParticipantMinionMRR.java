@@ -17,17 +17,7 @@ public class ParticipantMinionMRR implements Runnable {
 	}
 	
 	public void run() {
-        int nextRecord;
-        Pair<?,?> mapOut;
-        ConfigurationMRR<?,?,?> config;
 		TaskEntry currentTask = null;
-        RandomAccessFile raf;
-        FileInputStream in;
-        ObjectOutputStream out;
-        byte[] input;
-        TreeMap<?,ArrayList<?>> redIn1;
-        TreeMap<?,ArrayList<?>> redIn2;
-        ArrayList<?> vals;
 		
 		/* Main loop */
 		while (true) {
@@ -43,38 +33,73 @@ public class ParticipantMinionMRR implements Runnable {
 				/* Failed to get the job, sadly, not much we can do :( */
 				return;
 			}
-			
-            config = currentTask.config;
             
-            // Do we have to map, or is this just a reduce?
-            if (currentTask.file2 != null) {
-                nextRecord = currentTask.id.start;
-                input = new byte[currentTask.recordSize];
-                try {
-                    raf = new RandomAccessFile(currentTask.file1, "r");
-                    raf.seek(nextRecord * currentTask.recordSize);
-                    in = new FileInputStream(raf.getFD);
-                    redIn1 = new TreeMap();
-                    for (int i = nextRecord; i < currentTask.id.end; i++) {
-                        in.read(input);
-                        mapOut = config.map(readRecord(input));
-                        vals = redIn1.get(mapOut.key);
-                        if (vals == null) {
-                            vals = new ArrayList();
-                            vals.add(mapOut.value);
-                            redIn1.put(mapOut.key,vals);
-                        } else {
-                            vals.add(mapOut.value);
-                        }
-                    }
-                } catch (Exception e) {
-                                                                            //TODO: error handling
-                }
-			}
+            mapReduce(currentTask.config, currentTask);
             
 			/* Add the job to the completed work list */
 			master.completeTask(currentTask.id);
 		}
 	}
+    
+    private <MAPIN, REDKEY, REDVAL> void mapReduce(ConfigurationMRR<MAPIN, REDKEY, REDVAL> config, TaskEntry currentTask) {
+        int nextRecord;
+        Pair<REDKEY,REDVAL> mapOut;
+        RandomAccessFile raf;
+        FileInputStream in;
+        ObjectOutputStream out;
+        ObjectInputStream objIn;
+        byte[] input;
+        TreeMap<REDKEY,ArrayList<REDVAL>> redIn1;
+        TreeMap<REDKYE,ArrayList<REDVAL>> redIn2;
+        ArrayList<REDVAL> vals;
+        Iterator<REDKEY> iter;
+        REDKEY key;
+        
+        // Do we have to map, or is this just a reduce?
+        if (currentTask.file2 != null) {
+            nextRecord = currentTask.id.start;
+            input = new byte[currentTask.recordSize];
+            try {
+                raf = new RandomAccessFile(currentTask.file1, "r");
+                raf.seek(nextRecord * currentTask.recordSize);
+                in = new FileInputStream(raf.getFD);
+                redIn1 = new TreeMap();
+                for (int i = nextRecord; i < currentTask.id.end; i++) {
+                    in.read(input);
+                    mapOut = config.map(readRecord(input));
+                    vals = redIn1.get(mapOut.key);
+                    if (vals == null) {
+                        vals = new ArrayList();
+                        vals.add(mapOut.value);
+                        redIn1.put(mapOut.key,vals);
+                    } else {
+                        vals.add(mapOut.value);
+                    }
+                }
+                in.close();
+            } catch (Exception e) {
+                                                                        //TODO: error handling
+            }
+            redIn2 = new TreeMap();
+        } else {
+            try {
+                objIn = new ObjectInputStream(new FileInputStream(currentTask.file1));
+                redIn1 = objIn.readObject();
+                objIn.close();
+                objIn = new ObjectInputStream(new FileInputStream(currentTask.file2));
+                redIn2 = objIn.readObject();
+                objIn.close();
+            } catch (Exception e) {
+                                                                        //TODO: error handling
+            }
+        }
+        
+        iter = (redIn1.keySet()).iterator();
+        while (iter.hasNext()) {
+            key = iter.next();
+            vals = redIn1.get(key);
+            
+        }
+    }
 
 }
