@@ -32,5 +32,9 @@ public class TaskID implements Serializable {
 		}
 		return returnTask;
 	}
+	
+	public String toFileName() {
+		return Long.toString(this.jobID) + "." + Integer.toString(this.start) + "." + Integer.toString(this.end) + ".mrr";
+	}
 
 }

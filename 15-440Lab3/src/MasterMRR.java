@@ -186,5 +186,15 @@ public class MasterMRR {
 	public int getAvailableTasks() {
 		return this.availableTasks;
 	}
+	
+	public boolean stopJob(long jobID, Exception err) {
+		/* Terminates a job */
+		JobEntry j = this.findJob(jobID);
+		if (j != null) {
+			j.err = err;
+			return true;
+		}
+		return false;
+	} 
 }
 

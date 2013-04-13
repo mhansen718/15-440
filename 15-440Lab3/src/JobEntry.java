@@ -10,6 +10,7 @@ public class JobEntry {
 	public ConfigurationMRR<?,?,?> config;
 	public ConcurrentLinkedQueue<TaskID> runningTasks;
 	public ConcurrentLinkedQueue<TaskID> completeTasks;
+	public Exception err;
 	
 	public String toString() {
 		return Long.toString(id) + "  " + name + "  " + host + ":" + Integer.toString(port) + "  " + runningTasks.toString(); 
