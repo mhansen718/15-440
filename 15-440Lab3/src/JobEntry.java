@@ -7,6 +7,7 @@ public class JobEntry {
 	public long id;
 	public String host;
 	public int port;
+	public ConfigurationMRR<?,?,?,?> config;
 	public HashSet<TaskID> runningTasks;
 	public HashSet<TaskID> completeTasks;
 	
