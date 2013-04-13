@@ -9,6 +9,7 @@ public class TaskEntry implements Serializable{
 	public TaskID id;
 	public String file1;
     public String file2;
+    public int recordSize;
 	public ConfigurationMRR<?,?,?> config;
 	
 }

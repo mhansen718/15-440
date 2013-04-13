@@ -11,7 +11,14 @@ public class ParticipantMinionMRR implements Runnable {
 	}
 	
 	public void run() {
+        int nextRecord;
+        Pair<?,?> mapOut;
+        ConfigurationMRR<?,?,?> config;
 		TaskEntry currentTask = null;
+        RandomAccessFile raf;
+        FileInputStream in;
+        ObjectOutputStream out;
+        byte[] input;
 		
 		/* Main loop */
 		while (true) {
@@ -28,8 +35,24 @@ public class ParticipantMinionMRR implements Runnable {
 				return;
 			}
 			
-			// TODO: Do the job, thats your part...
-			
+            config = currentTask.config;
+            
+            
+            // Do we have to map, or is this just a reduce?
+            if (currentTask.file2 != null) {
+                nextRecord = currentTask.id.start;
+                input = new byte[currentTask.recordSize];
+                try {
+                    raf = new RandomAccessFile(currentTask.file1, "r");
+                    raf.seek(nextRecord * currentTask.recordSize);
+                    in = new FileInputStream(raf.getFD);
+                    in.read(input);
+                    mapOut = config.map(readRecord(input));
+                    
+                } catch (Exception e) {
+                                                                            //TODO: error handling
+                }
+			}
 			/* Add the job to the completed work list */
 			master.completeTask(currentTask.id);
 		}

@@ -36,7 +36,8 @@ public class MasterJobHandlerMRR implements Runnable {
 						te.file1 = Long.toString(t1.jobID) + ".mrr";
 						te.file2 = Long.toString(t2.jobID) + ".mrr";
 						te.id = TaskID.merge(t1, t2);
-						
+						te.recordSize = 0;
+                        
 						this.master.addTask(te);
 						this.job.runningTasks.add(te.id);
 						this.job.completeTasks.remove(t1);

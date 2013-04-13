@@ -82,6 +82,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 						te.config = j.config;
 						te.file1 = j.config.inFile;
                         te.file2 = null;
+                        te.recordSize = j.config.recordSize;
 						te.id = new TaskID();
 						te.id.jobID = j.id;
 						if (modCount == 0) {
