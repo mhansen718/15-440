@@ -1,22 +1,17 @@
 import java.io.Serializable;
 
 
-public class ConfigurationMRR<MAPIN, REDKEY, REDVAL> implements Serializable {
-
-	private static final long serialVersionUID = 573305004071782408L;
+public abstract class ConfigurationMRR<MAPIN, REDKEY, REDVAL> extends Serializable {
 	
-    public MAPIN readRecord(byte[] record) {
-        
-    }
+    int recordSize, startRecord, endRecord;
     
-	public Pair<REDKEY, REDVAL> map(MAPIN mapin) {
-		/* The default map function, an identity map */
-		return new Pair(null, mapin);
-	}
+    String inputFile, outputFile;
     
-	public REDVAL reduce(REDVAL val1, REDVAL val2) {
-		/* The default reduce, an identity reduce */
-		return new Pair(val1,val2);
-	}
+    MAPIN readRecord(Object record);
+    
+	Pair<REDKEY, REDVAL> map(MAPIN mapin);
+    
+	REDVAL reduce(REDVAL val1, REDVAL val2);
 	
+    Object writeRecord(Pair<REDKEY, REDVAL>);
 }
