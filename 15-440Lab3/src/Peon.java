@@ -10,6 +10,6 @@ public class Peon {
 	public int power;
 	public int dead;
 	public Socket connection;
-	public HashMap<Integer, TaskEntry> tasks;
+	public HashMap<TaskID, TaskEntry> runningTasks;
 
 }

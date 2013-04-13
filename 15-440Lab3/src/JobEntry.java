@@ -7,9 +7,10 @@ public class JobEntry {
 	public long id;
 	public String host;
 	public int port;
-	public HashSet<Integer> tasks;
+	public HashSet<TaskID> runningTasks;
+	public HashSet<TaskID> completeTasks;
 	
 	public String toString() {
-		return Long.toString(id) + "  " + name + "  " + host + ":" + Integer.toString(port) + "  " + tasks.toString(); 
+		return Long.toString(id) + "  " + name + "  " + host + ":" + Integer.toString(port) + "  " + runningTasks.toString(); 
 	}
 }

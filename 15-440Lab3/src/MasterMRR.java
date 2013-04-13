@@ -1,29 +1,29 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 
 public class MasterMRR {
 	
 	private ConcurrentLinkedQueue<Peon> peons;
-	private LinkedBlockingQueue<TaskEntry> pendingTasks;
+	private ConcurrentLinkedQueue<TaskEntry> pendingTasks;
 	private int currentPower;
-	private HashSet<JobEntry> jobs;
+	private ConcurrentHashMap<Long, JobEntry> jobs;
 	private String user;
 	private int listenPort;
 	private int retries;
+	private int availableTasks;
 	
 	public MasterMRR() {
 		super();
 		this.peons = new ConcurrentLinkedQueue<Peon>();
-		this.pendingTasks = new LinkedBlockingQueue<TaskEntry>();
+		this.pendingTasks = new ConcurrentLinkedQueue<TaskEntry>();
+		this.jobs = new ConcurrentHashMap<Long, JobEntry>();
 	}
 
 	public void main(String args[]) {
@@ -32,8 +32,8 @@ public class MasterMRR {
 		String[] configParse = null;
 		String configParameter = null;
 		String configValue = null;
+		int pow = this.peons.size();
 		Iterator<Peon> peon;
-		InetAddress participantAddress = null;
 		HashSet<Thread> handlers = new HashSet<Thread>();
 		
 		/* Check arguments and print usage if incorrect */
@@ -108,7 +108,9 @@ public class MasterMRR {
 			/* Loop through all the peons and spawn threads to process their status' and give
 			 * them new jobs, etc */
 			peon = this.peons.iterator();
-			int pow = 0;
+			this.currentPower = pow;
+			pow = 0;
+			this.availableTasks = this.pendingTasks.size();
 			while (peon.hasNext()) {
 				Peon p = peon.next();
 				
@@ -120,68 +122,42 @@ public class MasterMRR {
 				Thread t = new Thread(new MasterPeonHandlerMRR(this, p));
 				handlers.add(t);
 				t.start();
-				
-				if (p.isDead) {
-					/* If the peon is dead, see if it is reachable now and try
-					 * to restart the process if needed */
-					try {
-						participantAddress = InetAddress.getByName(p.host);
-					} catch (UnknownHostException excpt) {
-						/* No luck reaching the host, report the error but not much we can do */
-						System.out.println(" MasterMRR: Warning: host " + p.host + " could not be ressolved");
-						continue;
-					}
-					try {
-						if (participantAddress.isReachable(1000)) {
-							System.out.println("Remote Starting on " + p.host);
-							Runtime.getRuntime().exec("./ssh_work " + this.user + " " + p.host + " " + 
-									System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + Integer.toString(this.listenPort));
-							p.isDead = false;
-						}
-					} catch (IOException excpt) {
-						/* Had a problem doing the reachability test */
-						System.out.println(" MasterMRR: Warning: Failed to reconnect to participant " + p.host);
-						continue;
-					}
-				} else {
-					/* Ask the participant how its doing, and 
-					 * declare it dead if unreachable */
-					// TODO: Talk to participant and get status
-					/* If the participant responded, update its status */
-					p.power = peonUpdate.power;
-					for (Integer i : peonUpdate.completedTasks) {
-						/* Update the outstanding prereqs of all task waiting to be executed, 
-						 * sending out completed jobs */
-						TaskEntry work = this.tasks.remove(i);
-						for (Integer j : work.postreqs) {
-							this.tasks.get(j).outstandingPrereqs.remove(work.id);
-						}
-					}
-					/* Else, the partipicant is unreachible, declare it dead */
-					p.isDead = true;
-				}
 			}
-			this.currentPower = pow;
 			
-			for (JobEntry j : this.jobs) {
+			for (JobEntry j : this.jobs.values()) {
 				// TODO: Spawn ahndlers to process the jobs
 			}
 			
-			/* Wait for all the ahndlers to terminate to prevent overlapping issues */
+			/* Wait for all the handlers to terminate to prevent overlapping issues */
 			for (Thread t : handlers) {
-				t.join();
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+					/* Should never happen */
+					System.out.println(" MasterMRR: Process wait interrupted, exiting...");
+					System.exit(-3);
+				}
 			}
 		}
 	}
 	
 	public void addTask(TaskEntry task) {
 		/* Give out the jobs list */
-		this.tasks.put(id, task);
+		this.pendingTasks.add(task);
 		return;
 	}
 	
-	public HashSet<JobEntry> getJobs() {
-		return this.jobs;
+	public Collection<JobEntry> getJobs() {
+		/* Return the whole job list */
+		return this.jobs.values();
+	}
+	
+	public JobEntry findJob(long id) {
+		return this.jobs.get(id);
+	}
+	
+	public TaskEntry getTask() {
+		return this.pendingTasks.poll();
 	}
 	
 	public int getCurrentPower() {
@@ -194,6 +170,14 @@ public class MasterMRR {
 	
 	public String getUsername() {
 		return this.user;
+	}
+	
+	public int getListenPort() {
+		return this.listenPort;
+	}
+	
+	public int getAvailableTasks() {
+		return this.availableTasks;
 	}
 }
 
