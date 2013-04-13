@@ -80,8 +80,8 @@ public class MasterPeonHandlerMRR implements Runnable {
 						/* Create new tasks and add them to the job and task queue */
 						TaskEntry te = new TaskEntry();
 						te.config = j.config;
-						te.files = new HashSet<String>();
-						te.files.add(j.config.inFile);
+						te.file1 = j.config.inFile;
+                        te.file2 = null;
 						te.id = new TaskID();
 						te.id.jobID = j.id;
 						if (modCount == 0) {

@@ -33,9 +33,8 @@ public class MasterJobHandlerMRR implements Runnable {
 					 * job running task list, also remove the two tasks from the job completed list */
 					if ((t1.isAdjacent(t2)) && !(t1.equals(t2))) {
 						TaskEntry te = new TaskEntry();
-						te.files = new HashSet<String>();
-						te.files.add(Long.toString(t1.jobID) + ".mrr");
-						te.files.add(Long.toString(t2.jobID) + ".mrr");
+						te.file1 = Long.toString(t1.jobID) + ".mrr";
+						te.file2 = Long.toString(t2.jobID) + ".mrr";
 						te.id = TaskID.merge(t1, t2);
 						
 						this.master.addTask(te);
