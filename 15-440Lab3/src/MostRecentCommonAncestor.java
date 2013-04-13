@@ -1,5 +1,5 @@
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.TreeMap;
 
 
 public class MostRecentCommonAncestor {
@@ -33,6 +33,9 @@ public class MostRecentCommonAncestor {
 		MemberRecord p2 = new MemberRecord();
 		p2.self = args[5];
 		p2.birthyear = Integer.parseInt(args[6]);
+		HashSet<MemberRecord> pairing = new HashSet<MemberRecord>();
+		pairing.add(p1);
+		pairing.add(p2);
 		
 		/* Make the job, start it and wait on it! */
 		JobMRR myJob = new JobMRR(config, "AncestorJob " + args[1] + "-" + args[2]);
@@ -47,20 +50,19 @@ public class MostRecentCommonAncestor {
 		if (myJob.encounteredException()) {
 			System.out.println("Oh no!!! The job failed... because a " + myJob.getException().toString() + " Exception happened....");
 		} else {
-			ArrayList<Pair<HashSet<MemberRecord>, HashSet<MemberRecord>>> reduced = myJob.readFile();
-			for (Pair<HashSet<MemberRecord>, HashSet<MemberRecord>> pair : reduced) {
-				if (pair.key.contains(p1) && pair.key.contains(p2)) {
-					/* Find the youngest of the common ancestors */
-					MemberRecord currentYoung = (MemberRecord) pair.value.toArray()[0];
-					for (MemberRecord mem : pair.value) {
-						if (mem.birthyear > currentYoung.birthyear) {
-							currentYoung = mem;
-						}
+			TreeMap<HashSet<MemberRecord>, HashSet<MemberRecord>>> reduced = myJob.readFile();
+			if (reduced.containsKey(pairing)) {
+				HashSet<MemberRecord> pair = reduced.get(pairing);
+				/* Find the youngest of the common ancestors */
+				MemberRecord currentYoung = (MemberRecord) pair.toArray()[0];
+				for (MemberRecord mem : pair) {
+					if (mem.birthyear > currentYoung.birthyear) {
+						currentYoung = mem;
 					}
-					System.out.println(p1.self + " and " + p2.self + " have " + currentYoung.self + " born " + currentYoung.birthyear + " as their youngest common ancestor");
 				}
+				System.out.println(p1.self + " and " + p2.self + " have " + currentYoung.self + " born " + currentYoung.birthyear + " as their youngest common ancestor");
 			}
-			System.out.println("These two people have no common ancestors");
 		}
+		System.out.println("These two people have no common ancestors");
 	} 
 }
