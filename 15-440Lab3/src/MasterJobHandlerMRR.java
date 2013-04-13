@@ -18,8 +18,8 @@ public class MasterJobHandlerMRR implements Runnable {
 		Iterator<TaskID> tid1 = null;
 		Iterator<TaskID> tid2 = null;
 		
-		/* Check if the job is done, if so, send word to the app */
-		if ((this.job.runningTasks.size() == 0) && (this.job.completeTasks.size() == 1)) {
+		/* Check if the job is done or errored, if so, send word to the app */
+		if (((this.job.runningTasks.size() == 0) && (this.job.completeTasks.size() == 1)) || (this.job.err != null)) {
 			// TODO: Send signal to app !!!!
 		} else {
 			/* Loop through the list of completed tasks and pair up into a new task */
@@ -31,10 +31,10 @@ public class MasterJobHandlerMRR implements Runnable {
 					TaskID t2 = tid2.next();
 					/* If the blocks for records are adjacent, merge tasks and add to task queue and 
 					 * job running task list, also remove the two tasks from the job completed list */
-					if ((t1.isAdjacent(t2)) && !(t1.equals(t2))) {
+					if (t1.isAdjacent(t2)) {
 						TaskEntry te = new TaskEntry();
-						te.file1 = Long.toString(t1.jobID) + ".mrr";
-						te.file2 = Long.toString(t2.jobID) + ".mrr";
+						te.file1 = t1.toFileName();
+						te.file2 = t2.toFileName();
 						te.id = TaskID.merge(t1, t2);
 						te.recordSize = 0;
                         

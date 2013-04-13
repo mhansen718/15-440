@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -53,7 +54,11 @@ public class MasterPeonHandlerMRR implements Runnable {
 			
 			for (int i = 0; i < tasksToDo; i++) {
 				TaskEntry te = this.master.getTask();
-				tasks.put(te.id, te);
+				JobEntry j = this.master.findJob(te.id.jobID);
+				/* If a job has been terminated, dont send it out to be done */
+				if ((j != null) && (j.err == null)) {
+					tasks.put(te.id, te);
+				}
 			}
 			
 			peon.runningTasks.putAll(tasks);
@@ -66,10 +71,15 @@ public class MasterPeonHandlerMRR implements Runnable {
 				peon.power = peonStatus.power;
 				for (TaskID id : peonStatus.completedTasks) {
 					peon.runningTasks.remove(id);
-					/* Update the jobs lists */
+					/* Update the jobs lists, clear up the files if the job is terminated */
 					JobEntry j = this.master.findJob(id.jobID);
-					j.runningTasks.remove(id);
-					j.completeTasks.add(id);
+					if ((j != null) && (j.err == null)) {
+						j.runningTasks.remove(id);
+						j.completeTasks.add(id);
+					} else {
+						File f = new File(id.toFileName());
+						f.delete();
+					}
 				}
 				for (JobEntry j : peonStatus.newJobs) {
 					/* Figure out the record partitioning */

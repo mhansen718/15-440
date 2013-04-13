@@ -40,6 +40,12 @@ public class UserInterface implements Runnable {
     		} else if (inputString.equals("quit")) {
     			System.out.println("Goodbye!");
     			return;
+    		} else if (inputString.contains("stop")) {
+    			if (this.master.stopJob(Long.parseLong(inputString.split(" ")[1]), new ServerTerminationException())) {
+    				System.out.println("Terminate job " + Integer.parseInt(inputString.split(" ")[1]));
+    			} else {
+    				System.out.println("Failed to terminate job " + Integer.parseInt(inputString.split(" ")[1]));
+    			}
     		} else {
     			System.out.println(inputString + ": Command Not Found");
     		}
