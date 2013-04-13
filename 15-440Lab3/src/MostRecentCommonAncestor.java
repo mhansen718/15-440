@@ -27,6 +27,17 @@ public class MostRecentCommonAncestor {
 		JobMRR myJob = new JobMRR(config, "AncestorJob " + args[1] + "-" + args[2]);
 		myJob.submit();
 		
-		myJob.waitOnJob();
-	}
+		try {
+			myJob.waitOnJob();
+		} catch (InterruptedException e) {
+			System.out.println("We were inturrpted while waiting on our job, :(");
+		}
+		
+		if (myJob.encounteredException()) {
+			System.out.println("Oh no!!! The job failed... because a " + myJob.getException().toString() + " Exception happened....");
+		} else {
+			myJob.readFile();
+			
+		}
+	} 
 }
