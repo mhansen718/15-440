@@ -23,7 +23,7 @@ public class JobMRR {
 	public void submit() {
 		/* Submit this job to the MapReduce Master for execution,
 		 * throws exception if rejected by master (for reasons like repeat name or something) */
-		this.t = new Thread(new JobExec(this));
+		this.t = new Thread(new JobExec(this.jobName, this.config));
 		this.t.start();
 		return;
 	}
@@ -35,7 +35,7 @@ public class JobMRR {
 	
 	public boolean encounteredException() {
 		/* Checks if there was an error during the course of the job */
-		return (this.err == null);
+		return !(this.err == null);
 	}
 	
 	public Exception getException() {
@@ -43,13 +43,13 @@ public class JobMRR {
 		return this.err;
 	}
 	
-	public void waitOnJob() throws Exception {
+	public void waitOnJob() throws InterruptedException {
 		/* Sleep until job is done */
 		this.t.join();
 		return;
 	}
 	
-	public void waitOnJob(long timeout) throws Exception {
+	public void waitOnJob(long timeout) throws InterruptedException {
 		/* Sleep until job is done; now with timeout! */
 		this.t.join(timeout);
 		return;
@@ -58,11 +58,6 @@ public class JobMRR {
 	/* These methods are for the thread to use to set the exception and filename */
 	public void setException(Exception excpt) {
 		this.err = excpt;
-		return;
-	}
-	
-	public void setFile(String name) {
-		this.file = name;
 		return;
 	}
 }
