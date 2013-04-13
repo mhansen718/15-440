@@ -8,6 +8,6 @@ public class TaskEntry implements Serializable{
 	/* Container and message class between Master and Participants */
 	public TaskID id;
 	public HashSet<String> files;
-	public ConfigurationMRR<?,?,?,?> config;
+	public ConfigurationMRR<?,?,?> config;
 	
 }

@@ -20,14 +20,14 @@ public class ParticipantMRR {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private LinkedBlockingQueue<TaskEntry> tasks;
-    private HashSet<Integer> completedTasks;
+    private HashSet<TaskID> completedTasks;
     private HashSet<Thread> minions;
     private Semaphore completedTasksProtect;
     
     public ParticipantMRR() {
     	super();
     	this.minions = new HashSet<Thread>();
-    	this.completedTasks = new HashSet<Integer>();
+    	this.completedTasks = new HashSet<TaskID>();
     	this.completedTasksProtect = new Semaphore(1);
     }
     
@@ -118,7 +118,7 @@ public class ParticipantMRR {
         }
     }
     
-    public void completeTask(int id) {
+    public void completeTask(TaskID id) {
     	/* Acquire the semphore and add the task to the completed tasks list */
     	this.completedTasksProtect.acquireUninterruptibly();
     	this.completedTasks.add(id);

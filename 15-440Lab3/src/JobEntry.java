@@ -7,7 +7,7 @@ public class JobEntry {
 	public long id;
 	public String host;
 	public int port;
-	public ConfigurationMRR<?,?,?,?> config;
+	public ConfigurationMRR<?,?,?> config;
 	public ConcurrentLinkedQueue<TaskID> runningTasks;
 	public ConcurrentLinkedQueue<TaskID> completeTasks;
 	
