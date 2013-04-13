@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -34,9 +35,9 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecord, HashSet<Memb
 	}
 
 	@Override
-	public Pair<HashSet<MemberRecord>, HashSet<MemberRecord>> map(
+	public ArrayList<Pair<HashSet<MemberRecord>, HashSet<MemberRecord>>> map(
 			FamilyRecord mapin) {
-		
+		ArrayList<Pair<HashSet<MemberRecord>, HashSet<MemberRecord>>> returnPairList = new ArrayList<Pair<HashSet<MemberRecord>, HashSet<MemberRecord>>>();
 		for (MemberRecord mem : mapin.family) {
 			HashSet<MemberRecord> pairing = new HashSet<MemberRecord>();
 			pairing.add(mapin.self);

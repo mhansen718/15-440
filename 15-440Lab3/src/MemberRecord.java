@@ -7,4 +7,8 @@ public class MemberRecord implements Serializable {
 	
 	public String self;
 	public int birthyear;
+	
+	public boolean equals(MemberRecord other) {
+		return (this.self.equals(other.self) && (this.birthyear == other.birthyear));
+	}
 }
