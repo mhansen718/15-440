@@ -50,10 +50,12 @@ public class ParticipantMinionMRR implements Runnable {
         ObjectInputStream objIn;
         byte[] input;
         TreeMap<REDKEY,ArrayList<REDVAL>> redIn1;
-        TreeMap<REDKYE,ArrayList<REDVAL>> redIn2;
+        TreeMap<REDKEY,ArrayList<REDVAL>> redIn2;
+        TreeMap<REDKEY,ArrayList<REDVAL>> redOut;
         ArrayList<REDVAL> vals;
         Iterator<REDKEY> iter;
         REDKEY key;
+        REDVAL val;
         
         // Do we have to map, or is this just a reduce?
         if (currentTask.file2 != null) {
@@ -94,11 +96,50 @@ public class ParticipantMinionMRR implements Runnable {
             }
         }
         
+        redOut = new TreeMap();
         iter = (redIn1.keySet()).iterator();
         while (iter.hasNext()) {
             key = iter.next();
             vals = redIn1.get(key);
             
+            if (redIn2.containsKey(key)) {
+                vals.addAll(redIn2.get(key));
+                redIn2.remove(key);
+            }
+            
+            val = vals.get(0);
+            for (int i = 1; i < vals.size(); i++) {
+                val = config.reduce(val,vals.get(i));
+            }
+            
+            vals = new ArrayList();
+            vals.add(val);
+            
+            redOut.put(key,vals);
+        }
+        
+        iter = (redIn2.keySet()).iterator();
+        while (iter.hasNext()) {
+            key = iter.next();
+            vals = redIn2.get(key);
+            
+            val = vals.get(0);
+            for (int i = 1; i < vals.size(); i++) {
+                val = config.reduce(val,vals.get(i));
+            }
+            
+            vals = new ArrayList();
+            vals.add(val);
+            
+            redOut.put(key,vals);
+        }
+        
+        try {
+            out = new ObjectOutputStream(new FileOutputStream(//TODO: FILENAME));
+            out.writeObject(redOut);
+            out.close();
+        } catch (Exception e) {
+                                                                            //TODO: error handling
         }
     }
 
