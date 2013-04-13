@@ -1,19 +1,19 @@
 
 public class JobMRR {
 
-	private ConfigurationMRR<?, ?, ?, ?> config;
+	private ConfigurationMRR<?, ?, ?> config;
 	private String jobName;
 	private Thread t;
 	private Exception err;
 	private String file;
 	
-	public JobMRR(ConfigurationMRR<?, ?, ?, ?> config) {
+	public JobMRR(ConfigurationMRR<?, ?, ?> config) {
 		super();
 		this.config = config;
 		this.err = null;
 	}
 	
-	public JobMRR(ConfigurationMRR<?, ?, ?, ?> config, String name) {
+	public JobMRR(ConfigurationMRR<?, ?, ?> config, String name) {
 		super();
 		this.config = config;
 		this.jobName = name;
