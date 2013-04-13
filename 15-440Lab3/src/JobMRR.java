@@ -5,11 +5,11 @@ public class JobMRR {
 	private String jobName;
 	private Thread t;
 	private Exception err;
-	private String file;
 	
 	public JobMRR(ConfigurationMRR<?, ?, ?> config) {
 		super();
 		this.config = config;
+		this.jobName = "Job on " + config.inFile;
 		this.err = null;
 	}
 	
