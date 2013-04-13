@@ -2,12 +2,13 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.HashSet;
 
 
 public class MasterPeonHandlerMRR implements Runnable {
 
-	MasterMRR master;
-	Peon peon;
+	private MasterMRR master;
+	private Peon peon;
 	
 	public MasterPeonHandlerMRR(MasterMRR master, Peon peon) {
 		super();
@@ -21,6 +22,10 @@ public class MasterPeonHandlerMRR implements Runnable {
 		int tasksToDo = 0;
 		HashMap<TaskID, TaskEntry> tasks = new HashMap<TaskID, TaskEntry>();
 		ParticipantStatus peonStatus = null;
+		int step = 0;
+		int length = 0;
+		int mod = 0;
+		int modCount = 0;
 		
 		if (this.peon.dead == 0) {
 			/* This participant is very dead, try to revive it */
@@ -61,19 +66,43 @@ public class MasterPeonHandlerMRR implements Runnable {
 				peon.power = peonStatus.power;
 				for (TaskID id : peonStatus.completedTasks) {
 					peon.runningTasks.remove(id);
-					/* Update the job's lists */
+					/* Update the jobs lists */
 					JobEntry j = this.master.findJob(id.jobID);
 					j.runningTasks.remove(id);
 					j.completeTasks.add(id);
 				}
 				for (JobEntry j : peonStatus.newJobs) {
-					
+					/* Figure out the record partitioning */
+					length = j.config.end - j.config.start;
+					step = (length / this.master.getCurrentPower());
+					mod = (length % this.master.getCurrentPower());
+					for (int i = 0; i < this.master.getCurrentPower(); i++) {
+						/* Create new tasks and add them to the job and task queue */
+						TaskEntry te = new TaskEntry();
+						te.config = j.config;
+						te.files = new HashSet<String>();
+						te.files.add(j.config.inFile);
+						te.id = new TaskID();
+						te.id.jobID = j.id;
+						if (modCount == 0) {
+							te.id.end = j.config.start + ((i + 1) * step) + mod;
+							te.id.start = j.config.start + (i * step) + mod;
+						} else {
+							te.id.end = j.config.start + ((i + 1) * step) + (mod - modCount) + 1;
+							te.id.start = j.config.start + (i * step) + (mod - modCount);
+							modCount--;
+						}
+						j.runningTasks.add(te.id);
+						this.master.addTask(te);
+					}
+					this.master.addJob(j);
 				}
+				// TODO: Send confirmation
 			} else {
 				/* Participant failed to response, make it a bit more dead, and
 				 * if its totally dead, dump its work load onto the pending tasks
 				 * queue */
-				 peon.dead -= 1;
+				 peon.dead--;
 				 if (peon.dead == 0) {
 					 for (TaskEntry te : peon.runningTasks.values()) {
 						 this.master.addTask(te);

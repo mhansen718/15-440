@@ -14,5 +14,23 @@ public class TaskID implements Serializable {
 		return ((this.jobID == other.jobID) &&
 				(this.start == other.jobID));
 	}
+	
+	public boolean isAdjacent(TaskID other) {
+		return ((this.end == other.start) || 
+				(this.start == other.end));
+	}
+	
+	public static TaskID merge(TaskID task1, TaskID task2) {
+		TaskID returnTask = new TaskID();
+		returnTask.jobID = task1.jobID;
+		if (task1.start < task2.start) {
+			returnTask.start = task1.start;
+			returnTask.end = task2.end;
+		} else {
+			returnTask.start = task2.start;
+			returnTask.end = task1.end;
+		}
+		return returnTask;
+	}
 
 }

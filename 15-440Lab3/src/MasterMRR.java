@@ -125,7 +125,9 @@ public class MasterMRR {
 			}
 			
 			for (JobEntry j : this.jobs.values()) {
-				// TODO: Spawn ahndlers to process the jobs
+				Thread t = new Thread(new MasterJobHandlerMRR(this, j));
+				handlers.add(t);
+				t.start();
 			}
 			
 			/* Wait for all the handlers to terminate to prevent overlapping issues */
@@ -154,6 +156,11 @@ public class MasterMRR {
 	
 	public JobEntry findJob(long id) {
 		return this.jobs.get(id);
+	}
+	
+	public void addJob(JobEntry job) {
+		this.jobs.put(job.id, job);
+		return;
 	}
 	
 	public TaskEntry getTask() {
