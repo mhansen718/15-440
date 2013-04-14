@@ -13,7 +13,7 @@ public abstract class ConfigurationMRR<MAPIN, REDKEY, REDVAL> implements Seriali
     
     abstract public MAPIN readRecord(byte[] record);
     
-	abstract public Pair<REDKEY, REDVAL> map(MAPIN mapin);
+	abstract public ArrayList<Pair<REDKEY, REDVAL>> map(MAPIN mapin);
     
 	abstract public REDVAL reduce(REDVAL val1, REDVAL val2);
 	

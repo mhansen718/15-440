@@ -27,7 +27,15 @@ public class MasterPeonHandlerMRR implements Runnable {
 		int length = 0;
 		int mod = 0;
 		int modCount = 0;
-		
+        ObjectOutputStream out;
+        ObjectInputStream in;
+        
+		try {
+            out = new ObjectOutputStream(this.peon.socket.getOutputStream());
+        } catch (Exception e) {
+                                                                //TODO: error
+        }
+        
 		if (this.peon.dead == 0) {
 			/* This participant is very dead, try to revive it */
 			try {
@@ -43,7 +51,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 					Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
 							System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
 							Integer.toString(this.master.getListenPort()));
-					// TODO: Reconnect to participant and see what his status is
+					//TODO: Ehh?  What's happening here?
 				}
 			} catch (IOException excpt) {
 				/* Had a problem doing the reachability test, not much we can do here... */
@@ -62,7 +70,11 @@ public class MasterPeonHandlerMRR implements Runnable {
 			}
 			
 			peon.runningTasks.putAll(tasks);
-			// TODO: Ship this list off the to participant
+			try {
+                out.writeObject(peonStatus);
+            } catch (Exception e) {
+                                                        //TODO: error
+            }
 			
 			// TODO: Get back a status class thingy
 			

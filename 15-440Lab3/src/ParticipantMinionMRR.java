@@ -43,7 +43,7 @@ public class ParticipantMinionMRR implements Runnable {
     
     private <MAPIN, REDKEY, REDVAL> void mapReduce(ConfigurationMRR<MAPIN, REDKEY, REDVAL> config, TaskEntry currentTask) {
         int nextRecord;
-        Pair<REDKEY,REDVAL> mapOut;
+        ArrayList<Pair<REDKEY,REDVAL>> mapOut;
         RandomAccessFile raf;
         FileInputStream in;
         ObjectOutputStream out;
@@ -69,13 +69,15 @@ public class ParticipantMinionMRR implements Runnable {
                 for (int i = nextRecord; i < currentTask.id.end; i++) {
                     in.read(input);
                     mapOut = config.map(readRecord(input));
-                    vals = redIn1.get(mapOut.key);
-                    if (vals == null) {
-                        vals = new ArrayList();
-                        vals.add(mapOut.value);
-                        redIn1.put(mapOut.key,vals);
-                    } else {
-                        vals.add(mapOut.value);
+                    for (Pair<REDKEY,REDVAL> p : mapOut) {
+                        vals = redIn1.get(p.key);
+                        if (vals == null) {
+                            vals = new ArrayList();
+                            vals.add(p.value);
+                            redIn1.put(p.key,vals);
+                        } else {
+                            vals.add(p.value);
+                        }
                     }
                 }
                 in.close();
@@ -135,7 +137,7 @@ public class ParticipantMinionMRR implements Runnable {
         }
         
         try {
-            out = new ObjectOutputStream(new FileOutputStream(//TODO: FILENAME));
+            out = new ObjectOutputStream(new FileOutputStream(currentTask.id.toFileName()));
             out.writeObject(redOut);
             out.close();
         } catch (Exception e) {
