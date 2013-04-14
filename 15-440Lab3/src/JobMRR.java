@@ -4,21 +4,21 @@ import java.io.ObjectInputStream;
 import java.util.TreeMap;
 
 
-public class JobMRR {
+public class JobMRR<MAPIN,REDKEY,REDVAL> {
 
-	private ConfigurationMRR<?, ?, ?> config;
+	private ConfigurationMRR<MAPIN, REDKEY, REDVAL> config;
 	private String jobName;
 	private Thread t;
 	private Exception err;
 	
-	public JobMRR(ConfigurationMRR<?, ?, ?> config) {
+	public JobMRR(ConfigurationMRR<MAPIN, REDKEY, REDVAL> config) {
 		super();
 		this.config = config;
 		this.jobName = "Job on " + config.inFile;
 		this.err = null;
 	}
 	
-	public JobMRR(ConfigurationMRR<?, ?, ?> config, String name) {
+	public JobMRR(ConfigurationMRR<MAPIN, REDKEY, REDVAL> config, String name) {
 		super();
 		this.config = config;
 		this.jobName = name;
@@ -60,9 +60,9 @@ public class JobMRR {
 		return;
 	}
 	
-	public TreeMap<?, ?> readFile() throws IOException, ClassNotFoundException {
+	public TreeMap<REDKEY, REDVAL> readFile() throws IOException, ClassNotFoundException {
 		ObjectInputStream obj = new ObjectInputStream(new FileInputStream(this.config.outFile));
-		return ((TreeMap<?, ?>) obj.readObject());
+		return ((TreeMap<REDKEY, REDVAL>) obj.readObject());
 	}
 	
 	/* These methods are for the thread to use to set the exception */

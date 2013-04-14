@@ -39,7 +39,7 @@ public class MostRecentCommonAncestor {
 		pairing.add(p2);
 		
 		/* Make the job, start it and wait on it! */
-		JobMRR myJob = new JobMRR(config, "AncestorJob " + args[1] + "-" + args[2]);
+		JobMRR<FamilyRecord, HashSet<MemberRecord>, HashSet<MemberRecord>> myJob = new JobMRR<FamilyRecord, HashSet<MemberRecord>, HashSet<MemberRecord>>(config, "AncestorJob " + args[1] + "-" + args[2]);
 		myJob.submit();
 		
 		try {

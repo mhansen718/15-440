@@ -1,6 +1,8 @@
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,6 +26,7 @@ public class JobExec implements Runnable {
         ObjectOutputStream out;
         ObjectInputStream in;
         JobEntry response = null;
+        ServerSocket waitSocket = null;
     
 		/* Make a new job entry to be sent to the local participant */
 		JobEntry submitJob = new JobEntry();
@@ -64,7 +67,7 @@ public class JobExec implements Runnable {
         }
         
         try {
-            response = in.readObject();
+            response = (JobEntry) in.readObject();
         } catch (Exception e) {
             System.err.println("Couldn't understand server message");
             return;
