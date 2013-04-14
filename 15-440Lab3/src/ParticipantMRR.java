@@ -69,7 +69,7 @@ public class ParticipantMRR {
             this.out = new ObjectOutputStream(this.socket.getOutputStream());
         } catch (IOException e) {
             // Couldn't connect to master, no error because this process was created remotely
-            // System.exit(-1);
+            System.exit(-1);
         }
         
         status = new ParticipantStatus();
@@ -133,13 +133,6 @@ public class ParticipantMRR {
 				e1.printStackTrace();
 			}
         	
-        	try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	
             try {
                 in = new ObjectInputStream(this.socket.getInputStream());
                 status = (ParticipantStatus) in.readObject();
@@ -160,7 +153,12 @@ public class ParticipantMRR {
                 out = new ObjectOutputStream(this.socket.getOutputStream());
                 out.writeObject(status);
             } catch (IOException e) {
-                continue;
+                try {
+                	Thread.sleep(200);
+					this.socket = new Socket(this.host,this.port);
+				} catch (Exception e1) {
+					System.exit(-1);
+				}
             }
             
             try {
