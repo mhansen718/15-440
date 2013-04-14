@@ -28,7 +28,10 @@ public class MasterJobHandlerMRR implements Runnable {
                 out.writeObject(this.job);
             } catch (IOException e) {
                 System.err.println("Failed to send job back to client");
+                return;
             }
+            
+            this.master.removeJob(this.job.id);
             
             try {
                 out.close();
