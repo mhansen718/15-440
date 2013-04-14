@@ -15,10 +15,26 @@ public class ParticipantListenerMRR implements Runnable {
 		/* Sit and listen to the rain drops, I mean, the network
 		 * on the listen port for new job requests */
 		
+        JobEntry newJob = null;
+        private ServerSocket listenSocket = null;
+        private Socket socket = null;
+        private ObjectInputStream in;
+        
+        try {
+            listenSocket = new ServerSocket(listenPort);
+        } catch (IOException e) {
+            //Could not listen for jobs
+        }
+        
 		while (true) {
-		// TODO: Get job from the app (sent by the JobExec) and add it t the queue
-			JobEntry newJob;
-			
+            try {
+                socket = listenSocket.accept();
+                in = new ObjectInputStream(socket.getInputStream());
+                newJob = in.readObject();
+            } catch (IOException e) {
+                //Accept error
+            }
+            
 			this.master.addNewJob(newJob);
 		}
 	}
