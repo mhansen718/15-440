@@ -3,7 +3,7 @@ public class PeonListener implements Runnable {
     private ConcurrentLinkedQueue<Peon> peons;
     private ServerSocket listenSocket = null;
     
-    public PeonListener(port,peons) {
+    public PeonListener(int port, ConcurrentLinkedQueue<Peon> peons) {
         this.port = port;
         this.peons = peons;
     }
