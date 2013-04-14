@@ -50,7 +50,7 @@ public class MostRecentCommonAncestor {
 		if (myJob.encounteredException()) {
 			System.out.println("Oh no!!! The job failed... because a " + myJob.getException().toString() + " Exception happened....");
 		} else {
-			TreeMap<HashSet<MemberRecord>, HashSet<MemberRecord>>> reduced = myJob.readFile();
+			TreeMap<HashSet<MemberRecord>, HashSet<MemberRecord>> reduced = myJob.readFile();
 			if (reduced.containsKey(pairing)) {
 				HashSet<MemberRecord> pair = reduced.get(pairing);
 				/* Find the youngest of the common ancestors */
