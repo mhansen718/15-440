@@ -88,7 +88,9 @@ public class MasterPeonHandlerMRR implements Runnable {
 				}
 			}
 			
+			/* If there are some tasks, add them to the list of running tasks */
 			peon.runningTasks.putAll(tasks);
+			
             peonStatus = new ParticipantStatus();
             peonStatus.newTasks = tasks;
 			try {

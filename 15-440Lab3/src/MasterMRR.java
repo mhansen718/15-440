@@ -2,6 +2,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,6 +76,7 @@ public class MasterMRR {
 						newPeon.port = Integer.parseInt(part.split(":")[1]);
 						newPeon.dead = 0;
 						newPeon.power = 1;
+						newPeon.runningTasks = new HashMap<TaskID, TaskEntry>();
 						this.peons.add(newPeon);
 					}
 				} catch (Exception excpt) {
@@ -125,7 +127,8 @@ public class MasterMRR {
 			/* Loop through all the peons and spawn threads to process their status' and give
 			 * them new jobs, etc */
 			peon = this.peons.iterator();
-			this.currentPower = pow;
+			this.currentPower = Math.max(pow, this.peons.size());
+			System.out.println(" Total Power: " + Integer.toString(this.currentPower));
 			pow = 0;
 			this.availableTasks = this.pendingTasks.size();
 			while (peon.hasNext()) {
@@ -225,6 +228,10 @@ public class MasterMRR {
 	
 	public boolean remoteStart() {
 		return this.remoteStart;
+	}
+	
+	public int getNodes() {
+		return this.peons.size();
 	}
 }
 
