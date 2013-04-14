@@ -104,7 +104,11 @@ public class MasterPeonHandlerMRR implements Runnable {
 				/* Update the system based on the status from the participant */
 				peon.power = peonStatus.power;
 				for (TaskID id : peonStatus.completedTasks) {
-					peon.runningTasks.remove(id);
+					TaskEntry check = peon.runningTasks.remove(id);
+					/* Check for resent and ignore if it is a resend */
+					if (check == null) {
+						continue;
+					}
 					/* Update the jobs lists, clear up the files if the job is terminated */
 					JobEntry j = this.master.findJob(id.jobID);
 					if ((j != null) && (j.err == null)) {
@@ -116,6 +120,10 @@ public class MasterPeonHandlerMRR implements Runnable {
 					}
 				}
 				for (JobEntry j : peonStatus.newJobs) {
+					/* Check for resent new job and ignore if present */
+					if (this.master.findJob(j.id) != null) {
+						continue;
+					}
 					/* Figure out the record partitioning */
 					length = j.config.end - j.config.start;
 					step = (length / this.master.getCurrentPower());
