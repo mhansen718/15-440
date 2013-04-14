@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.ArrayList;
 
 
 public abstract class ConfigurationMRR<MAPIN, REDKEY, REDVAL> implements Serializable {
