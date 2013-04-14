@@ -12,6 +12,7 @@ public abstract class ConfigurationMRR<MAPIN, REDKEY, REDVAL> implements Seriali
     public String inFile;
     public String outFile;
     public int port;
+    public int participantPort;
     
     abstract public MAPIN readRecord(byte[] record);
     

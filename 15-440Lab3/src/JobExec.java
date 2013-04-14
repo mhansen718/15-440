@@ -17,6 +17,9 @@ public class JobExec implements Runnable {
 
 	@Override
 	public void run() {
+        Socket socket = null;
+        ObjectOutputStream out;
+    
 		/* Make a new job entry to be sent to the local participant */
 		JobEntry submitJob = new JobEntry();
 		submitJob.config = this.config;
@@ -33,7 +36,13 @@ public class JobExec implements Runnable {
 		submitJob.completeTasks = new ConcurrentLinkedQueue<TaskID>();
 		submitJob.id = Math.abs(submitJob.host.hashCode()) + Math.abs(submitJob.name.hashCode()) + Math.abs((new Long(System.currentTimeMillis()).hashCode()));
 		
-		// TODO: Ship this job to local participant
+		try {
+            socket = new Socket(InetAddress.getLocalHost(), this.config.participantPort);
+            out = new ObjectOutputStream(socket.getOutputStream());
+            out.writeObject(submitJob);
+        } catch (IOException e) {
+        
+        }
 		
 	}
 
