@@ -43,7 +43,7 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecord, HashSet<Memb
 			pairing.add(mapin.self);
 			pairing.add(mem);
 			HashSet<MemberRecord> currentMutual = new HashSet<MemberRecord>(mapin.family);
-			Pair<HashSet<MemberRecord>, HashSet<MemberRecord>> p = new Pair(pairing, currentMutual);
+			Pair<HashSet<MemberRecord>, HashSet<MemberRecord>> p = new Pair<HashSet<MemberRecord>, HashSet<MemberRecord>>(pairing, currentMutual);
 			returnPairList.add(p);
 		}
 		return null;

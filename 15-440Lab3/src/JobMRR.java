@@ -23,7 +23,7 @@ public class JobMRR {
 	public void submit() {
 		/* Submit this job to the MapReduce Master for execution,
 		 * throws exception if rejected by master (for reasons like repeat name or something) */
-		this.t = new Thread(new JobExec(this.jobName, this.config));
+		this.t = new Thread(new JobExec(this, this.jobName, this.config));
 		this.t.start();
 		return;
 	}

@@ -68,6 +68,9 @@ public class ParticipantMRR {
             // System.exit(-1);
         }
         
+        Thread newJobListener = new Thread(new ParticipantListenerMRR(this, Integer.parseInt(args[2])));
+        newJobListener.start();
+        
         RandomAccessFile mine = null;
 		try {
 			mine = new RandomAccessFile(System.getProperty("user.dir") + "/hi." + InetAddress.getLocalHost().getHostName() + ".txt", "rw");
@@ -116,7 +119,9 @@ public class ParticipantMRR {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        	// TODO: add jobs to the queue when we get them */
+        	// TODO: listen to the master
+        	
+        	
         }
     }
     
