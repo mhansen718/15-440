@@ -57,6 +57,7 @@ public class JobExec implements Runnable {
             waitSocket = new ServerSocket(this.config.port);
             socket = waitSocket.accept();
             in = new ObjectInputStream(socket.getInputStream());
+            waitSocket.close();
         } catch (IOException e) {
             System.err.println("Failed to listen for job completion");
             return;
@@ -70,6 +71,14 @@ public class JobExec implements Runnable {
         }
         
         this.master.setException(response.err);
+        
+        try {
+            in.close();
+            socket.close();
+        } catch (IOException e) {
+            System.err.println("Failed to close sockets");
+        }
+        
         return;
 	}
 
