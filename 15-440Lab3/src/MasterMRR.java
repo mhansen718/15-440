@@ -231,6 +231,16 @@ public class MasterMRR {
 	}
 	
 	public int getNodes() {
+		int nodes = 0;
+		for (Peon p : this.peons) {
+			if (p.dead > 0) {
+				nodes++;
+			}
+		}
+		return nodes;
+	}
+	
+	public int getTotalNodes() {
 		return this.peons.size();
 	}
 }

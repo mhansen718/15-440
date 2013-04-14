@@ -41,8 +41,9 @@ public class UserInterface implements Runnable {
     			System.out.println("Goodbye!");
     			return;
     		} else if (inputString.equals("power")) {
-    			System.out.println("Current System Power (Nodes): " + 
-    					Integer.toString(this.master.getCurrentPower()) + " (" + Integer.toString(this.master.getNodes()) + ")");
+    			System.out.println("Current System Power (Active Nodes / Total Nodes): " + 
+    					Integer.toString(this.master.getCurrentPower()) + " (" + Integer.toString(this.master.getNodes()) + 
+    					"/" + Integer.toString(this.master.getTotalNodes()) + ")");
     		} else if (inputString.contains("stop")) {
     			if (this.master.stopJob(Long.parseLong(inputString.split(" ")[1]), new ServerTerminationException())) {
     				System.out.println("Terminate job " + Integer.parseInt(inputString.split(" ")[1]));
