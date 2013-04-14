@@ -28,16 +28,30 @@ public class ParticipantListenerMRR implements Runnable {
         try {
             listenSocket = new ServerSocket(listenPort);
         } catch (IOException e) {
-            //Could not listen for jobs
+            System.out.println("Could not listen on port: " + listenPort);
         }
         
 		while (true) {
             try {
                 socket = listenSocket.accept();
+            } catch (IOException e) {
+                System.out.println("Failed to accept connection");
+                continue;
+            }
+            
+            try {
                 in = new ObjectInputStream(socket.getInputStream());
                 newJob = (JobEntry) in.readObject();
             } catch (Exception e) {
-                //Accept error
+                System.out.println("Failed to receive new job");
+                continue;
+            }
+            
+            try {
+                in.close();
+                socket.close();
+            } catch (IOException e) {
+                System.out.println("Failed to close connection");
             }
             
 			this.master.addNewJob(newJob);
