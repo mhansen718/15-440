@@ -37,6 +37,7 @@ public class ParticipantMRR {
     	Iterator<Thread> minion;
     	Thread t;
     	int id;
+        ParticipantStatus status = null;
     	
     	/* First order of business, KILL ALL OTHER PARTICIPANTS ON THIS SYSTEM,
     	 * command credits to the internet */
@@ -62,10 +63,18 @@ public class ParticipantMRR {
         try {
             this.socket = new Socket(this.host,this.port);
             this.out = new ObjectOutputStream(this.socket.getOutputStream());
-            this.in = new ObjectInputStream(this.socket.getInputStream());
         } catch (IOException e) {
             // Couldn't connect to master, no error because this process was created remotely
             // System.exit(-1);
+        }
+        
+        status = new ParticipantStatus();
+        status.power = this.processors;
+        
+        try {
+            this.out.writeObject(status);
+        } catch (IOException e) {
+        
         }
         
         Thread newJobListener = new Thread(new ParticipantListenerMRR(this, Integer.parseInt(args[2])));
