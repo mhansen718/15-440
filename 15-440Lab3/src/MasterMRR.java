@@ -18,12 +18,16 @@ public class MasterMRR {
 	private int listenPort;
 	private int retries;
 	private int availableTasks;
+	private int localListenPort;
+	private boolean remoteStart;
 	
 	public MasterMRR() {
 		super();
 		this.peons = new ConcurrentLinkedQueue<Peon>();
 		this.pendingTasks = new ConcurrentLinkedQueue<TaskEntry>();
 		this.jobs = new ConcurrentHashMap<Long, JobEntry>();
+		/* Turn remote start on by default */
+		this.remoteStart = true;
 	}
 
 	public void main(String args[]) {
@@ -82,6 +86,12 @@ public class MasterMRR {
 				this.listenPort = Integer.parseInt(configValue);
 			} else if (configParameter.equalsIgnoreCase("retries")) {
 				this.retries = Integer.parseInt(configValue);
+			} else if (configParameter.equalsIgnoreCase("local_port")) {
+				this.localListenPort = Integer.parseInt(configValue);
+			} else if (configParameter.equalsIgnoreCase("remote_start")) {
+				if (configValue.equalsIgnoreCase("off")) {
+					this.remoteStart = false;
+				}
 			}
 				// TODO: Add more parameters if needed ...
 
@@ -98,7 +108,7 @@ public class MasterMRR {
 			/* Failed to close the file, whatever will we do.... */
 		}
 		
-        Thread PeonListener = new Thread(new PeonListener(listenPort,peons));
+        Thread PeonListener = new Thread(new PeonListener(this.listenPort, this.peons));
         PeonListener.start();
         
 		/* Create and start UI */
@@ -186,6 +196,10 @@ public class MasterMRR {
 		return this.listenPort;
 	}
 	
+	public int getLocalListenPort() {
+		return this.localListenPort;
+	}
+	
 	public int getAvailableTasks() {
 		return this.availableTasks;
 	}
@@ -199,5 +213,9 @@ public class MasterMRR {
 		}
 		return false;
 	} 
+	
+	public boolean remoteStart() {
+		return this.remoteStart;
+	}
 }
 

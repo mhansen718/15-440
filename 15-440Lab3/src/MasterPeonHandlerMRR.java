@@ -49,10 +49,12 @@ public class MasterPeonHandlerMRR implements Runnable {
 			}
 			try {
 				if (participantAddress.isReachable(1000)) {
-					System.out.println("Remote Starting on " + this.peon.host);
-					Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
-							System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
-							Integer.toString(this.master.getListenPort()));
+					if (this.master.remoteStart()) {
+						System.out.println("Remote Starting on " + this.peon.host);
+						Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
+								System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
+								Integer.toString(this.master.getListenPort()) + " " + Integer.toString(this.master.getLocalListenPort()));
+					}
 					//TODO: Ehh?  What's happening here?
 				}
 			} catch (IOException excpt) {
