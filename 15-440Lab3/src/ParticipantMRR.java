@@ -35,9 +35,12 @@ public class ParticipantMRR {
     
     public void main(String args[]) {
     	Iterator<Thread> minion;
+        Iterator<TaskID> idIter;
+        Iterator<JobEntry> jobIter;
     	Thread t;
     	int id;
         ParticipantStatus status = null;
+        ParticipantStatus confirmation = null;
     	
     	/* First order of business, KILL ALL OTHER PARTICIPANTS ON THIS SYSTEM,
     	 * command credits to the internet */
@@ -138,6 +141,28 @@ public class ParticipantMRR {
             }
             
             //TODO: process new tasks
+            
+            try {
+                out = new ObjectOutputStream(this.socket.getOutputStream());
+                out.writeObject(status);
+            } catch (IOException e) {
+            
+            }
+            
+            try {
+                confirmation = in.readObject();
+            } catch (IOException e) {
+                // Put everything back in the queues, we aren't sure the master knows
+                idIter = status.completedTasks.iterator();
+                while (idIter.hasNext()) {
+                    completeTask(idIter.next());
+                }
+                jobIter = status.newJobs.iterator();
+                while (jobIter.hasNext()) {
+                    addNewJob(jobIter.next());
+                }
+                continue;
+            }
         }
     }
     
@@ -146,6 +171,19 @@ public class ParticipantMRR {
     	this.completedTasksProtect.acquireUninterruptibly();
     	this.completedTasks.add(id);
     	this.completedTasksProtect.release();
+    }
+    
+    private HashSet<TaskID> flushCompleted() {
+        HashSet<TaskID> tasks = new HashSet();
+        Iterator<TaskID> iter;
+        this.completedTasksProtect.acquireUninterruptibly();
+        iter = this.completedTasks.iterator();
+        while (iter.hasNext()) {
+            tasks.add(iter.next());
+            iter.remove();
+        }
+    	this.completedTasksProtect.release();
+        return tasks;
     }
     
     public TaskEntry getNextTask() throws Exception {
@@ -157,5 +195,15 @@ public class ParticipantMRR {
     	/* Add a new job to the queue */
     	this.newJobs.add(job);
     	return;
+    }
+    
+    private HashSet<JobEntry> flushNewJobs() {
+        HashSet<JobEntry> jobs = new HashSet();
+        JobEntry j = this.newJobs.poll();
+        while (j != null) {
+            jobs.add(j);
+            j = this.newJobs.poll();
+        }
+        return jobs;
     }
 }

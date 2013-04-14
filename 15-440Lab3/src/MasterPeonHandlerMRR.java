@@ -143,7 +143,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 					this.master.addJob(j);
 				}
 				
-                peonStatus.power = -1;
+                peonStatus.power = 0;
                 peonStatus.newJobs = null;
                 peonStatus.completedTasks = null;
                 
