@@ -214,6 +214,11 @@ public class MasterMRR {
 		return false;
 	} 
 	
+	public void removeJob(long jobID) {
+		this.jobs.remove(jobID);
+		return;
+	}
+	
 	public boolean remoteStart() {
 		return this.remoteStart;
 	}
