@@ -82,12 +82,6 @@ public class ParticipantMRR {
             System.exit(-1);
         }
         
-        try {
-            this.out.close();
-        } catch (IOException e) {
-            // Couldn't close stream, weird
-        }
-        
         Thread newJobListener = new Thread(new ParticipantListenerMRR(this, Integer.parseInt(args[2])));
         newJobListener.start();
         

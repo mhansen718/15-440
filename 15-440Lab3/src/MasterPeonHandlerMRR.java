@@ -66,12 +66,6 @@ public class MasterPeonHandlerMRR implements Runnable {
                 return;
             }
             
-            try {
-                in.close();
-            } catch (IOException e) {
-                // Failed to close stream, oh well
-            }
-            
             peon.power = peonStatus.power;
             peon.dead = this.master.getRetries();
             
@@ -97,6 +91,7 @@ public class MasterPeonHandlerMRR implements Runnable {
                 out = new ObjectOutputStream(this.peon.connection.getOutputStream());
                 out.writeObject(peonStatus);
             } catch (IOException e) {
+            	e.printStackTrace();
                 peonStatus = null;
             }
 			
@@ -104,6 +99,7 @@ public class MasterPeonHandlerMRR implements Runnable {
                 in = new ObjectInputStream(this.peon.connection.getInputStream());
                 peonStatus = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
+            	e.printStackTrace();
                 peonStatus = null;
             }
 			
@@ -169,13 +165,6 @@ public class MasterPeonHandlerMRR implements Runnable {
                     out.writeObject(peonStatus);
                 } catch (IOException e) {
                     //Failed to send confirmation, not a huge deal
-                }
-                
-                try {
-                    in.close();
-                    out.close();
-                } catch (IOException e) {
-                    //Failed to close streams, what a shame
                 }
                 
 			} else {
