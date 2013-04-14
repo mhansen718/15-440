@@ -40,7 +40,7 @@ public class PeonListener implements Runnable {
         
         while (iter.hasNext()) {
             peon = iter.next();
-            if ((host.equals(peon.host)) && (port == peon.port)) {
+            if ((host.equalsIgnoreCase(peon.host)) && (port == peon.port)) {
                 peon.connection = socket;
                 return;
             }
