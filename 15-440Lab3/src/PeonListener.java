@@ -27,6 +27,19 @@ public class PeonListener implements Runnable {
     }
     
     private void updatePeon(Socket socket) {
+        Iterator<Peon> iter = peons.iterator();
+        String host = (socket.getInetAddress()).getHostName();
+        int port = socket.getPort();
+        Peon peon;
         
+        while (iter.hasNext()) {
+            peon = iter.next();
+            if ((host.equals(peon.host)) && (port == peon.port)) {
+                peon.socket = socket;
+                return;
+            }
+        }
+        System.err.println("Illegal connection attempt from " + host);
+        socket.close();
     }
 }
