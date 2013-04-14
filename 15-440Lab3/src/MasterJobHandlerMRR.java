@@ -17,10 +17,25 @@ public class MasterJobHandlerMRR implements Runnable {
 	public void run() {
 		Iterator<TaskID> tid1 = null;
 		Iterator<TaskID> tid2 = null;
+        Socket socket = null;
+        ObjectOutputStream out;
 		
 		/* Check if the job is done or errored, if so, send word to the app */
 		if (((this.job.runningTasks.size() == 0) && (this.job.completeTasks.size() == 1)) || (this.job.err != null)) {
-			// TODO: Send signal to app !!!!
+			try {
+                socket = new Socket(this.job.host,this.job.port);
+                out = new ObjectOutputStream(socket.getOutputStream());
+                out.writeObject(this.job);
+            } catch (IOException e) {
+                System.err.println("Failed to send job back to client");
+            }
+            
+            try {
+                out.close();
+                socket.close();
+            } catch (IOException e) {
+                System.err.println("Failed to close connection with client");
+            }
 		} else {
 			/* Loop through the list of completed tasks and pair up into a new task */
 			tid1 = this.job.completeTasks.iterator();
