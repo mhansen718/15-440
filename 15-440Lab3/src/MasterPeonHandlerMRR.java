@@ -73,6 +73,7 @@ public class MasterPeonHandlerMRR implements Runnable {
             }
             
             peon.power = peonStatus.power;
+            peon.dead = this.master.getRetries();
             
 		} else {
 			/* Send the participant all the tasks it should do  and add them to the list of tasks being done by peon */
@@ -105,6 +106,8 @@ public class MasterPeonHandlerMRR implements Runnable {
             }
 			
 			if (peonStatus != null) {
+				/* Declare the peon healthy */
+				peon.dead = this.master.getRetries();
 				/* Update the system based on the status from the participant */
 				peon.power = peonStatus.power;
 				for (TaskID id : peonStatus.completedTasks) {
