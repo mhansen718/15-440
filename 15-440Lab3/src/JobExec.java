@@ -41,7 +41,7 @@ public class JobExec implements Runnable {
             out = new ObjectOutputStream(socket.getOutputStream());
             out.writeObject(submitJob);
         } catch (IOException e) {
-        
+            System.err.println("Failed to submit mapReduce job");
         }
 		
 	}
