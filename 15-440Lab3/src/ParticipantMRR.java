@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
@@ -23,6 +24,7 @@ public class ParticipantMRR {
     private HashSet<TaskID> completedTasks;
     private HashSet<Thread> minions;
     private Semaphore completedTasksProtect;
+    private ConcurrentLinkedQueue<JobEntry> newJobs;
     
     public ParticipantMRR() {
     	super();
@@ -130,5 +132,9 @@ public class ParticipantMRR {
     	return this.tasks.take();
     }
     
-    
+    public void addNewJob(JobEntry job) {
+    	/* Add a new job to the queue */
+    	this.newJobs.add(job);
+    	return;
+    }
 }

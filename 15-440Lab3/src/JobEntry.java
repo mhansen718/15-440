@@ -1,8 +1,11 @@
+import java.io.Serializable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 
-public class JobEntry {
+public class JobEntry implements Serializable {
 
+	private static final long serialVersionUID = -7711420349120343750L;
+	
 	public String name;
 	public long id;
 	public String host;
