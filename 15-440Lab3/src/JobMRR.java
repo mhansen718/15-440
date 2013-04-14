@@ -1,3 +1,9 @@
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.TreeMap;
+
 
 public class JobMRR {
 
@@ -55,7 +61,12 @@ public class JobMRR {
 		return;
 	}
 	
-	/* These methods are for the thread to use to set the exception and filename */
+	public TreeMap<?, ?> readFile() throws IOException, ClassNotFoundException {
+		ObjectInputStream obj = new ObjectInputStream(new FileInputStream(this.config.outFile));
+		return ((TreeMap<?, ?>) obj.readObject());
+	}
+	
+	/* These methods are for the thread to use to set the exception */
 	public void setException(Exception excpt) {
 		this.err = excpt;
 		return;

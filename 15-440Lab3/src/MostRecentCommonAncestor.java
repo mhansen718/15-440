@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.TreeMap;
 
@@ -50,7 +51,13 @@ public class MostRecentCommonAncestor {
 		if (myJob.encounteredException()) {
 			System.out.println("Oh no!!! The job failed... because a " + myJob.getException().toString() + " Exception happened....");
 		} else {
-			TreeMap<HashSet<MemberRecord>, HashSet<MemberRecord>> reduced = myJob.readFile();
+			TreeMap<HashSet<MemberRecord>, HashSet<MemberRecord>> reduced = null;
+			try {
+				reduced = (TreeMap<HashSet<MemberRecord>, HashSet<MemberRecord>>) myJob.readFile();
+			} catch (Exception excpt) {
+				System.out.println("Failed to read the product file from reduce");
+				return;
+			}
 			if (reduced.containsKey(pairing)) {
 				HashSet<MemberRecord> pair = reduced.get(pairing);
 				/* Find the youngest of the common ancestors */
@@ -61,6 +68,7 @@ public class MostRecentCommonAncestor {
 					}
 				}
 				System.out.println(p1.self + " and " + p2.self + " have " + currentYoung.self + " born " + currentYoung.birthyear + " as their youngest common ancestor");
+				return;
 			}
 		}
 		System.out.println("These two people have no common ancestors");
