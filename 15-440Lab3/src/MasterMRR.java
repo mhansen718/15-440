@@ -36,7 +36,7 @@ public class MasterMRR {
 		String[] configParse = null;
 		String configParameter = null;
 		String configValue = null;
-		int pow = this.peons.size();
+		int pow;
 		Iterator<Peon> peon;
 		HashSet<Thread> handlers = new HashSet<Thread>();
 		
@@ -74,6 +74,7 @@ public class MasterMRR {
 						newPeon.host = part.split(":")[0];
 						newPeon.port = Integer.parseInt(part.split(":")[1]);
 						newPeon.dead = 0;
+						newPeon.power = 1;
 						this.peons.add(newPeon);
 					}
 				} catch (Exception excpt) {
@@ -108,6 +109,9 @@ public class MasterMRR {
 			/* Failed to close the file, whatever will we do.... */
 		}
 		
+		pow = this.peons.size();
+		
+		/* Create the listener for dead participants */
         Thread PeonListener = new Thread(new PeonListener(this.listenPort, this.peons));
         PeonListener.start();
         
