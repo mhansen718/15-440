@@ -1,4 +1,5 @@
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
@@ -51,9 +52,9 @@ public class ParticipantMinionMRR implements Runnable {
         ObjectOutputStream out;
         ObjectInputStream objIn;
         byte[] input;
-        TreeMap<REDKEY,ArrayList<REDVAL>> redIn1;
-        TreeMap<REDKEY,ArrayList<REDVAL>> redIn2;
-        TreeMap<REDKEY,ArrayList<REDVAL>> redOut;
+        TreeMap<REDKEY,ArrayList<REDVAL>> redIn1 = null;
+        TreeMap<REDKEY,ArrayList<REDVAL>> redIn2 = null;
+        TreeMap<REDKEY,ArrayList<REDVAL>> redOut = null;
         ArrayList<REDVAL> vals;
         Iterator<REDKEY> iter;
         REDKEY key;
@@ -66,15 +67,15 @@ public class ParticipantMinionMRR implements Runnable {
             try {
                 raf = new RandomAccessFile(currentTask.file1, "r");
                 raf.seek(nextRecord * currentTask.recordSize);
-                in = new FileInputStream(raf.getFD);
-                redIn1 = new TreeMap();
+                in = new FileInputStream(raf.getFD());
+                redIn1 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
                 for (int i = nextRecord; i < currentTask.id.end; i++) {
                     in.read(input);
-                    mapOut = config.map(readRecord(input));
+                    mapOut = config.map(config.readRecord(input));
                     for (Pair<REDKEY,REDVAL> p : mapOut) {
                         vals = redIn1.get(p.key);
                         if (vals == null) {
-                            vals = new ArrayList();
+                            vals = new ArrayList<REDVAL>();
                             vals.add(p.value);
                             redIn1.put(p.key,vals);
                         } else {
@@ -86,21 +87,21 @@ public class ParticipantMinionMRR implements Runnable {
             } catch (Exception e) {
                                                                         //TODO: error handling
             }
-            redIn2 = new TreeMap();
+            redIn2 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
         } else {
             try {
                 objIn = new ObjectInputStream(new FileInputStream(currentTask.file1));
-                redIn1 = objIn.readObject();
+                redIn1 = (TreeMap<REDKEY, ArrayList<REDVAL>>) objIn.readObject();
                 objIn.close();
                 objIn = new ObjectInputStream(new FileInputStream(currentTask.file2));
-                redIn2 = objIn.readObject();
+                redIn2 = (TreeMap<REDKEY, ArrayList<REDVAL>>) objIn.readObject();
                 objIn.close();
             } catch (Exception e) {
                                                                         //TODO: error handling
             }
         }
         
-        redOut = new TreeMap();
+        redOut = new TreeMap<REDKEY, ArrayList<REDVAL>>();
         iter = (redIn1.keySet()).iterator();
         while (iter.hasNext()) {
             key = iter.next();
@@ -116,7 +117,7 @@ public class ParticipantMinionMRR implements Runnable {
                 val = config.reduce(val,vals.get(i));
             }
             
-            vals = new ArrayList();
+            vals = new ArrayList<REDVAL>();
             vals.add(val);
             
             redOut.put(key,vals);
@@ -132,7 +133,7 @@ public class ParticipantMinionMRR implements Runnable {
                 val = config.reduce(val,vals.get(i));
             }
             
-            vals = new ArrayList();
+            vals = new ArrayList<REDVAL>();
             vals.add(val);
             
             redOut.put(key,vals);
