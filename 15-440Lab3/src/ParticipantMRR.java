@@ -37,6 +37,7 @@ public class ParticipantMRR {
     	Iterator<Thread> minion;
         Iterator<TaskID> idIter;
         Iterator<JobEntry> jobIter;
+        Iterator<TaskEntry> taskIter;
     	Thread t;
     	int id;
         ParticipantStatus status = null;
@@ -140,7 +141,14 @@ public class ParticipantMRR {
                 continue;
             }
             
-            //TODO: process new tasks
+            taskIter = (status.newTasks.values()).iterator();
+            while (taskIter.hasNext()) {
+                tasks.offer(taskIter.next());
+            }
+            
+            status.completedTasks = flushCompleted();
+            status.newJobs = flushNewJobs();
+            status.newTasks = null;
             
             try {
                 out = new ObjectOutputStream(this.socket.getOutputStream());
