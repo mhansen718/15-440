@@ -180,7 +180,7 @@ public class ParticipantMRR {
     }
     
     private HashSet<TaskID> flushCompleted() {
-        HashSet<TaskID> tasks = new HashSet();
+        HashSet<TaskID> tasks = new HashSet<TaskID>();
         Iterator<TaskID> iter;
         this.completedTasksProtect.acquireUninterruptibly();
         iter = this.completedTasks.iterator();
