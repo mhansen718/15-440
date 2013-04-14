@@ -77,9 +77,15 @@ public class ParticipantMRR {
         
         try {
             this.out.writeObject(status);
+        } catch (IOException e) {
+            // Failed to phone home properly, may as well wait to be remade
+            System.exit(-1);
+        }
+        
+        try {
             this.out.close();
         } catch (IOException e) {
-        
+            // Couldn't close stream, weird
         }
         
         Thread newJobListener = new Thread(new ParticipantListenerMRR(this, Integer.parseInt(args[2])));
@@ -154,7 +160,7 @@ public class ParticipantMRR {
                 out = new ObjectOutputStream(this.socket.getOutputStream());
                 out.writeObject(status);
             } catch (IOException e) {
-            
+                continue;
             }
             
             try {

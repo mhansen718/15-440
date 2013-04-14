@@ -62,9 +62,14 @@ public class MasterPeonHandlerMRR implements Runnable {
             try {
                 in = new ObjectInputStream(this.peon.connection.getInputStream());
                 peonStatus = (ParticipantStatus) in.readObject();
-                in.close();
             } catch (Exception e) {
-                
+                return;
+            }
+            
+            try {
+                in.close();
+            } catch (IOException e) {
+                // Failed to close stream, oh well
             }
             
             peon.power = peonStatus.power;
@@ -165,7 +170,7 @@ public class MasterPeonHandlerMRR implements Runnable {
                     in.close();
                     out.close();
                 } catch (IOException e) {
-                
+                    //Failed to close streams, what a shame
                 }
                 
 			} else {

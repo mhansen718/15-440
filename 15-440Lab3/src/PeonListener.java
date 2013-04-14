@@ -49,8 +49,7 @@ public class PeonListener implements Runnable {
         try {
 			socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// Failed to close socket to illegal connection, might actually be a problem
 		}
     }
 }
