@@ -63,6 +63,7 @@ public class MasterPeonHandlerMRR implements Runnable {
             try {
                 in = new ObjectInputStream(this.peon.socket.getInputStream());
                 peonStatus = in.readObject();
+                in.close();
             } catch (IOException e) {
                 
             }
@@ -83,6 +84,8 @@ public class MasterPeonHandlerMRR implements Runnable {
 			}
 			
 			peon.runningTasks.putAll(tasks);
+            peonStatus = new ParticipantStatus();
+            peonStatus.newTasks = tasks;
 			try {
                 out = new ObjectOutputStream(this.peon.getOutputStream());
                 out.writeObject(peonStatus);

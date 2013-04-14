@@ -73,6 +73,7 @@ public class ParticipantMRR {
         
         try {
             this.out.writeObject(status);
+            this.out.close();
         } catch (IOException e) {
         
         }
@@ -128,9 +129,15 @@ public class ParticipantMRR {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-        	// TODO: listen to the master
         	
-        	
+            try {
+                in = new ObjectInputStream(this.socket.getInputStream());
+                status = in.readObject();
+            } catch (IOException e) {
+                continue;
+            }
+            
+            //TODO: process new tasks
         }
     }
     

@@ -8,5 +8,6 @@ public class ParticipantStatus implements Serializable {
 
 	public HashSet<TaskID> completedTasks;
 	public HashSet<JobEntry> newJobs;
+    public HashMap<TaskID, TaskEntry> newTasks;
 	public int power;
 }
