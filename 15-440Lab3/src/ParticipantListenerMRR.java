@@ -1,3 +1,8 @@
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 
 public class ParticipantListenerMRR implements Runnable {
 
@@ -16,9 +21,9 @@ public class ParticipantListenerMRR implements Runnable {
 		 * on the listen port for new job requests */
 		
         JobEntry newJob = null;
-        private ServerSocket listenSocket = null;
-        private Socket socket = null;
-        private ObjectInputStream in;
+        ServerSocket listenSocket = null;
+        Socket socket = null;
+        ObjectInputStream in;
         
         try {
             listenSocket = new ServerSocket(listenPort);
@@ -30,8 +35,8 @@ public class ParticipantListenerMRR implements Runnable {
             try {
                 socket = listenSocket.accept();
                 in = new ObjectInputStream(socket.getInputStream());
-                newJob = in.readObject();
-            } catch (IOException e) {
+                newJob = (JobEntry) in.readObject();
+            } catch (Exception e) {
                 //Accept error
             }
             

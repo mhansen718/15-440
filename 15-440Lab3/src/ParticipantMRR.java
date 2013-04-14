@@ -136,8 +136,8 @@ public class ParticipantMRR {
         	
             try {
                 in = new ObjectInputStream(this.socket.getInputStream());
-                status = in.readObject();
-            } catch (IOException e) {
+                status = (ParticipantStatus) in.readObject();
+            } catch (Exception e) {
                 continue;
             }
             
@@ -158,8 +158,8 @@ public class ParticipantMRR {
             }
             
             try {
-                confirmation = in.readObject();
-            } catch (IOException e) {
+                confirmation = (ParticipantStatus) in.readObject();
+            } catch (Exception e) {
                 // Put everything back in the queues, we aren't sure the master knows
                 idIter = status.completedTasks.iterator();
                 while (idIter.hasNext()) {

@@ -29,8 +29,8 @@ public class MasterPeonHandlerMRR implements Runnable {
 		int length = 0;
 		int mod = 0;
 		int modCount = 0;
-        ObjectOutputStream out;
-        ObjectInputStream in;
+        ObjectOutputStream out = null;
+        ObjectInputStream in = null;
         
 		if (this.peon.dead == 0) {
 			/* This participant is very dead, try to revive it */
@@ -55,16 +55,16 @@ public class MasterPeonHandlerMRR implements Runnable {
 			}
             
             try {
-                sleep(5000);
-            } catch ( ) {
+                Thread.sleep(5000);
+            } catch (Exception e) {
             
             }
             
             try {
-                in = new ObjectInputStream(this.peon.socket.getInputStream());
-                peonStatus = in.readObject();
+                in = new ObjectInputStream(this.peon.connection.getInputStream());
+                peonStatus = (ParticipantStatus) in.readObject();
                 in.close();
-            } catch (IOException e) {
+            } catch (Exception e) {
                 
             }
             
@@ -87,16 +87,16 @@ public class MasterPeonHandlerMRR implements Runnable {
             peonStatus = new ParticipantStatus();
             peonStatus.newTasks = tasks;
 			try {
-                out = new ObjectOutputStream(this.peon.getOutputStream());
+                out = new ObjectOutputStream(this.peon.connection.getOutputStream());
                 out.writeObject(peonStatus);
             } catch (IOException e) {
-                peonStatus = null
+                peonStatus = null;
             }
 			
 			try {
-                in = new ObjectInputStream(this.peon.socket.getInputStream());
-                peonStatus = in.readObject();
-            } catch (IOException e) {
+                in = new ObjectInputStream(this.peon.connection.getInputStream());
+                peonStatus = (ParticipantStatus) in.readObject();
+            } catch (Exception e) {
                 peonStatus = null;
             }
 			

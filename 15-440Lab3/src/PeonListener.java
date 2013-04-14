@@ -1,3 +1,9 @@
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 public class PeonListener implements Runnable {
     int port;
     private ConcurrentLinkedQueue<Peon> peons;
@@ -35,11 +41,16 @@ public class PeonListener implements Runnable {
         while (iter.hasNext()) {
             peon = iter.next();
             if ((host.equals(peon.host)) && (port == peon.port)) {
-                peon.socket = socket;
+                peon.connection = socket;
                 return;
             }
         }
         System.err.println("Illegal connection attempt from " + host);
-        socket.close();
+        try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
