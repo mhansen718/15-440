@@ -110,14 +110,11 @@ public class MasterPeonHandlerMRR implements Runnable {
 					}
 					/* Update the jobs lists, clear up the files if the job is terminated */
 					JobEntry j = this.master.findJob(id.jobID);
-					if ((j != null) && (j.err == null)) {
-						if (id.err != null) {
-							j.err = id.err;
-						} else {
+					if ((j != null) && (j.err == null) && (id.err == null)) {
 							j.runningTasks.remove(id);
 							j.completeTasks.add(id);
-						}
 					} else {
+						this.master.stopJob(j.id, id.err);
 						File f = new File(id.toFileName());
 						f.delete();
 					}
