@@ -22,6 +22,8 @@ public class JobExec implements Runnable {
 	public void run() {
         Socket socket = null;
         ObjectOutputStream out;
+        ObjectInputStream in;
+        JobEntry response = null;
     
 		/* Make a new job entry to be sent to the local participant */
 		JobEntry submitJob = new JobEntry();
@@ -43,10 +45,32 @@ public class JobExec implements Runnable {
             socket = new Socket(InetAddress.getLocalHost(), this.config.participantPort);
             out = new ObjectOutputStream(socket.getOutputStream());
             out.writeObject(submitJob);
+            out.close();
+            socket.close();
         } catch (IOException e) {
             System.err.println("Failed to submit mapReduce job");
+            return;
         }
 		
+        // Now wait for the master to say the job is done
+        try {
+            waitSocket = new ServerSocket(this.config.port);
+            socket = waitSocket.accept();
+            in = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            System.err.println("Failed to listen for job completion");
+            return;
+        }
+        
+        try {
+            response = in.readObject();
+        } catch (Exception e) {
+            System.err.println("Couldn't understand server message");
+            return;
+        }
+        
+        this.master.setException(response.err);
+        return;
 	}
 
 }
