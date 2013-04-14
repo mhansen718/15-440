@@ -98,6 +98,9 @@ public class MasterMRR {
 			/* Failed to close the file, whatever will we do.... */
 		}
 		
+        Thread PeonListener = new Thread(new PeonListener(listenPort,peons));
+        PeonListener.start();
+        
 		/* Create and start UI */
 		Thread UI = new Thread(new UserInterface(this));
 		UI.start();
