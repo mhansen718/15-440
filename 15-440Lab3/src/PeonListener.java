@@ -40,12 +40,12 @@ public class PeonListener implements Runnable {
         
         while (iter.hasNext()) {
             peon = iter.next();
-            if ((host.equalsIgnoreCase(peon.host)) && (port == peon.port)) {
+            if (host.equalsIgnoreCase(peon.host)) {
                 peon.connection = socket;
                 return;
             }
         }
-        System.err.println("Illegal connection attempt from " + host);
+        System.err.println("Illegal connection attempt from " + host + ":" + Integer.toString(port));
         try {
 			socket.close();
 		} catch (IOException e) {
