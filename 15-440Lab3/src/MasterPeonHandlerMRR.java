@@ -5,7 +5,6 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
-import java.util.HashSet;
 
 
 public class MasterPeonHandlerMRR implements Runnable {
@@ -104,18 +103,30 @@ public class MasterPeonHandlerMRR implements Runnable {
 				/* Update the system based on the status from the participant */
 				peon.power = peonStatus.power;
 				for (TaskID id : peonStatus.completedTasks) {
-					peon.runningTasks.remove(id);
+					TaskEntry check = peon.runningTasks.remove(id);
+					/* Check for resent and ignore if it is a resend */
+					if (check == null) {
+						continue;
+					}
 					/* Update the jobs lists, clear up the files if the job is terminated */
 					JobEntry j = this.master.findJob(id.jobID);
 					if ((j != null) && (j.err == null)) {
-						j.runningTasks.remove(id);
-						j.completeTasks.add(id);
+						if (id.err != null) {
+							j.err = id.err;
+						} else {
+							j.runningTasks.remove(id);
+							j.completeTasks.add(id);
+						}
 					} else {
 						File f = new File(id.toFileName());
 						f.delete();
 					}
 				}
 				for (JobEntry j : peonStatus.newJobs) {
+					/* Check for resent new job and ignore if present */
+					if (this.master.findJob(j.id) != null) {
+						continue;
+					}
 					/* Figure out the record partitioning */
 					length = j.config.end - j.config.start;
 					step = (length / this.master.getCurrentPower());
