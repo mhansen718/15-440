@@ -32,12 +32,6 @@ public class MasterPeonHandlerMRR implements Runnable {
         ObjectOutputStream out;
         ObjectInputStream in;
         
-		try {
-            out = new ObjectOutputStream(this.peon.socket.getOutputStream());
-        } catch (Exception e) {
-                                                                //TODO: error
-        }
-        
 		if (this.peon.dead == 0) {
 			/* This participant is very dead, try to revive it */
 			try {
@@ -55,11 +49,26 @@ public class MasterPeonHandlerMRR implements Runnable {
 								System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
 								Integer.toString(this.master.getListenPort()) + " " + Integer.toString(this.master.getLocalListenPort()));
 					}
-					//TODO: Ehh?  What's happening here?
 				}
 			} catch (IOException excpt) {
 				/* Had a problem doing the reachability test, not much we can do here... */
 			}
+            
+            try {
+                sleep(5000);
+            } catch ( ) {
+            
+            }
+            
+            try {
+                in = new ObjectInputStream(this.peon.socket.getInputStream());
+                peonStatus = in.readObject();
+            } catch (IOException e) {
+                
+            }
+            
+            peon.power = peonStatus.power;
+            
 		} else {
 			/* Send the participant all the tasks it should do  and add them to the list of tasks being done by peon */
 			tasksToDo = (this.master.getAvailableTasks() / this.master.getCurrentPower()) * this.peon.power;
@@ -75,12 +84,18 @@ public class MasterPeonHandlerMRR implements Runnable {
 			
 			peon.runningTasks.putAll(tasks);
 			try {
+                out = new ObjectOutputStream(this.peon.getOutputStream());
                 out.writeObject(peonStatus);
-            } catch (Exception e) {
-                                                        //TODO: error
+            } catch (IOException e) {
+                peonStatus = null
             }
 			
-			// TODO: Get back a status class thingy
+			try {
+                in = new ObjectInputStream(this.peon.socket.getInputStream());
+                peonStatus = in.readObject();
+            } catch (IOException e) {
+                peonStatus = null;
+            }
 			
 			if (peonStatus != null) {
 				/* Update the system based on the status from the participant */
@@ -124,7 +139,24 @@ public class MasterPeonHandlerMRR implements Runnable {
 					}
 					this.master.addJob(j);
 				}
-				// TODO: Send confirmation
+				
+                peonStatus.power = -1;
+                peonStatus.newJobs = null;
+                peonStatus.completedTasks = null;
+                
+                try {
+                    out.writeObject(peonStatus);
+                } catch (IOException e) {
+                    //Failed to send confirmation, not a huge deal
+                }
+                
+                try {
+                    in.close();
+                    out.close();
+                } catch (IOException e) {
+                
+                }
+                
 			} else {
 				/* Participant failed to response, make it a bit more dead, and
 				 * if its totally dead, dump its work load onto the pending tasks
