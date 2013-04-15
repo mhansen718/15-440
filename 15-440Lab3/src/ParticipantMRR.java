@@ -107,6 +107,8 @@ public class ParticipantMRR {
 			e2.printStackTrace();
 		}
         
+        newJobs = new ConcurrentLinkedQueue();
+        
         /* Run the main loop */
         while (true) {
         	/* check the minions, removing the dead and adding more if needed */
