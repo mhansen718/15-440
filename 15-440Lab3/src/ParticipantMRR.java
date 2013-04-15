@@ -145,6 +145,12 @@ public class ParticipantMRR {
                 out = new ObjectOutputStream(this.socket.getOutputStream());
                 status = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
+            	e.printStackTrace();
+            	  try {
+                      mine.write(e.getStackTrace().toString().getBytes());
+                  } catch (Exception ex) {
+                  
+                  }
                 System.exit(-1);
             }
             

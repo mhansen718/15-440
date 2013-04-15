@@ -40,17 +40,15 @@ public class MasterPeonHandlerMRR implements Runnable {
 			return;
 		}
         
-		if (this.peon.dead == 0) {
+		if (this.peon.dead == 0 && this.master.remoteStart()) {
 			/* This participant is very dead, try to revive it */
 			try {
 				if (participantAddress.isReachable(1000)) {
-					if (this.master.remoteStart()) {
-						System.out.println("Remote Starting on " + this.peon.host);
-						Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
-								System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
-								Integer.toString(this.master.getListenPort()) + " " + Integer.toString(this.master.getLocalListenPort()));
-						this.peon.connection = null;
-					}
+					System.out.println("Remote Starting on " + this.peon.host);
+					Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
+							System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
+							Integer.toString(this.master.getListenPort()) + " " + Integer.toString(this.master.getLocalListenPort()));
+					this.peon.connection = null;
 				}
 			} catch (IOException excpt) {
 				/* Had a problem doing the reachability test, not much we can do here... */
