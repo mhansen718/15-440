@@ -77,6 +77,7 @@ public class ParticipantMRR {
         
         try {
             this.out.writeObject(status);
+            this.socket.close();
         } catch (IOException e) {
             // Failed to phone home properly, may as well wait to be remade
             System.exit(-1);
@@ -128,10 +129,11 @@ public class ParticipantMRR {
 			}
         	
             try {
+                this.socket = new Socket(this.host,this.port);
                 in = new ObjectInputStream(this.socket.getInputStream());
                 status = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
-                continue;
+                System.exit(-1);
             }
             
             taskIter = (status.newTasks.values()).iterator();
@@ -146,13 +148,11 @@ public class ParticipantMRR {
             try {
                 out = new ObjectOutputStream(this.socket.getOutputStream());
                 out.writeObject(status);
+                out.close();
+                in.close();
+                this.socket.close();
             } catch (IOException e) {
-                try {
-                	Thread.sleep(200);
-					this.socket = new Socket(this.host,this.port);
-				} catch (Exception e1) {
-					System.exit(-1);
-				}
+                continue;
             }
             
             try {
