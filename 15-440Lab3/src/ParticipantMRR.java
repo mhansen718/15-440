@@ -64,27 +64,30 @@ public class ParticipantMRR {
         try {
             this.port = Integer.parseInt(args[1]);
         } catch (NumberFormatException e) {
-            // Our script somehow failed to give a valid integer port... What!?
-        	System.out.println(":(");
+        	System.out.println("java ClientMRR [master host] [master port] [local job listen port]");
             System.exit(-1);
         }
         
         try {
             this.socket = new Socket(this.host,this.port);
             this.out = new ObjectOutputStream(this.socket.getOutputStream());
+            /* Simply used to wait for the master to be ready */
+            this.in = new ObjectInputStream(this.socket.getInputStream());
         } catch (IOException e) {
-            // Couldn't connect to master, no error because this process was created remotely
+            // Couldn't connect to master
+        	System.out.println(" ClientMRR: Failed to connect to master");
             System.exit(-1);
         }
         
         status = new ParticipantStatus();
         status.power = this.processors;
-        
+
         try {
             this.out.writeObject(status);
-            this.socket.close();
+            //this.socket.close();
         } catch (IOException e) {
             // Failed to phone home properly, may as well wait to be remade
+        	System.out.println(" ClientMRR: Failed to send status to master");
             System.exit(-1);
         }
         
@@ -136,6 +139,7 @@ public class ParticipantMRR {
             try {
                 this.socket = new Socket(this.host,this.port);
                 in = new ObjectInputStream(this.socket.getInputStream());
+                out = new ObjectOutputStream(this.socket.getOutputStream());
                 status = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
                 System.exit(-1);
@@ -151,7 +155,6 @@ public class ParticipantMRR {
             status.newTasks = null;
             
             try {
-                out = new ObjectOutputStream(this.socket.getOutputStream());
                 out.writeObject(status);
                 out.close();
                 in.close();

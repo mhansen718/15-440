@@ -9,7 +9,7 @@ public class Peon {
 	public int port;
 	public int power;
 	public int dead;
-	public Socket connection;
+	public volatile Socket connection;
 	public HashMap<TaskID, TaskEntry> runningTasks;
 
 }

@@ -50,7 +50,7 @@ public class MasterMRR {
 		try {
 			config = new RandomAccessFile(args[0], "r");
 		} catch (FileNotFoundException excpt) {
-			System.out.println(" MasterMRR: Failed to open config file, please check file path and try again");
+			System.out.println(" ServerMRR: Failed to open config file, please check file path and try again");
 			System.exit(-1);
 		}
 		
@@ -58,7 +58,7 @@ public class MasterMRR {
 		try {
 			configLineRead = config.readLine();
 		} catch (IOException e) {
-			System.out.println(" MasterMRR: Failed to read config file");
+			System.out.println(" ServerMRR: Failed to read config file");
 			System.exit(-2);
 		}
 		
@@ -80,7 +80,7 @@ public class MasterMRR {
 						this.peons.add(newPeon);
 					}
 				} catch (Exception excpt) {
-					System.out.println(" MasterMRR: Failed to parse participant list in config file, please check the form");
+					System.out.println(" ServerMRR: Failed to parse participant list in config file, please check the form");
 					System.exit(-4);
 				}
 			} else if (configParameter.equalsIgnoreCase("username")) {
@@ -101,7 +101,7 @@ public class MasterMRR {
 			try {
 				configLineRead = config.readLine();
 			} catch (IOException e) {
-				System.out.println(" MasterMRR: Failed to read config file");
+				System.out.println(" ServerMRR: Failed to read config file");
 				System.exit(-2);
 			}
 		}
@@ -156,7 +156,7 @@ public class MasterMRR {
 					t.join();
 				} catch (InterruptedException e) {
 					/* Should never happen */
-					System.out.println(" MasterMRR: Process wait interrupted, exiting...");
+					System.out.println(" ServerMRR: Process wait interrupted, exiting...");
 					System.exit(-3);
 				}
 			}

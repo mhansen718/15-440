@@ -10,11 +10,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class JobExec implements Runnable {
 
-	private JobMRR master;
+	private JobMRR<?, ?, ?> master;
 	private String jobName;
 	private ConfigurationMRR<?, ?, ?> config;
 	
-	public JobExec(JobMRR master, String jobName, ConfigurationMRR<?,?,?> config) {
+	public JobExec(JobMRR<?, ?, ?> master, String jobName, ConfigurationMRR<?,?,?> config) {
 		super();
 		this.jobName = jobName;
 		this.config = config;
@@ -51,7 +51,7 @@ public class JobExec implements Runnable {
             out.close();
             socket.close();
         } catch (IOException e) {
-            System.err.println("Failed to submit mapReduce job");
+            this.master.setException(e);
             return;
         }
 		
@@ -62,14 +62,14 @@ public class JobExec implements Runnable {
             in = new ObjectInputStream(socket.getInputStream());
             waitSocket.close();
         } catch (IOException e) {
-            System.err.println("Failed to listen for job completion");
+        	this.master.setException(e);
             return;
         }
         
         try {
             response = (JobEntry) in.readObject();
         } catch (Exception e) {
-            System.err.println("Couldn't understand server message");
+        	this.master.setException(e);
             return;
         }
         
@@ -79,7 +79,7 @@ public class JobExec implements Runnable {
             in.close();
             socket.close();
         } catch (IOException e) {
-            System.err.println("Failed to close sockets");
+        	this.master.setException(e);
         }
         
         return;

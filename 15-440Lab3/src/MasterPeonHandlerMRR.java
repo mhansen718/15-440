@@ -31,15 +31,17 @@ public class MasterPeonHandlerMRR implements Runnable {
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
         
+        System.out.println("Running");
+        try {
+			participantAddress = InetAddress.getByName(this.peon.host);
+		} catch (UnknownHostException excpt) {
+			/* No luck reaching the host, report the error but not much we can do */
+			System.out.println(" ServerMRR: Warning: host " + this.peon.host + " could not be ressolved");
+			return;
+		}
+        
 		if (this.peon.dead == 0) {
 			/* This participant is very dead, try to revive it */
-			try {
-				participantAddress = InetAddress.getByName(this.peon.host);
-			} catch (UnknownHostException excpt) {
-				/* No luck reaching the host, report the error but not much we can do */
-				System.out.println(" MasterMRR: Warning: host " + this.peon.host + " could not be ressolved");
-				return;
-			}
 			try {
 				if (participantAddress.isReachable(1000)) {
 					if (this.master.remoteStart()) {
@@ -47,24 +49,35 @@ public class MasterPeonHandlerMRR implements Runnable {
 						Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
 								System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
 								Integer.toString(this.master.getListenPort()) + " " + Integer.toString(this.master.getLocalListenPort()));
+						this.peon.connection = null;
 					}
 				}
 			} catch (IOException excpt) {
 				/* Had a problem doing the reachability test, not much we can do here... */
 			}
             
-            try {
-                Thread.sleep(5000);
-            } catch (Exception e) {
-            
+            while(this.peon.connection == null) {
+            	try {
+					if (!participantAddress.isReachable(1000)) {
+						return;
+					}
+				} catch (IOException e) {
+					return;
+				}
             }
             
+            System.out.println("Getting Status");
+            System.out.println(this.peon.connection.toString());
             try {
                 in = new ObjectInputStream(this.peon.connection.getInputStream());
+                /* Signal client that it can send the object now */
+                out = new ObjectOutputStream(this.peon.connection.getOutputStream());
                 peonStatus = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
+            	e.printStackTrace();
                 return;
             }
+            System.out.println("Got status");
             
             peon.power = peonStatus.power;
             peon.dead = this.master.getRetries();
@@ -87,8 +100,23 @@ public class MasterPeonHandlerMRR implements Runnable {
 			
             peonStatus = new ParticipantStatus();
             peonStatus.newTasks = tasks;
+            
+            /* Wait on reconnect */
+            while(this.peon.connection == null) {
+            	try {
+					if (!participantAddress.isReachable(1000)) {
+						injurePeon();
+						return;
+					}
+				} catch (IOException e) {
+					injurePeon();
+					return;
+				}
+            }
+            
 			try {
                 out = new ObjectOutputStream(this.peon.connection.getOutputStream());
+                in = new ObjectInputStream(this.peon.connection.getInputStream());
                 out.writeObject(peonStatus);
             } catch (IOException e) {
             	e.printStackTrace();
@@ -96,7 +124,6 @@ public class MasterPeonHandlerMRR implements Runnable {
             }
 			
 			try {
-                in = new ObjectInputStream(this.peon.connection.getInputStream());
                 peonStatus = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
             	e.printStackTrace();
@@ -167,18 +194,25 @@ public class MasterPeonHandlerMRR implements Runnable {
                     //Failed to send confirmation, not a huge deal
                 }
                 
+                /* Terminate connect */
+                this.peon.connection = null;
+                
 			} else {
-				/* Participant failed to response, make it a bit more dead, and
-				 * if its totally dead, dump its work load onto the pending tasks
-				 * queue */
-				 peon.dead--;
-				 if (peon.dead == 0) {
-					 for (TaskEntry te : peon.runningTasks.values()) {
-						 this.master.addTask(te);
-						 peon.runningTasks.remove(te.id);
-					 }
-				 }
+				injurePeon();
 			}
 		}
+	}
+	
+	private void injurePeon() {
+		/* Participant failed to response, make it a bit more dead, and
+		 * if its totally dead, dump its work load onto the pending tasks
+		 * queue */
+		 this.peon.dead--;
+		 if (peon.dead == 0) {
+			 for (TaskEntry te : peon.runningTasks.values()) {
+				 this.master.addTask(te);
+				 this.peon.runningTasks.remove(te.id);
+			 }
+		 }
 	}
 }
