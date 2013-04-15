@@ -157,15 +157,15 @@ public class ParticipantMRR {
             
             try {
                 out.writeObject(status);
-                out.close();
-                in.close();
-                this.socket.close();
             } catch (IOException e) {
                 continue;
             }
             
             try {
                 confirmation = (ParticipantStatus) in.readObject();
+                out.close();
+                in.close();
+                this.socket.close();
             } catch (Exception e) {
                 // Put everything back in the queues, we aren't sure the master knows
                 idIter = status.completedTasks.iterator();
