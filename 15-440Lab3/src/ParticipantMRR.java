@@ -52,6 +52,11 @@ public class ParticipantMRR {
 			System.exit(-1);
 		}
     	
+    	if (args.length != 3 ) {
+    		System.out.println("java ClientMRR [master host] [master port] [local job listen port]");
+    		System.exit(-1);
+    	}
+    	
         this.processors = Runtime.getRuntime().availableProcessors();
         
         this.host = args[0];

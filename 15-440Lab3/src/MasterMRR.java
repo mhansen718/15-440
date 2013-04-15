@@ -43,7 +43,7 @@ public class MasterMRR {
 		
 		/* Check arguments and print usage if incorrect */
 		if (args.length != 1) {
-			System.out.println("java MasterMRR [configuration file path]");
+			System.out.println("java ServerMRR [configuration file path]");
 		}
 		
 		/* Begin by reading in the config file */
