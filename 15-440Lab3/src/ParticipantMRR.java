@@ -156,6 +156,13 @@ public class ParticipantMRR {
             status.completedTasks = flushCompleted();
             status.newJobs = flushNewJobs();
             status.newTasks = null;
+            status.power = this.processors;
+            
+            try {
+                mine.write("Sending status\n".getBytes());
+            } catch (Exception e) {
+            
+            }
             
             try {
                 out.writeObject(status);
