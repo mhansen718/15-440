@@ -6,27 +6,30 @@ public class MostRecentCommonAncestor {
 
 	/* Idea and basic operation credits to (I couldnt think of anything cool :( )
 	 * http://stevekrenzel.com/finding-friends-with-mapreduce */
-	
+
 	public static void main(String[] args) {
-		
-		if (args.length != 7) {
-			System.out.println("Usage: java MutualFamilyMembers [record file] [start index(record #)] [end index(record #)] [person1] [person1 birthyear] [person2] [person2 birthyear]");
+
+		if (args.length != 9) {
+			System.out.println("Usage: java MutualFamilyMembers [record file] [start index(record #)] [end index(record #)]" + 
+					" [person1] [person1 birthyear] [person2] [person2 birthyear] [listen port] [local port]");
 			return;
 		}
-		
-		
+
+
 		/* Use MapReduce to find a list of mutualfamily members, then simply pick
 		 * the most recent using the birthday */
-		
+
 		MRRFamilyConfig config = new MRRFamilyConfig();
-		
+
 		/* Set up my configuration */
 		config.recordSize = 931;
 		config.inFile = args[0];
 		config.outFile = args[0] + ".out";
 		config.start = Integer.parseInt(args[1]);
 		config.end = Integer.parseInt(args[2]);
-		
+		config.listenBackPort = Integer.parseInt(args[7]);
+		config.participantPort = Integer.parseInt(args[8]);
+
 		/* Set up the records for the people to find */
 		MemberRecord p1 = new MemberRecord();
 		p1.self = args[3];
