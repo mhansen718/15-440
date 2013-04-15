@@ -161,6 +161,8 @@ public class MasterMRR {
 				}
 			}
 		}
+		System.out.println("Leaving...");
+		return;
 	}
 	
 	public void addTask(TaskEntry task) {
