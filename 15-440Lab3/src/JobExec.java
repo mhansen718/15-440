@@ -38,7 +38,7 @@ public class JobExec implements Runnable {
 			this.master.setException(e);
 			return;
 		}
-		submitJob.port = this.config.port;
+		submitJob.port = this.config.listenBackPort;
 		submitJob.err = null;
 		submitJob.runningTasks = new ConcurrentLinkedQueue<TaskID>();
 		submitJob.completeTasks = new ConcurrentLinkedQueue<TaskID>();
@@ -57,7 +57,7 @@ public class JobExec implements Runnable {
 		
         // Now wait for the master to say the job is done
         try {
-            waitSocket = new ServerSocket(this.config.port);
+            waitSocket = new ServerSocket(this.config.listenBackPort);
             socket = waitSocket.accept();
             in = new ObjectInputStream(socket.getInputStream());
             waitSocket.close();
