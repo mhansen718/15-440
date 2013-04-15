@@ -18,6 +18,7 @@ public class MasterMRR {
 	private String user;
 	private int listenPort;
 	private int retries;
+	private int timeout;
 	private int availableTasks;
 	private int localListenPort;
 	private boolean remoteStart;
@@ -95,6 +96,8 @@ public class MasterMRR {
 				if (configValue.equalsIgnoreCase("off")) {
 					this.remoteStart = false;
 				}
+			} else if (configParameter.equalsIgnoreCase("timeout")) {
+				this.timeout = Integer.parseInt(configValue);
 			}
 				// TODO: Add more parameters if needed ...
 
@@ -195,6 +198,10 @@ public class MasterMRR {
 	
 	public int getRetries() {
 		return this.retries;
+	}
+	
+	public int getTimeout() {
+		return this.timeout;
 	}
 	
 	public String getUsername() {

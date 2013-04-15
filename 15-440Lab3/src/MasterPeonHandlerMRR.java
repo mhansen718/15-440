@@ -40,28 +40,36 @@ public class MasterPeonHandlerMRR implements Runnable {
 			return;
 		}
         
-		if (this.peon.dead == 0 && this.master.remoteStart()) {
+		if (this.peon.dead == 0) {
 			/* This participant is very dead, try to revive it */
-			try {
-				if (participantAddress.isReachable(1000)) {
-					System.out.println("Remote Starting on " + this.peon.host);
-					Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
-							System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
-							Integer.toString(this.master.getListenPort()) + " " + Integer.toString(this.master.getLocalListenPort()));
-					this.peon.connection = null;
-				}
-			} catch (IOException excpt) {
-				/* Had a problem doing the reachability test, not much we can do here... */
-			}
-            
-            while(this.peon.connection == null) {
-            	try {
-					if (!participantAddress.isReachable(1000)) {
-						return;
+			System.out.println("working wrong");
+			if (this.master.remoteStart()) {
+				try {
+					if (participantAddress.isReachable(1000)) {
+						System.out.println("Remote Starting on " + this.peon.host);
+						Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
+								System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
+								Integer.toString(this.master.getListenPort()) + " " + Integer.toString(this.master.getLocalListenPort()));
+						this.peon.connection = null;
 					}
-				} catch (IOException e) {
+				} catch (IOException excpt) {
+					/* Had a problem doing the reachability test, not much we can do here... */
 					return;
 				}
+			}
+            
+			int timeout = 0;
+            do {
+            	try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					/* Not much can be done, keep going... */
+				}
+            	timeout++;
+            } while(this.peon.connection == null || timeout == this.master.getTimeout());
+            
+            if (timeout == this.master.getTimeout()) {
+            	return;
             }
             
             System.out.println("Getting Status");
@@ -104,16 +112,19 @@ public class MasterPeonHandlerMRR implements Runnable {
             peonStatus.newTasks = tasks;
             
             /* Wait on reconnect */
-            while(this.peon.connection == null) {
+            int timeout = 0;
+            do {
             	try {
-					if (!participantAddress.isReachable(1000)) {
-						injurePeon();
-						return;
-					}
-				} catch (IOException e) {
-					injurePeon();
-					return;
-				}
+            		Thread.sleep(1000);
+            	} catch (InterruptedException e) {
+            		/* Not much can be done, keep going... */
+            	}
+            	timeout++;
+            } while(this.peon.connection == null || timeout == this.master.getTimeout());
+            
+            if (timeout == this.master.getTimeout()) {
+            	injurePeon();
+            	return;
             }
             
 			try {
