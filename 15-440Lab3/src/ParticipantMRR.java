@@ -84,7 +84,8 @@ public class ParticipantMRR {
 
         try {
             this.out.writeObject(status);
-            //this.socket.close();
+            this.out.close();
+            this.socket.close();
         } catch (IOException e) {
             // Failed to phone home properly, may as well wait to be remade
         	System.out.println(" ClientMRR: Failed to send status to master");

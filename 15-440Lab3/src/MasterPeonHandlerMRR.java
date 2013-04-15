@@ -73,6 +73,9 @@ public class MasterPeonHandlerMRR implements Runnable {
                 /* Signal client that it can send the object now */
                 out = new ObjectOutputStream(this.peon.connection.getOutputStream());
                 peonStatus = (ParticipantStatus) in.readObject();
+                in.close();
+                out.close();
+                this.peon.connection.close();
             } catch (Exception e) {
             	e.printStackTrace();
                 return;
@@ -81,6 +84,7 @@ public class MasterPeonHandlerMRR implements Runnable {
             
             peon.power = peonStatus.power;
             peon.dead = this.master.getRetries();
+            this.peon.connection = null;
             
 		} else {
 			/* Send the participant all the tasks it should do  and add them to the list of tasks being done by peon */
@@ -190,6 +194,9 @@ public class MasterPeonHandlerMRR implements Runnable {
                 
                 try {
                     out.writeObject(peonStatus);
+                    in.close();
+                    out.close();
+                    this.peon.connection.close();
                 } catch (IOException e) {
                     //Failed to send confirmation, not a huge deal
                 }
