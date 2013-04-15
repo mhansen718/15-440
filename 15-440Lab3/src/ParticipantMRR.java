@@ -4,6 +4,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.RandomAccessFile;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.HashSet;
@@ -138,7 +139,8 @@ public class ParticipantMRR {
 			}
         	
             try {
-                this.socket = new Socket(this.host,this.port);
+                this.socket = new Socket();
+                this.socket.connect(new InetSocketAddress(this.host,this.port), 5000);
                 in = new ObjectInputStream(this.socket.getInputStream());
                 out = new ObjectOutputStream(this.socket.getOutputStream());
                 status = (ParticipantStatus) in.readObject();
