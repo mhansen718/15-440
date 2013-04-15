@@ -57,11 +57,4 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecord, HashSet<Memb
 		return mutual;
 	}
 
-	@Override
-	public byte[] writeRecord(
-			Pair<HashSet<MemberRecord>, HashSet<MemberRecord>> record) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

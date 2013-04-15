@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.TreeMap;
 
@@ -12,6 +11,7 @@ public class MostRecentCommonAncestor {
 		
 		if (args.length != 7) {
 			System.out.println("Usage: java MutualFamilyMembers [record file] [start index(record #)] [end index(record #)] [person1] [person1 birthyear] [person2] [person2 birthyear]");
+			return;
 		}
 		
 		
@@ -49,7 +49,7 @@ public class MostRecentCommonAncestor {
 		}
 		
 		if (myJob.encounteredException()) {
-			System.out.println("Oh no!!! The job failed... because a " + myJob.getException().toString() + " Exception happened....");
+			System.out.println("Oh no!!! The job failed... because a " + myJob.getException().toString() + " happened....");
 		} else {
 			TreeMap<HashSet<MemberRecord>, HashSet<MemberRecord>> reduced = null;
 			try {
@@ -71,6 +71,6 @@ public class MostRecentCommonAncestor {
 				return;
 			}
 		}
-		System.out.println("These two people have no common ancestors");
+		System.out.println("These two people have no common ancestors (at least in the record set given)");
 	} 
 }

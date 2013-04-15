@@ -1,3 +1,6 @@
+import java.util.Iterator;
+import java.util.TreeMap;
+
 
 
 public class WordCount {
@@ -23,7 +26,7 @@ public class WordCount {
         
         config.inFile = args[0];
         
-        JobMRR<String,String,int> job = new JobMRR<String,String,int>(config);
+        JobMRR<String,String,Integer> job = new JobMRR<String,String,Integer>(config);
         job.submit();
         
         try {
@@ -39,7 +42,13 @@ public class WordCount {
         }
         
         // Display the word frequency in alphabetical order
-        TreeMap<String,int> words = job.readFile();
+        TreeMap<String, Integer> words = null;
+		try {
+			words = job.readFile();
+		} catch (Exception e) {
+			System.out.println("Failed to read file :(");
+			return;
+		}
         
         Iterator<String> iter = (words.navigableKeySet()).iterator();
         String word;
