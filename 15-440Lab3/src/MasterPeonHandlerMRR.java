@@ -66,7 +66,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 					/* Not much can be done, keep going... */
 				}
             	timeout++;
-            } while(this.peon.connection == null || timeout == this.master.getTimeout());
+            } while(this.peon.connection == null && timeout < this.master.getTimeout());
             
             if (timeout == this.master.getTimeout()) {
             	return;
@@ -120,7 +120,7 @@ public class MasterPeonHandlerMRR implements Runnable {
             		/* Not much can be done, keep going... */
             	}
             	timeout++;
-            } while(this.peon.connection == null || timeout == this.master.getTimeout());
+            } while(this.peon.connection == null && timeout < this.master.getTimeout());
             
             if (timeout == this.master.getTimeout()) {
             	injurePeon();
