@@ -12,11 +12,11 @@ mrr_server: ServerMRR.java MasterMRR.java MasterPeonHandlerMRR.java JobEntry.jav
 mrr_client: ClientMRR.java ParticipantMRR.java ParticipantMinionMRR.java JobEntry.java TaskEntry.java TaskID.java ConfigurationMRR.java Pair.java ParticipantStatus.java ParticipantListenerMRR.java 
 	$(JVC) $(JVFLAGS) $(LIBS) ClientMRR.java
 
-family_example: MostRecentCommonAncestor.java MemberRecord.java FamilyRecord.java MRRFamilyConfig.java ConfigurationMRR.java JobMRR.java JobExec.java Pair.java
-	$(JVC) $(JVFLAGS) $(LIBS) MostRecentCommonAncestor.java
+family_example: FamilyCollection.java MemberRecord.java FamilyRecords.java MRRFamilyConfig.java ConfigurationMRR.java JobMRR.java JobExec.java Pair.java
+	$(JVC) $(JVFLAGS) $(LIBS) FamilyCollection.java
 
 word_example: WordCount.java WordCountConfig.java ConfigurationMRR.java JobMRR.java JobExec.java Pair.java
 	$(JVC) $(JVFLAGS) $(LIBS) WordCount.java
 
 clean:
-	rm -f *.class *~
+	rm -f *.class *~ *.mrr

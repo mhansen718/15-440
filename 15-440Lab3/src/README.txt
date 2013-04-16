@@ -27,15 +27,20 @@ HOW TO COMPILE & RUN:
 HOW TO RUN OUR EXAMPLES:
     Two examples are provide with the code, MostRecentCommonAncestor and . 
     These examples require records specific form and example record sets are provided 
-    (family.txt and respectively).
+    (short_family.txt and respectively).
 
     To run these examples, the following two commands are required:
 
-       java MostRecentCommondAncestor [record file] [start record] [end record] [person1] [p1 birthyear] [person2] [p2 brithyear] [listen port] [local port]
+       java FamilyCollection [record file] [start record] [end record] [family1] [person2] [listen port] [local port]
 
        java
 
      The first example takes a dataset of family tree information in which each record
-     contains a person's name and birthyear as well as there parents, parent's parents, 
-     etc. for 5 generations (including themselves). Using this tree, the dataset is
-     transformed via MapReduce into a list of paired
+     contains a person's name and birthyear as well as their parents. Using this small,
+     record, the MapReduce facility combines these records into families based on last 
+     name (a small unit; ie person and their parents) are placed into both the mother 
+     and father's family. Once done, the data is now output as a pair of family names
+     (string) and members (hashset). The intersection of two of these records represents
+     the common members of both families.
+
+     The second example
