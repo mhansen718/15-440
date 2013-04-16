@@ -199,7 +199,8 @@ public class ParticipantMRR {
                 }
                 continue;
             }
-            //TODO: erase used files
+            // We got confirmation, time to erase the files we used
+            
         }
     }
     
