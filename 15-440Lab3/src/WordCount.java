@@ -27,6 +27,7 @@ public class WordCount {
         }
         
         config.inFile = args[0];
+        config.outFile = args[0] + ".out";
         
         JobMRR<String,String,Integer> job = new JobMRR<String,String,Integer>(config);
         job.submit();

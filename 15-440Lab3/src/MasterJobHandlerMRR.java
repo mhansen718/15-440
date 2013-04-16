@@ -28,6 +28,14 @@ public class MasterJobHandlerMRR implements Runnable {
 		
 		/* Check if the job is done or errored, if so, send word to the app */
 		if (((this.job.runningTasks.size() == 0) && (this.job.completeTasks.size() == 1)) || (this.job.err != null)) {
+			/* Rename our ugly file name to the user's requested file name */
+			try {
+            File outFile = new File(this.job.completeTasks.poll().toFileName());
+            outFile.renameTo(new File(this.job.config.outFile));
+			} catch (Exception excpt) {
+				this.job.err = new IOException();
+			}
+            /* Send to the client */
 			try {
                 socket = new Socket(this.job.host,this.job.port);
                 out = new ObjectOutputStream(socket.getOutputStream());
@@ -41,10 +49,7 @@ public class MasterJobHandlerMRR implements Runnable {
             	System.out.println("Error: " + this.job.err.toString());
             }
             
-            /* Rename our ugly file name to the user's requested file name */
-            File outFile = new File((this.job.completeTasks.poll()).toFileName());
-            outFile.renameTo(new File(this.job.config.outFile));
-            
+            /* Remove the job from the master job list, its done now */
             this.master.removeJob(this.job.id);
             
             try {

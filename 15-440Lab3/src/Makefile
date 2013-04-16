@@ -19,4 +19,4 @@ word_example: WordCount.java WordCountConfig.java ConfigurationMRR.java JobMRR.j
 	$(JVC) $(JVFLAGS) $(LIBS) WordCount.java
 
 clean:
-	rm -f *.class *~ *.mrr
+	rm -f -- *.class *~ *.mrr

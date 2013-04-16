@@ -9,7 +9,7 @@ public class FamilyCollection {
 
 	public static void main(String[] args) {
 
-		if (args.length != 9) {
+		if (args.length != 7) {
 			System.out.println("Usage: java FamilyCollection [record file] [start index(record #)] [end index(record #)]" + 
 					" [family1] [family2] [listen port] [local port]");
 			return;

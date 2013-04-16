@@ -10,6 +10,7 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecords, String, Has
 	@Override
 	public FamilyRecords readRecord(byte[] record) {
 		FamilyRecords structRecord = new FamilyRecords();
+		structRecord.parents = new HashSet<MemberRecord>();
 		
 		/* Add person */
 		MemberRecord mem = new MemberRecord();

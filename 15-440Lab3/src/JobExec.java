@@ -16,6 +16,7 @@ public class JobExec implements Runnable {
 	
 	public JobExec(JobMRR<?, ?, ?> master, String jobName, ConfigurationMRR<?,?,?> config) {
 		super();
+		this.master = master;
 		this.jobName = jobName;
 		this.config = config;
 	}

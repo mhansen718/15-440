@@ -47,10 +47,9 @@ public class ParticipantMRR {
         ParticipantStatus status = null;
         ParticipantStatus confirmation = null;
     	
-    	/* First order of business, KILL ALL OTHER PARTICIPANTS ON THIS SYSTEM,
-    	 * command credits to the internet */
+    	/* First order of business, KILL ALL OTHER PARTICIPANTS ON THIS SYSTEM */
     	try {
-			Runtime.getRuntime().exec("kill -9 `ps ax | grep 'java ClientMRR' | awk '{print $1}'");
+			Runtime.getRuntime().exec("killall -r 'java ClientMRR'");
 		} catch (IOException e3) {
 			/* Failed to take over this node, maybe..... we'll just have to try again later */
 			System.exit(-1);
