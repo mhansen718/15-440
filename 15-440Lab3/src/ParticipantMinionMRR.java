@@ -85,7 +85,7 @@ public class ParticipantMinionMRR implements Runnable {
                 }
                 in.close();
             } catch (Exception e) {
-                                                                        //TODO: error handling
+                e.printStackTrace();
             }
             redIn2 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
         } else {
@@ -97,7 +97,7 @@ public class ParticipantMinionMRR implements Runnable {
                 redIn2 = (TreeMap<REDKEY, ArrayList<REDVAL>>) objIn.readObject();
                 objIn.close();
             } catch (Exception e) {
-                                                                        //TODO: error handling
+                e.printStackTrace();
             }
         }
         
