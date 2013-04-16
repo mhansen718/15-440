@@ -131,12 +131,6 @@ public class MasterPeonHandlerMRR implements Runnable {
                 out = new ObjectOutputStream(this.peon.connection.getOutputStream());
                 in = new ObjectInputStream(this.peon.connection.getInputStream());
                 out.writeObject(peonStatus);
-            } catch (IOException e) {
-            	e.printStackTrace();
-                peonStatus = null;
-            }
-			
-			try {
                 peonStatus = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
             	e.printStackTrace();
