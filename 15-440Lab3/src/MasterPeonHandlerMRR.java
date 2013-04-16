@@ -140,6 +140,7 @@ public class MasterPeonHandlerMRR implements Runnable {
             }
 			
 			if (peonStatus != null) {
+				System.out.println("No null!");
 				/* Declare the peon healthy */
 				peon.dead = this.master.getRetries();
 				/* Update the system based on the status from the participant */

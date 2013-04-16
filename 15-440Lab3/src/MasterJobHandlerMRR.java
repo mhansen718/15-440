@@ -52,9 +52,11 @@ public class MasterJobHandlerMRR implements Runnable {
 				tid2 = this.job.completeTasks.iterator();
 				while(tid2.hasNext()) {
 					TaskID t2 = tid2.next();
+					System.out.println("Tasks complete are : " + t2.toFileName() + " and " + t1.toFileName());
 					/* If the blocks for records are adjacent, merge tasks and add to task queue and 
 					 * job running task list, also remove the two tasks from the job completed list */
 					if (t1.isAdjacent(t2)) {
+						System.out.println("FOUND THEM ADJACENT");
 						TaskEntry te = new TaskEntry();
 						te.file1 = t1.toFileName();
 						te.file2 = t2.toFileName();
