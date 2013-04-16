@@ -41,6 +41,7 @@ public class ParticipantMinionMRR implements Runnable {
             
 			/* Add the job to the completed work list */
 			master.completeTask(currentTask.id);
+			System.out.println("Completed a task");
 		}
 	}
     
@@ -64,7 +65,7 @@ public class ParticipantMinionMRR implements Runnable {
         System.out.println("file2: " + currentTask.file2 + "\n");
         
         // Do we have to map, or is this just a reduce?
-        if (currentTask.file2 == null) {
+        if (currentTask.file2 == null || currentTask.file2 != null) {
         	System.out.print("Here");
             nextRecord = currentTask.id.start;
             input = new byte[currentTask.recordSize];
@@ -105,6 +106,8 @@ public class ParticipantMinionMRR implements Runnable {
             }
         }
         
+        System.out.println("Mapped");
+        
         redOut = new TreeMap<REDKEY, ArrayList<REDVAL>>();
         iter = (redIn1.keySet()).iterator();
         while (iter.hasNext()) {
@@ -126,7 +129,7 @@ public class ParticipantMinionMRR implements Runnable {
             
             redOut.put(key,vals);
         }
-        
+        System.out.println("REduced 1");
         iter = (redIn2.keySet()).iterator();
         while (iter.hasNext()) {
             key = iter.next();
@@ -142,6 +145,7 @@ public class ParticipantMinionMRR implements Runnable {
             
             redOut.put(key,vals);
         }
+        System.out.println("Done!");
         
         try {
             out = new ObjectOutputStream(new FileOutputStream(currentTask.id.toFileName()));
@@ -150,6 +154,7 @@ public class ParticipantMinionMRR implements Runnable {
         } catch (Exception e) {
             // Failed to write output file
         }
+        return;
     }
 
 }

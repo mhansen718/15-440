@@ -145,6 +145,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 				/* Update the system based on the status from the participant */
 				peon.power = peonStatus.power;
 				for (TaskID id : peonStatus.completedTasks) {
+					System.out.println("Some tasks are reported done");
 					TaskEntry check = peon.runningTasks.remove(id);
 					/* Check for resent and ignore if it is a resend */
 					if (check == null) {
@@ -153,15 +154,18 @@ public class MasterPeonHandlerMRR implements Runnable {
 					/* Update the jobs lists, clear up the files if the job is terminated */
 					JobEntry j = this.master.findJob(id.jobID);
 					if ((j != null) && (j.err == null) && (id.err == null)) {
+							System.out.println("no error in task");
 							j.runningTasks.remove(id);
 							j.completeTasks.add(id);
 					} else {
+						System.out.println("TASK ERRORS: " + id.err.toString());
 						this.master.stopJob(j.id, id.err);
 						File f = new File(id.toFileName());
 						f.delete();
 					}
 				}
 				for (JobEntry j : peonStatus.newJobs) {
+					System.out.println("Got a new job");
 					/* Check for resent new job and ignore if present */
 					if (this.master.findJob(j.id) != null) {
 						continue;

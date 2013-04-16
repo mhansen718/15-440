@@ -22,6 +22,8 @@ public class MasterJobHandlerMRR implements Runnable {
 		Iterator<TaskID> tid2 = null;
         Socket socket = null;
         ObjectOutputStream out;
+        
+        System.out.println("A got a job to process");
 		
 		/* Check if the job is done or errored, if so, send word to the app */
 		if (((this.job.runningTasks.size() == 0) && (this.job.completeTasks.size() == 1)) || (this.job.err != null)) {
@@ -33,7 +35,7 @@ public class MasterJobHandlerMRR implements Runnable {
                 System.err.println("Failed to send job back to client");
                 return;
             }
-            
+            System.out.println("This job is done: " + this.job.err.toString());
             this.master.removeJob(this.job.id);
             
             try {
