@@ -199,6 +199,7 @@ public class ParticipantMRR {
                 }
                 continue;
             }
+            //TODO: erase used files
         }
     }
     
