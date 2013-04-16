@@ -3,40 +3,42 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 
-public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecord, HashSet<MemberRecord>, HashSet<MemberRecord>> {
+public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecords, String, HashSet<MemberRecord>> {
 
 	private static final long serialVersionUID = 5198221844897768850L;
 
 	@Override
-	public FamilyRecord readRecord(byte[] record) {
-		FamilyRecord structRecord = new FamilyRecord();
+	public FamilyRecords readRecord(byte[] record) {
+		FamilyRecords structRecord = new FamilyRecords();
 		
-		/* Add the individual to their family record */
-		MemberRecord my = new MemberRecord();
-		my.self = (new String(Arrays.copyOfRange(record, 0, 26)));
-		my.birthyear = Integer.parseInt((new String(Arrays.copyOfRange(record, 26, 30))));
-		structRecord.self = my;
+		/* Add person */
+		MemberRecord mem = new MemberRecord();
+		String fullName = (new String(Arrays.copyOfRange(record, 0, 26))).trim();
+		mem.firstName = fullName.split(" ")[0];
+		mem.lastName = fullName.split(" ")[1];
+		mem.birthyear = Integer.parseInt((new String(Arrays.copyOfRange(record, 26, 30))));
+		structRecord.members.add(mem);
 		
-		/* Add their ancestors */
-		structRecord.family = new HashSet<MemberRecord>();
-		for (int i = 0; i < 30; i++) {
-			/* Run through the list immediate family members */
-			int index = i * 30;
-			if (Byte.toString(record[index]).equals(" ")) {
-				break;
-			} else {
-				MemberRecord member = new MemberRecord();
-				member.self = (new String(Arrays.copyOfRange(record, index, (index + 26))));
-				member.birthyear = Integer.parseInt((new String(Arrays.copyOfRange(record, (index + 26), (index + 30)))));
-				structRecord.family.add(member);
-			}
-		}
+		/* Add father */
+		fullName = (new String(Arrays.copyOfRange(record, 30, 56))).trim();
+		mem.firstName = fullName.split(" ")[0];
+		mem.lastName = fullName.split(" ")[1];
+		mem.birthyear = Integer.parseInt((new String(Arrays.copyOfRange(record, 56, 60))));
+		structRecord.members.add(mem);
+		
+		/* Add mother */
+		fullName = (new String(Arrays.copyOfRange(record, 60, 86))).trim();
+		mem.firstName = fullName.split(" ")[0];
+		mem.lastName = fullName.split(" ")[1];
+		mem.birthyear = Integer.parseInt((new String(Arrays.copyOfRange(record, 86, 90))));
+		structRecord.members.add(mem);
+		
 		return structRecord;
 	}
 
 	@Override
 	public ArrayList<Pair<HashSet<MemberRecord>, HashSet<MemberRecord>>> map(
-			FamilyRecord mapin) {
+			FamilyRecords mapin) {
 		ArrayList<Pair<HashSet<MemberRecord>, HashSet<MemberRecord>>> returnPairList = new ArrayList<Pair<HashSet<MemberRecord>, HashSet<MemberRecord>>>();
 		for (MemberRecord mem : mapin.family) {
 			HashSet<MemberRecord> pairing = new HashSet<MemberRecord>();
@@ -56,5 +58,7 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecord, HashSet<Memb
 		mutual.retainAll(val2);
 		return mutual;
 	}
+
+
 
 }

@@ -54,6 +54,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 					}
 				} catch (IOException excpt) {
 					/* Had a problem doing the reachability test, not much we can do here... */
+					this.peon.connection = null;
 					return;
 				}
 			}
@@ -84,6 +85,7 @@ public class MasterPeonHandlerMRR implements Runnable {
                 this.peon.connection.close();
             } catch (Exception e) {
             	e.printStackTrace();
+            	this.peon.connection = null;
                 return;
             }
             System.out.println("Got status");
