@@ -71,6 +71,7 @@ public class MasterJobHandlerMRR implements Runnable {
 						/* Refresh the iterators now that the structure has been modified */
 						tid1 = this.job.completeTasks.iterator();
 						tid2 = this.job.completeTasks.iterator();
+                        break;
 					}
 				}
 			}

@@ -13,7 +13,7 @@ public class TaskID implements Serializable {
 	
 	public boolean equals(TaskID other) {
 		return ((this.jobID == other.jobID) &&
-				(this.start == other.jobID));
+				(this.start == other.start));
 	}
 	
 	public boolean isAdjacent(TaskID other) {
