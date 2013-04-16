@@ -65,7 +65,7 @@ public class ParticipantMinionMRR implements Runnable {
         System.out.println("file2: " + currentTask.file2 + "\n");
         
         // Do we have to map, or is this just a reduce?
-        if (currentTask.file2 == null || currentTask.file2 != null) {
+        if (currentTask.file2.equals("null")) {
         	System.out.print("Here");
             nextRecord = currentTask.id.start;
             input = new byte[currentTask.recordSize];

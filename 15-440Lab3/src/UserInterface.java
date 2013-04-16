@@ -39,7 +39,7 @@ public class UserInterface implements Runnable {
     			}
     		} else if (inputString.equals("quit")) {
     			System.out.println("Goodbye!");
-    			return;
+    			System.exit(0);
     		} else if (inputString.equals("power")) {
     			System.out.println("Current System Power (Active Nodes / Total Nodes): " + 
     					Integer.toString(this.master.getCurrentPower()) + " (" + Integer.toString(this.master.getNodes()) + 

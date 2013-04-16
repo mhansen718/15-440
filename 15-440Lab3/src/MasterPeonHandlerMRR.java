@@ -96,10 +96,14 @@ public class MasterPeonHandlerMRR implements Runnable {
             
 		} else {
 			/* Send the participant all the tasks it should do  and add them to the list of tasks being done by peon */
-			tasksToDo = (this.master.getAvailableTasks() / this.master.getCurrentPower()) * this.peon.power;
+			tasksToDo = ((int) Math.ceil((((double) this.master.getAvailableTasks()) / ((double) this.master.getCurrentPower())) * this.peon.power));
+			System.out.println("Mast has: " + this.master.getAvailableTasks() + " and we will do " + tasksToDo);
 			
 			for (int i = 0; i < tasksToDo; i++) {
 				TaskEntry te = this.master.getTask();
+				if (te == null) {
+					break;
+				}
 				JobEntry j = this.master.findJob(te.id.jobID);
 				/* If a job has been terminated, dont send it out to be done */
 				if ((j != null) && (j.err == null)) {
@@ -146,7 +150,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 				/* Update the system based on the status from the participant */
 				peon.power = peonStatus.power;
 				for (TaskID id : peonStatus.completedTasks) {
-					System.out.println("Some tasks are reported done");
+					System.out.println("Some tasks are reported done: ie this one " + id.toString() + " in there? " + peon.runningTasks.containsKey(id));
 					TaskEntry check = peon.runningTasks.remove(id);
 					/* Check for resent and ignore if it is a resend */
 					if (check == null) {
@@ -176,12 +180,13 @@ public class MasterPeonHandlerMRR implements Runnable {
 					length = j.config.end - j.config.start;
 					step = (length / this.master.getCurrentPower());
 					mod = (length % this.master.getCurrentPower());
+					modCount = mod;
 					for (int i = 0; i < this.master.getCurrentPower(); i++) {
 						/* Create new tasks and add them to the job and task queue */
 						TaskEntry te = new TaskEntry();
 						te.config = j.config;
 						te.file1 = j.config.inFile;
-                        te.file2 = null;
+                        te.file2 = "null";
                         te.recordSize = j.config.recordSize;
 						te.id = new TaskID();
 						te.id.jobID = j.id;

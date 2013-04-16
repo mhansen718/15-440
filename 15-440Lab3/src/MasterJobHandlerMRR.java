@@ -1,3 +1,4 @@
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -35,7 +36,15 @@ public class MasterJobHandlerMRR implements Runnable {
                 System.err.println("Failed to send job back to client");
                 return;
             }
-            System.out.println("This job is done: " + this.job.err.toString());
+            System.out.println("This job is done! or errored :(");
+            if (this.job.err != null) {
+            	System.out.println("Error: " + this.job.err.toString());
+            }
+            
+            /* Rename our ugly file name to the user's requested file name */
+            File outFile = new File((this.job.completeTasks.poll()).toFileName());
+            outFile.renameTo(new File(this.job.config.outFile));
+            
             this.master.removeJob(this.job.id);
             
             try {
@@ -58,6 +67,7 @@ public class MasterJobHandlerMRR implements Runnable {
 					if (t1.isAdjacent(t2)) {
 						System.out.println("FOUND THEM ADJACENT");
 						TaskEntry te = new TaskEntry();
+						te.config = this.job.config;
 						te.file1 = t1.toFileName();
 						te.file2 = t2.toFileName();
 						te.id = TaskID.merge(t1, t2);

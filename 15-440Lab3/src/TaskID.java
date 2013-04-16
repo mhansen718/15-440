@@ -10,12 +10,22 @@ public class TaskID implements Serializable {
 	public int start;
 	public int end;
 	public Exception err;
-	
-	public boolean equals(TaskID other) {
-		return ((this.jobID == other.jobID) &&
-				(this.start == other.start));
+
+	@Override
+	public boolean equals(Object obj) {
+		System.out.println("Im equals? " + ((this.jobID == ((TaskID) obj).jobID) &&
+				(this.start == ((TaskID) obj).start)));
+		return ((this.jobID == ((TaskID) obj).jobID) &&
+				(this.start == ((TaskID) obj).start));
 	}
 	
+	
+	@Override
+	public int hashCode() {
+		return ((int) this.jobID) + (this.start ^ this.end);
+	}
+
+
 	public boolean isAdjacent(TaskID other) {
 		return ((this.end == other.start) || 
 				(this.start == other.end));
