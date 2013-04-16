@@ -3,5 +3,6 @@ import java.util.HashSet;
 
 public class FamilyRecords {
 
-	HashSet<MemberRecord> members;
+	MemberRecord self;
+	HashSet<MemberRecord> parents;
 }

@@ -150,6 +150,7 @@ public class MasterPeonHandlerMRR implements Runnable {
 					TaskEntry check = peon.runningTasks.remove(id);
 					/* Check for resent and ignore if it is a resend */
 					if (check == null) {
+						System.out.println("OH NOES not on my list");
 						continue;
 					}
 					/* Update the jobs lists, clear up the files if the job is terminated */
