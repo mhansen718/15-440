@@ -198,6 +198,8 @@ public class ParticipantMRR {
                 }
                 continue;
             }
+            // We got confirmation, time to erase the files we used
+            
         }
     }
     
