@@ -60,8 +60,8 @@ public class ParticipantMinionMRR implements Runnable {
         REDKEY key;
         REDVAL val;
         
-        System.out.println(currentTask.file1);
-        System.out.println(currentTask.file2 + "\n");
+        System.out.println("file1: " + currentTask.file1);
+        System.out.println("file2: " + currentTask.file2 + "\n");
         
         // Do we have to map, or is this just a reduce?
         if (currentTask.file2 != null) {
@@ -147,7 +147,7 @@ public class ParticipantMinionMRR implements Runnable {
             out.writeObject(redOut);
             out.close();
         } catch (Exception e) {
-                                                                            //TODO: error handling
+            // Failed to write output file
         }
     }
 
