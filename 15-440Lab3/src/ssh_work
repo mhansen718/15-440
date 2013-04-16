@@ -1,0 +1,1 @@
+ssh -o 'StrictHostKeyChecking no' $1@$2 "cd $3 ; java ClientMRR $4 $5 $6"
