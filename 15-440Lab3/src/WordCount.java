@@ -9,7 +9,7 @@ public class WordCount {
     public static void main(String[] args) {
     
         if (args.length < 4) {
-            System.out.println("Usage: java WordCount [inputfile] [recordSize] [startRecord] [endRecord]");
+            System.out.println("Usage: java WordCount [inputfile] [recordSize] [startRecord] [endRecord] [return port] [local port]");
             return;
         }
         
@@ -19,8 +19,10 @@ public class WordCount {
             config.recordSize = Integer.parseInt(args[1]);
             config.start = Integer.parseInt(args[2]);
             config.end = Integer.parseInt(args[3]);
+            config.listenBackPort = Integer.parseInt(args[4]);
+            config.participantPort = Integer.parseInt(args[5]);
         } catch (NumberFormatException e) {
-            System.out.println("Usage: java WordCount [inputfile] [recordSize] [startRecord] [endRecord]");
+            System.out.println("Usage: java WordCount [inputfile] [recordSize] [startRecord] [endRecord] [return port] [local port]");
             return;
         }
         

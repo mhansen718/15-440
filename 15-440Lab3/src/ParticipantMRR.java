@@ -32,6 +32,9 @@ public class ParticipantMRR {
     	this.minions = new HashSet<Thread>();
     	this.completedTasks = new HashSet<TaskID>();
     	this.completedTasksProtect = new Semaphore(1);
+    	this.tasks = new LinkedBlockingQueue<TaskEntry>();
+    	this.newJobs = new ConcurrentLinkedQueue<JobEntry>();
+    	
     }
     
     public void main(String args[]) {
@@ -64,6 +67,9 @@ public class ParticipantMRR {
         
         try {
             this.port = Integer.parseInt(args[1]);
+            if ((this.port > 65535) || (this.port < 0)) {
+    			System.out.println(" ClientMRR: Local listen port out of range");
+    		}
         } catch (NumberFormatException e) {
         	System.out.println("java ClientMRR [master host] [master port] [local job listen port]");
             System.exit(-1);
@@ -106,8 +112,6 @@ public class ParticipantMRR {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-        
-        newJobs = new ConcurrentLinkedQueue();
         
         /* Run the main loop */
         while (true) {
@@ -230,7 +234,7 @@ public class ParticipantMRR {
     }
     
     private HashSet<JobEntry> flushNewJobs() {
-        HashSet<JobEntry> jobs = new HashSet();
+        HashSet<JobEntry> jobs = new HashSet<JobEntry>();
         JobEntry j = this.newJobs.poll();
         while (j != null) {
             jobs.add(j);

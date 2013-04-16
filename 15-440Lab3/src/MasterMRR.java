@@ -78,7 +78,11 @@ public class MasterMRR {
 						newPeon.dead = 0;
 						newPeon.power = 1;
 						newPeon.runningTasks = new HashMap<TaskID, TaskEntry>();
-						this.peons.add(newPeon);
+						if ((newPeon.port > 65535) || (newPeon.port < 0)) {
+							System.out.println(" MasterMRR: Peon " + newPeon.host + "'s port is out of range");
+						} else {
+							this.peons.add(newPeon);
+						}
 					}
 				} catch (Exception excpt) {
 					System.out.println(" ServerMRR: Failed to parse participant list in config file, please check the form");
@@ -108,10 +112,18 @@ public class MasterMRR {
 				System.exit(-2);
 			}
 		}
+		
 		try {
 			config.close();
 		} catch (IOException e) {
 			/* Failed to close the file, whatever will we do.... */
+		}
+		
+		/* Check ports for errors */
+		if ((this.localListenPort > 65535) || (this.localListenPort < 0)) {
+			System.out.println(" ServerMRR: Local listen port out of range");
+		} else if ((this.listenPort > 65535) || (this.listenPort < 0)) {
+			System.out.println(" ServerMRR: Master listen port out of range");
 		}
 		
 		pow = this.peons.size();
