@@ -223,8 +223,8 @@ public class MasterPeonHandlerMRR implements Runnable {
 		 if (peon.dead == 0) {
 			 for (TaskEntry te : peon.runningTasks.values()) {
 				 this.master.addTask(te);
-				 this.peon.runningTasks.remove(te.id);
 			 }
+			 this.peon.runningTasks = new HashMap<TaskID, TaskEntry>();
 		 }
 	}
 }
