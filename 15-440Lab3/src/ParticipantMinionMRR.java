@@ -60,6 +60,9 @@ public class ParticipantMinionMRR implements Runnable {
         REDKEY key;
         REDVAL val;
         
+        System.out.println(currentTask.file1);
+        System.out.println(currentTask.file2 + "\n");
+        
         // Do we have to map, or is this just a reduce?
         if (currentTask.file2 != null) {
             nextRecord = currentTask.id.start;
