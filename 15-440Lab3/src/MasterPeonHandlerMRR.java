@@ -149,6 +149,11 @@ public class MasterPeonHandlerMRR implements Runnable {
 				peon.dead = this.master.getRetries();
 				/* Update the system based on the status from the participant */
 				peon.power = peonStatus.power;
+				/* If the status is bogus, hurt the peon and leave */
+				if ((peonStatus.completedTasks == null) || (peonStatus.newJobs == null)) {
+					injurePeon();
+					return;
+				}
 				for (TaskID id : peonStatus.completedTasks) {
 					System.out.println("Some tasks are reported done: ie this one " + id.toString() + " in there? " + peon.runningTasks.containsKey(id));
 					TaskEntry check = peon.runningTasks.remove(id);

@@ -47,7 +47,7 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecords, String, Has
 			family.addAll(mapin.parents);
 			returnPairList.add(new Pair<String, HashSet<MemberRecord>>(mem.lastName, family));
 		}
-		return null;
+		return returnPairList;
 	}
 
 	@Override
