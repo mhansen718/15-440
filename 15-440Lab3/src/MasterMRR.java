@@ -93,7 +93,7 @@ public class MasterMRR {
 			} else if (configParameter.equalsIgnoreCase("listen_port")) {
 				this.listenPort = Integer.parseInt(configValue);
 			} else if (configParameter.equalsIgnoreCase("retries")) {
-				this.retries = Integer.parseInt(configValue);
+				this.retries = Math.max(Integer.parseInt(configValue), 1);
 			} else if (configParameter.equalsIgnoreCase("local_port")) {
 				this.localListenPort = Integer.parseInt(configValue);
 			} else if (configParameter.equalsIgnoreCase("remote_start")) {
