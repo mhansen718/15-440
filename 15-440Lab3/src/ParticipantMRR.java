@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.io.File;
 
 public class ParticipantMRR {
     
@@ -26,6 +27,7 @@ public class ParticipantMRR {
     private HashSet<Thread> minions;
     private Semaphore completedTasksProtect;
     private ConcurrentLinkedQueue<JobEntry> newJobs;
+    private ConcurrentLinkedQueue<String> junkFiles;
     
     public ParticipantMRR() {
     	super();
@@ -34,6 +36,7 @@ public class ParticipantMRR {
     	this.completedTasksProtect = new Semaphore(1);
     	this.tasks = new LinkedBlockingQueue<TaskEntry>();
     	this.newJobs = new ConcurrentLinkedQueue<JobEntry>();
+        this.junkFiles = new ConcurrentLinkedQueue<String>();
     	
     }
     
@@ -101,17 +104,6 @@ public class ParticipantMRR {
         Thread newJobListener = new Thread(new ParticipantListenerMRR(this, Integer.parseInt(args[2])));
         newJobListener.start();
         
-        RandomAccessFile mine = null;
-		try {
-			mine = new RandomAccessFile(System.getProperty("user.dir") + "/hi." + InetAddress.getLocalHost().getHostName() + ".txt", "rw");
-		} catch (FileNotFoundException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (UnknownHostException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-        
         /* Run the main loop */
         while (true) {
         	/* check the minions, removing the dead and adding more if needed */
@@ -136,13 +128,6 @@ public class ParticipantMRR {
         		}
         	}
         	
-        	try {
-				mine.write("Hello\n".getBytes());
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-        	
             try {
                 this.socket = new Socket();
                 this.socket.connect(new InetSocketAddress(this.host,this.port), 5000);
@@ -151,11 +136,6 @@ public class ParticipantMRR {
                 status = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
             	e.printStackTrace();
-            	  try {
-                      mine.write(e.getStackTrace().toString().getBytes());
-                  } catch (Exception ex) {
-                  
-                  }
                 System.exit(-1);
             }
             
@@ -168,12 +148,6 @@ public class ParticipantMRR {
             status.newJobs = flushNewJobs();
             status.newTasks = null;
             status.power = this.processors;
-            
-            try {
-                mine.write("Sending status\n".getBytes());
-            } catch (Exception e) {
-            
-            }
             
             try {
                 out.writeObject(status);
@@ -190,7 +164,7 @@ public class ParticipantMRR {
                 // Put everything back in the queues, we aren't sure the master knows
                 idIter = status.completedTasks.iterator();
                 while (idIter.hasNext()) {
-                    completeTask(idIter.next());
+                    completeTaskID(idIter.next());
                 }
                 jobIter = status.newJobs.iterator();
                 while (jobIter.hasNext()) {
@@ -198,12 +172,33 @@ public class ParticipantMRR {
                 }
                 continue;
             }
-            // We got confirmation, time to erase the files we used
             
+            // We got confirmation, time to erase the files we used
+            try {
+                String oldFilename = this.junkFiles.poll();
+                while (oldFilename != null) {
+                    if (oldFilename.endsWith(".mrr")) {
+                        File oldFile = new File(oldFilename);
+                        oldFile.delete();
+                        oldFilename = this.junkFiles.poll();
+                    }
+                }
+            } catch (Exception e) {
+                //Failed to clean up after ourselves properly
+            }
         }
     }
     
-    public void completeTask(TaskID id) {
+    public void completeTask(TaskEntry task) {
+    	/* Acquire the semphore and add the task to the completed tasks list */
+    	this.completedTasksProtect.acquireUninterruptibly();
+    	this.completedTasks.add(task.id);
+    	this.completedTasksProtect.release();
+        this.junkFiles.offer(task.file1);
+        this.junkFiles.offer(task.file2);
+    }
+    
+    public void completeTaskID(TaskID id) {
     	/* Acquire the semphore and add the task to the completed tasks list */
     	this.completedTasksProtect.acquireUninterruptibly();
     	this.completedTasks.add(id);

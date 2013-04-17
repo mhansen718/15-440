@@ -40,7 +40,7 @@ public class ParticipantMinionMRR implements Runnable {
             mapReduce(currentTask.config, currentTask);
             
 			/* Add the job to the completed work list */
-			master.completeTask(currentTask.id);
+			master.completeTask(currentTask);
 			System.out.println("Completed a task");
 		}
 	}
@@ -55,7 +55,7 @@ public class ParticipantMinionMRR implements Runnable {
         byte[] input;
         TreeMap<REDKEY,ArrayList<REDVAL>> redIn1 = null;
         TreeMap<REDKEY,ArrayList<REDVAL>> redIn2 = null;
-        TreeMap<REDKEY,ArrayList<REDVAL>> redOut = null;
+        TreeMap<REDKEY,REDVAL> redOut = null;
         ArrayList<REDVAL> vals;
         Iterator<REDKEY> iter;
         REDKEY key;
@@ -63,6 +63,8 @@ public class ParticipantMinionMRR implements Runnable {
         
         System.out.println("file1: " + currentTask.file1);
         System.out.println("file2: " + currentTask.file2 + "\n");
+        redIn1 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
+        redIn2 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
         
         // Do we have to map, or is this just a reduce?
         if (currentTask.file2.equals("null")) {
@@ -73,7 +75,6 @@ public class ParticipantMinionMRR implements Runnable {
                 raf = new RandomAccessFile(currentTask.file1, "r");
                 raf.seek(nextRecord * currentTask.recordSize);
                 in = new FileInputStream(raf.getFD());
-                redIn1 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
                 for (int i = nextRecord; i < currentTask.id.end; i++) {
                     in.read(input);
                     mapOut = config.map(config.readRecord(input));
@@ -92,15 +93,24 @@ public class ParticipantMinionMRR implements Runnable {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            redIn2 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
         } else {
             try {
                 objIn = new ObjectInputStream(new FileInputStream(currentTask.file1));
-                redIn1 = (TreeMap<REDKEY, ArrayList<REDVAL>>) objIn.readObject();
+                TreeMap<REDKEY, REDVAL> readIn = (TreeMap<REDKEY, REDVAL>) objIn.readObject();
                 objIn.close();
+                for (REDKEY k : readIn.keySet()) {
+                    vals = new ArrayList();
+                    vals.add(readIn.get(k));
+                    redIn1.put(k,vals);
+                }
                 objIn = new ObjectInputStream(new FileInputStream(currentTask.file2));
-                redIn2 = (TreeMap<REDKEY, ArrayList<REDVAL>>) objIn.readObject();
+                readIn = (TreeMap<REDKEY, REDVAL>) objIn.readObject();
                 objIn.close();
+                for (REDKEY k : readIn.keySet()) {
+                    vals = new ArrayList();
+                    vals.add(readIn.get(k));
+                    redIn2.put(k,vals);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -108,7 +118,7 @@ public class ParticipantMinionMRR implements Runnable {
         
         System.out.println("Mapped");
         
-        redOut = new TreeMap<REDKEY, ArrayList<REDVAL>>();
+        redOut = new TreeMap<REDKEY, REDVAL>();
         iter = (redIn1.keySet()).iterator();
         while (iter.hasNext()) {
             key = iter.next();
@@ -124,10 +134,7 @@ public class ParticipantMinionMRR implements Runnable {
                 val = config.reduce(val,vals.get(i));
             }
             
-            vals = new ArrayList<REDVAL>();
-            vals.add(val);
-            
-            redOut.put(key,vals);
+            redOut.put(key,val);
         }
         System.out.println("REduced 1");
         iter = (redIn2.keySet()).iterator();
@@ -140,10 +147,7 @@ public class ParticipantMinionMRR implements Runnable {
                 val = config.reduce(val,vals.get(i));
             }
             
-            vals = new ArrayList<REDVAL>();
-            vals.add(val);
-            
-            redOut.put(key,vals);
+            redOut.put(key,val);
         }
         System.out.println("Done!");
         
