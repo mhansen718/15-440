@@ -17,6 +17,8 @@ public class UserInterface implements Runnable {
     	Scanner inputScan = new Scanner(System.in);
     	Iterator<JobEntry> job = null;
     	
+    	System.out.println(" ServerMRR initalized!");
+    	
     	/* Loop forever waiting on user input and process that input */
     	while (true) {
     		System.out.print("->> ");
