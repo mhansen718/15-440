@@ -156,7 +156,9 @@ public class MasterPeonHandlerMRR implements Runnable {
 							j.runningTasks.remove(id);
 							j.completeTasks.add(id);
 					} else {
-						this.master.stopJob(j.id, id.err);
+						if (j != null) {
+							this.master.stopJob(j.id, id.err);
+						}
 						File f = new File(id.toFileName());
 						f.delete();
 					}
