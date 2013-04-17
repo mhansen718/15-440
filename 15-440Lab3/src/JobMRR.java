@@ -28,6 +28,10 @@ public class JobMRR<MAPIN,REDKEY,REDVAL> {
 	public void submit() {
 		/* Submit this job to the MapReduce Master for execution,
 		 * throws exception if rejected by master (for reasons like repeat name or something) */
+        if (this.config.start >= this.config.end) {
+            System.err.println("Start record must be less than end record");
+            return;
+        }
 		this.t = new Thread(new JobExec(this, this.jobName, this.config));
 		this.t.start();
 		return;
