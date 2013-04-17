@@ -80,7 +80,6 @@ public class MasterPeonHandlerMRR implements Runnable {
                 out.close();
                 this.peon.connection.close();
             } catch (Exception e) {
-            	e.printStackTrace();
             	this.peon.connection = null;
                 return;
             }
@@ -133,7 +132,6 @@ public class MasterPeonHandlerMRR implements Runnable {
                 out.writeObject(peonStatus);
                 peonStatus = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
-            	e.printStackTrace();
                 peonStatus = null;
             }
 			
