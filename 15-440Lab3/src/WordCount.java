@@ -74,7 +74,7 @@ public class WordCount {
         String allWords = "";
         FileOutputStream out = null;
         try {
-            out = new FileOutputStream(args[1]);
+            out = new FileOutputStream(args[2]);
         } catch (Exception e) {
             System.err.println("Failed to open file for writing");
         }
