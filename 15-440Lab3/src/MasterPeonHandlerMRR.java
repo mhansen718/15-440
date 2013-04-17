@@ -44,7 +44,6 @@ public class MasterPeonHandlerMRR implements Runnable {
 			if (this.master.remoteStart()) {
 				try {
 					if (participantAddress.isReachable(1000)) {
-						System.out.println("Remote Starting on " + this.peon.host);
 						Runtime.getRuntime().exec("./ssh_work " + this.master.getUsername() + " " + this.peon.host + " " + 
 								System.getProperty("user.dir") + " " + InetAddress.getLocalHost().getHostName() + " " + 
 								Integer.toString(this.master.getListenPort()) + " " + Integer.toString(this.master.getLocalListenPort()));
@@ -149,7 +148,6 @@ public class MasterPeonHandlerMRR implements Runnable {
 					TaskEntry check = peon.runningTasks.remove(id);
 					/* Check for resent and ignore if it is a resend */
 					if (check == null) {
-						System.out.println("OH NOES not on my list");
 						continue;
 					}
 					/* Update the jobs lists, clear up the files if the job is terminated */
@@ -158,7 +156,6 @@ public class MasterPeonHandlerMRR implements Runnable {
 							j.runningTasks.remove(id);
 							j.completeTasks.add(id);
 					} else {
-						System.out.println("TASK ERRORS: " + id.err.toString());
 						this.master.stopJob(j.id, id.err);
 						File f = new File(id.toFileName());
 						f.delete();
