@@ -8,8 +8,8 @@ public class WordCount {
     
     public static void main(String[] args) {
     
-        if (args.length < 5) {
-            System.out.println("Usage: java WordCount [inputfile1] [inputfile2] [outputfile] [recordSize1] [recordSize2] [startRecord] [endRecord] [return port] [local port]");
+        if (args.length < 10) {
+            System.out.println("Usage: java WordCount [inputfile1] [inputfile2] [outputfile] [recordSize1] [recordSize2] [startRecord] [endRecord] [return port1] [return port2] [local port]");
             return;
         }
         
@@ -24,9 +24,11 @@ public class WordCount {
             config2.start = Integer.parseInt(args[5]);
             config2.end = Integer.parseInt(args[6]);
             config1.listenBackPort = Integer.parseInt(args[7]);
-            config1.participantPort = Integer.parseInt(args[8]);
+            config2.listenBackPort = Integer.parseInt(args[8]);
+            config1.participantPort = Integer.parseInt(args[9]);
+            config2.participantPort = Integer.parseInt(args[9]);
         } catch (NumberFormatException e) {
-            System.out.println("Usage: java WordCount [inputfile1] [inputfile2] [outputfile] [recordSize1] [recordSize2] [startRecord] [endRecord] [return port] [local port]");
+            System.out.println("Usage: java WordCount [inputfile1] [inputfile2] [outputfile] [recordSize1] [recordSize2] [startRecord] [endRecord] [return port1] [return port2] [local port]");
             return;
         }
         
@@ -73,11 +75,13 @@ public class WordCount {
         String word;
         String allWords = "";
         FileOutputStream out = null;
+
         try {
             out = new FileOutputStream(args[2]);
         } catch (Exception e) {
             System.err.println("Failed to open file for writing");
         }
+        
         while (iter.hasNext()) {
             word = iter.next();
             if (words2.containsKey(word)) {
