@@ -33,7 +33,7 @@ HOW TO RUN OUR EXAMPLES:
 
        java FamilyCollection [record file] [start record] [end record] [family1] [person2] [listen port] [local port]
 
-       java WordCount [inputfile] [outputfile] [recordSize] [startRecord] [endRecord] [return port] [local port]
+       java WordCount [inputfile1] [inputfile2] [outputfile] [recordSize1] [recordSize2] [startRecord] [endRecord] [return port1] [return port2] [local port]
 
      The first example takes a dataset of family tree information in which each record
      contains a person's name and birthyear as well as their parents. Using this small,
