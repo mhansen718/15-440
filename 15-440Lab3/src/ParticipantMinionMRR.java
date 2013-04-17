@@ -41,7 +41,6 @@ public class ParticipantMinionMRR implements Runnable {
             
 			/* Add the job to the completed work list */
 			master.completeTask(currentTask);
-			System.out.println("Completed a task");
 		}
 	}
     
@@ -61,14 +60,11 @@ public class ParticipantMinionMRR implements Runnable {
         REDKEY key;
         REDVAL val;
         
-        System.out.println("file1: " + currentTask.file1);
-        System.out.println("file2: " + currentTask.file2 + "\n");
         redIn1 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
         redIn2 = new TreeMap<REDKEY, ArrayList<REDVAL>>();
         
         // Do we have to map, or is this just a reduce?
         if (currentTask.file2.equals("null")) {
-        	System.out.print("Here");
             nextRecord = currentTask.id.start;
             input = new byte[currentTask.recordSize];
             try {
@@ -91,7 +87,7 @@ public class ParticipantMinionMRR implements Runnable {
                 }
                 in.close();
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         } else {
             try {
@@ -112,11 +108,9 @@ public class ParticipantMinionMRR implements Runnable {
                     redIn2.put(k,vals);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
-        
-        System.out.println("Mapped");
         
         redOut = new TreeMap<REDKEY, REDVAL>();
         iter = (redIn1.keySet()).iterator();
@@ -136,7 +130,7 @@ public class ParticipantMinionMRR implements Runnable {
             
             redOut.put(key,val);
         }
-        System.out.println("REduced 1");
+        
         iter = (redIn2.keySet()).iterator();
         while (iter.hasNext()) {
             key = iter.next();
@@ -149,7 +143,6 @@ public class ParticipantMinionMRR implements Runnable {
             
             redOut.put(key,val);
         }
-        System.out.println("Done!");
         
         try {
             out = new ObjectOutputStream(new FileOutputStream(currentTask.id.toFileName()));

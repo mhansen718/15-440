@@ -23,8 +23,6 @@ public class MasterJobHandlerMRR implements Runnable {
 		Iterator<TaskID> tid2 = null;
         Socket socket = null;
         ObjectOutputStream out;
-        
-        System.out.println("A got a job to process");
 		
 		/* Check if the job is done or errored, if so, send word to the app */
 		if (((this.job.runningTasks.size() == 0) && (this.job.completeTasks.size() == 1)) || (this.job.err != null)) {
@@ -44,7 +42,7 @@ public class MasterJobHandlerMRR implements Runnable {
                 System.err.println("Failed to send job back to client");
                 return;
             }
-            System.out.println("This job is done! or errored :(");
+            
             if (this.job.err != null) {
             	System.out.println("Error: " + this.job.err.toString());
             }
@@ -66,11 +64,9 @@ public class MasterJobHandlerMRR implements Runnable {
 				tid2 = this.job.completeTasks.iterator();
 				while(tid2.hasNext()) {
 					TaskID t2 = tid2.next();
-					System.out.println("Tasks complete are : " + t2.toFileName() + " and " + t1.toFileName());
 					/* If the blocks for records are adjacent, merge tasks and add to task queue and 
 					 * job running task list, also remove the two tasks from the job completed list */
 					if (t1.isAdjacent(t2)) {
-						System.out.println("FOUND THEM ADJACENT");
 						TaskEntry te = new TaskEntry();
 						te.config = this.job.config;
 						te.file1 = t1.toFileName();

@@ -143,7 +143,6 @@ public class MasterMRR {
 			 * them new jobs, etc */
 			peon = this.peons.iterator();
 			this.currentPower = Math.max(pow, this.peons.size());
-			System.out.println(" Total Power: " + Integer.toString(this.currentPower));
 			pow = 0;
 			this.availableTasks = this.pendingTasks.size();
 			while (peon.hasNext()) {
