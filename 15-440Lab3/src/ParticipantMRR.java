@@ -26,6 +26,7 @@ public class ParticipantMRR {
     private HashSet<Thread> minions;
     private Semaphore completedTasksProtect;
     private ConcurrentLinkedQueue<JobEntry> newJobs;
+    private ConcurrentLinkedQueue<String> junkFiles;
     
     public ParticipantMRR() {
     	super();
@@ -34,6 +35,7 @@ public class ParticipantMRR {
     	this.completedTasksProtect = new Semaphore(1);
     	this.tasks = new LinkedBlockingQueue<TaskEntry>();
     	this.newJobs = new ConcurrentLinkedQueue<JobEntry>();
+        this.junkFiles = new ConcurrentLinkedQueue<String>();
     	
     }
     
@@ -101,17 +103,6 @@ public class ParticipantMRR {
         Thread newJobListener = new Thread(new ParticipantListenerMRR(this, Integer.parseInt(args[2])));
         newJobListener.start();
         
-        RandomAccessFile mine = null;
-		try {
-			mine = new RandomAccessFile(System.getProperty("user.dir") + "/hi." + InetAddress.getLocalHost().getHostName() + ".txt", "rw");
-		} catch (FileNotFoundException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		} catch (UnknownHostException e2) {
-			// TODO Auto-generated catch block
-			e2.printStackTrace();
-		}
-        
         /* Run the main loop */
         while (true) {
         	/* check the minions, removing the dead and adding more if needed */
@@ -135,13 +126,6 @@ public class ParticipantMRR {
         			this.minions.add(t);
         		}
         	}
-        	
-        	try {
-				mine.write("Hello\n".getBytes());
-			} catch (Exception e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
         	
             try {
                 this.socket = new Socket();
@@ -170,12 +154,6 @@ public class ParticipantMRR {
             status.power = this.processors;
             
             try {
-                mine.write("Sending status\n".getBytes());
-            } catch (Exception e) {
-            
-            }
-            
-            try {
                 out.writeObject(status);
             } catch (IOException e) {
                 continue;
@@ -198,16 +176,28 @@ public class ParticipantMRR {
                 }
                 continue;
             }
-            // We got confirmation, time to erase the files we used
             
+            // We got confirmation, time to erase the files we used
+            try {
+                String oldFilename = this.junkFiles.poll();
+                while (oldFilename != null) {
+                    File oldFile = new File(oldFilename);
+                    oldFile.delete();
+                    oldFilename = this.junkFiles.poll();
+                }
+            } catch (Exception e) {
+                //Failed to clean up after ourselves properly
+            }
         }
     }
     
-    public void completeTask(TaskID id) {
+    public void completeTask(TaskEntry task) {
     	/* Acquire the semphore and add the task to the completed tasks list */
     	this.completedTasksProtect.acquireUninterruptibly();
-    	this.completedTasks.add(id);
+    	this.completedTasks.add(task.id);
     	this.completedTasksProtect.release();
+        this.junkFiles.offer(task.file1);
+        this.junkFiles.offer(task.file2);
     }
     
     private HashSet<TaskID> flushCompleted() {
