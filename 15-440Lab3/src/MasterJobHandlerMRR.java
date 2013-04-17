@@ -39,12 +39,7 @@ public class MasterJobHandlerMRR implements Runnable {
                 out = new ObjectOutputStream(socket.getOutputStream());
                 out.writeObject(this.job);
             } catch (IOException e) {
-                System.err.println("Failed to send job back to client");
                 return;
-            }
-            
-            if (this.job.err != null) {
-            	System.out.println("Error: " + this.job.err.toString());
             }
             
             /* Remove the job from the master job list, its done now */
@@ -54,7 +49,7 @@ public class MasterJobHandlerMRR implements Runnable {
                 out.close();
                 socket.close();
             } catch (IOException e) {
-                System.err.println("Failed to close connection with client");
+               return;
             }
 		} else {
 			/* Loop through the list of completed tasks and pair up into a new task */
