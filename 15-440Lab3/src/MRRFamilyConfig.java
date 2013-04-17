@@ -21,6 +21,7 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecords, String, Has
 		structRecord.self = mem;
 		
 		/* Add father */
+		mem = new MemberRecord();
 		fullName = (new String(Arrays.copyOfRange(record, 30, 56))).trim();
 		mem.firstName = fullName.split(" ")[0];
 		mem.lastName = fullName.split(" ")[1];
@@ -28,12 +29,13 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecords, String, Has
 		structRecord.parents.add(mem);
 		
 		/* Add mother */
+		mem = new MemberRecord();
 		fullName = (new String(Arrays.copyOfRange(record, 60, 86))).trim();
 		mem.firstName = fullName.split(" ")[0];
 		mem.lastName = fullName.split(" ")[1];
 		mem.birthyear = Integer.parseInt((new String(Arrays.copyOfRange(record, 86, 90))));
 		structRecord.parents.add(mem);
-		
+
 		return structRecord;
 	}
 

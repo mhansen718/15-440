@@ -56,7 +56,16 @@ public class FamilyCollection {
 			}
 			if (reduced.containsKey(family1) && reduced.containsKey(family2)) {
 				HashSet<MemberRecord> commonMembers = reduced.get(family1);
-				if (commonMembers.retainAll(reduced.get(family2))) {
+				System.out.println("Members " + family1 + ":");
+				for (MemberRecord mem : reduced.get(family1)) {
+					System.out.println(mem.firstName + " " + mem.lastName + " " + Integer.toString(mem.birthyear));
+				}
+				System.out.println("Members " + family2 + ":");
+				for (MemberRecord mem : reduced.get(family2)) {
+					System.out.println(mem.firstName + " " + mem.lastName + " " + Integer.toString(mem.birthyear));
+				}
+				commonMembers.retainAll(reduced.get(family2));
+				if (commonMembers.size() != 0) {
 					System.out.println("Common Members");
 					for (MemberRecord mem : commonMembers) {
 						System.out.println(mem.firstName + " " + mem.lastName + " " + Integer.toString(mem.birthyear));
