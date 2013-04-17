@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
+import java.io.File;
 
 public class ParticipantMRR {
     
@@ -135,11 +136,6 @@ public class ParticipantMRR {
                 status = (ParticipantStatus) in.readObject();
             } catch (Exception e) {
             	e.printStackTrace();
-            	  try {
-                      mine.write(e.getStackTrace().toString().getBytes());
-                  } catch (Exception ex) {
-                  
-                  }
                 System.exit(-1);
             }
             
@@ -168,7 +164,7 @@ public class ParticipantMRR {
                 // Put everything back in the queues, we aren't sure the master knows
                 idIter = status.completedTasks.iterator();
                 while (idIter.hasNext()) {
-                    completeTask(idIter.next());
+                    completeTaskID(idIter.next());
                 }
                 jobIter = status.newJobs.iterator();
                 while (jobIter.hasNext()) {
@@ -181,9 +177,11 @@ public class ParticipantMRR {
             try {
                 String oldFilename = this.junkFiles.poll();
                 while (oldFilename != null) {
-                    File oldFile = new File(oldFilename);
-                    oldFile.delete();
-                    oldFilename = this.junkFiles.poll();
+                    if (oldFilename.endsWith(".mrr")) {
+                        File oldFile = new File(oldFilename);
+                        oldFile.delete();
+                        oldFilename = this.junkFiles.poll();
+                    }
                 }
             } catch (Exception e) {
                 //Failed to clean up after ourselves properly
@@ -198,6 +196,13 @@ public class ParticipantMRR {
     	this.completedTasksProtect.release();
         this.junkFiles.offer(task.file1);
         this.junkFiles.offer(task.file2);
+    }
+    
+    public void completeTaskID(TaskID id) {
+    	/* Acquire the semphore and add the task to the completed tasks list */
+    	this.completedTasksProtect.acquireUninterruptibly();
+    	this.completedTasks.add(id);
+    	this.completedTasksProtect.release();
     }
     
     private HashSet<TaskID> flushCompleted() {

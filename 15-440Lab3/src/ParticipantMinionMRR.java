@@ -40,7 +40,7 @@ public class ParticipantMinionMRR implements Runnable {
             mapReduce(currentTask.config, currentTask);
             
 			/* Add the job to the completed work list */
-			master.completeTask(currentTask.id);
+			master.completeTask(currentTask);
 			System.out.println("Completed a task");
 		}
 	}
@@ -104,7 +104,7 @@ public class ParticipantMinionMRR implements Runnable {
                     redIn1.put(k,vals);
                 }
                 objIn = new ObjectInputStream(new FileInputStream(currentTask.file2));
-                redIn2 = (TreeMap<REDKEY, REDVAL>) objIn.readObject();
+                readIn = (TreeMap<REDKEY, REDVAL>) objIn.readObject();
                 objIn.close();
                 for (REDKEY k : readIn.keySet()) {
                     vals = new ArrayList();
