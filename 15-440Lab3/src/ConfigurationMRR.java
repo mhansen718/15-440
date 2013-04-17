@@ -14,9 +14,9 @@ public abstract class ConfigurationMRR<MAPIN, REDKEY, REDVAL> implements Seriali
     public int listenBackPort;
     public int participantPort;
     
-    abstract public MAPIN readRecord(byte[] record);
+    abstract public MAPIN readRecord(byte[] record) throws Exception;
     
-	abstract public ArrayList<Pair<REDKEY, REDVAL>> map(MAPIN mapin);
+	abstract public ArrayList<Pair<REDKEY, REDVAL>> map(MAPIN mapin) throws Exception;
     
-	abstract public REDVAL reduce(REDVAL val1, REDVAL val2);
+	abstract public REDVAL reduce(REDVAL val1, REDVAL val2) throws Exception;
 }

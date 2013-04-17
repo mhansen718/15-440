@@ -8,7 +8,7 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecords, String, Has
 	private static final long serialVersionUID = 5198221844897768850L;
 
 	@Override
-	public FamilyRecords readRecord(byte[] record) {
+	public FamilyRecords readRecord(byte[] record) throws Exception {
 		FamilyRecords structRecord = new FamilyRecords();
 		structRecord.parents = new HashSet<MemberRecord>();
 		
@@ -40,8 +40,7 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecords, String, Has
 	}
 
 	@Override
-	public ArrayList<Pair<String, HashSet<MemberRecord>>> map(
-			FamilyRecords mapin) {
+	public ArrayList<Pair<String, HashSet<MemberRecord>>> map(FamilyRecords mapin) throws Exception {
 		ArrayList<Pair<String, HashSet<MemberRecord>>> returnPairList = new ArrayList<Pair<String, HashSet<MemberRecord>>>();
 		for (MemberRecord mem : mapin.parents) {
 			HashSet<MemberRecord> family = new HashSet<MemberRecord>();
@@ -54,7 +53,7 @@ public class MRRFamilyConfig extends ConfigurationMRR<FamilyRecords, String, Has
 
 	@Override
 	public HashSet<MemberRecord> reduce(HashSet<MemberRecord> val1,
-			HashSet<MemberRecord> val2) {
+			HashSet<MemberRecord> val2) throws Exception {
 		HashSet<MemberRecord> mutual = new HashSet<MemberRecord>(val1);
 		mutual.addAll(val2);
 		return mutual;
