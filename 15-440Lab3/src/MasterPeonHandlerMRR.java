@@ -31,7 +31,6 @@ public class MasterPeonHandlerMRR implements Runnable {
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
         
-        System.out.println("Running");
         try {
 			participantAddress = InetAddress.getByName(this.peon.host);
 		} catch (UnknownHostException excpt) {
@@ -42,7 +41,6 @@ public class MasterPeonHandlerMRR implements Runnable {
         
 		if (this.peon.dead == 0) {
 			/* This participant is very dead, try to revive it */
-			System.out.println("working wrong");
 			if (this.master.remoteStart()) {
 				try {
 					if (participantAddress.isReachable(1000)) {
@@ -73,8 +71,6 @@ public class MasterPeonHandlerMRR implements Runnable {
             	return;
             }
             
-            System.out.println("Getting Status");
-            System.out.println(this.peon.connection.toString());
             try {
                 in = new ObjectInputStream(this.peon.connection.getInputStream());
                 /* Signal client that it can send the object now */
@@ -88,7 +84,6 @@ public class MasterPeonHandlerMRR implements Runnable {
             	this.peon.connection = null;
                 return;
             }
-            System.out.println("Got status");
             
             peon.power = peonStatus.power;
             peon.dead = this.master.getRetries();
@@ -97,7 +92,6 @@ public class MasterPeonHandlerMRR implements Runnable {
 		} else {
 			/* Send the participant all the tasks it should do  and add them to the list of tasks being done by peon */
 			tasksToDo = ((int) Math.ceil((((double) this.master.getAvailableTasks()) / ((double) this.master.getCurrentPower())) * this.peon.power));
-			System.out.println("Mast has: " + this.master.getAvailableTasks() + " and we will do " + tasksToDo);
 			
 			for (int i = 0; i < tasksToDo; i++) {
 				TaskEntry te = this.master.getTask();
@@ -144,7 +138,6 @@ public class MasterPeonHandlerMRR implements Runnable {
             }
 			
 			if (peonStatus != null) {
-				System.out.println("No null!");
 				/* Declare the peon healthy */
 				peon.dead = this.master.getRetries();
 				/* Update the system based on the status from the participant */
@@ -155,7 +148,6 @@ public class MasterPeonHandlerMRR implements Runnable {
 					return;
 				}
 				for (TaskID id : peonStatus.completedTasks) {
-					System.out.println("Some tasks are reported done: ie this one " + id.toString() + " in there? " + peon.runningTasks.containsKey(id));
 					TaskEntry check = peon.runningTasks.remove(id);
 					/* Check for resent and ignore if it is a resend */
 					if (check == null) {
@@ -165,7 +157,6 @@ public class MasterPeonHandlerMRR implements Runnable {
 					/* Update the jobs lists, clear up the files if the job is terminated */
 					JobEntry j = this.master.findJob(id.jobID);
 					if ((j != null) && (j.err == null) && (id.err == null)) {
-							System.out.println("no error in task");
 							j.runningTasks.remove(id);
 							j.completeTasks.add(id);
 					} else {
@@ -176,7 +167,6 @@ public class MasterPeonHandlerMRR implements Runnable {
 					}
 				}
 				for (JobEntry j : peonStatus.newJobs) {
-					System.out.println("Got a new job");
 					/* Check for resent new job and ignore if present */
 					if (this.master.findJob(j.id) != null) {
 						continue;

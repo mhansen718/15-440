@@ -13,8 +13,6 @@ public class TaskID implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		System.out.println("Im equals? " + ((this.jobID == ((TaskID) obj).jobID) &&
-				(this.start == ((TaskID) obj).start)));
 		return ((this.jobID == ((TaskID) obj).jobID) &&
 				(this.start == ((TaskID) obj).start));
 	}
