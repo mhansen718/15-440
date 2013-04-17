@@ -8,63 +8,85 @@ public class WordCount {
     
     public static void main(String[] args) {
     
-        if (args.length < 5) {
-            System.out.println("Usage: java WordCount [inputfile] [outputfile] [recordSize] [startRecord] [endRecord] [return port] [local port]");
+        if (args.length < 10) {
+            System.out.println("Usage: java WordCount [inputfile1] [inputfile2] [outputfile] [recordSize1] [recordSize2] [startRecord] [endRecord] [return port1] [return port2] [local port]");
             return;
         }
         
-        WordCountConfig config = new WordCountConfig();
+        WordCountConfig config1 = new WordCountConfig();
+        WordCountConfig config2 = new WordCountConfig();
         
         try {
-            config.recordSize = Integer.parseInt(args[2]);
-            config.start = Integer.parseInt(args[3]);
-            config.end = Integer.parseInt(args[4]);
-            config.listenBackPort = Integer.parseInt(args[5]);
-            config.participantPort = Integer.parseInt(args[6]);
+            config1.recordSize = Integer.parseInt(args[3]);
+            config1.start = Integer.parseInt(args[5]);
+            config1.end = Integer.parseInt(args[6]);
+            config2.recordSize = Integer.parseInt(args[4]);
+            config2.start = Integer.parseInt(args[5]);
+            config2.end = Integer.parseInt(args[6]);
+            config1.listenBackPort = Integer.parseInt(args[7]);
+            config2.listenBackPort = Integer.parseInt(args[8]);
+            config1.participantPort = Integer.parseInt(args[9]);
+            config2.participantPort = Integer.parseInt(args[9]);
         } catch (NumberFormatException e) {
-            System.out.println("Usage: java WordCount [inputfile] [outputfile] [recordSize] [startRecord] [endRecord] [return port] [local port]");
+            System.out.println("Usage: java WordCount [inputfile1] [inputfile2] [outputfile] [recordSize1] [recordSize2] [startRecord] [endRecord] [return port1] [return port2] [local port]");
             return;
         }
         
-        config.inFile = args[0];
-        config.outFile = args[0] + ".out";
+        config1.inFile = args[0];
+        config1.outFile = args[0] + ".out";
+        config2.inFile = args[1];
+        config2.outFile = args[1] + ".out";
         
-        JobMRR<String,String,Integer> job = new JobMRR<String,String,Integer>(config);
-        job.submit();
+        JobMRR<String,String,Integer> job1 = new JobMRR<String,String,Integer>(config1);
+        JobMRR<String,String,Integer> job2 = new JobMRR<String,String,Integer>(config2);
+        job1.submit();
+        job2.submit();
         
         try {
-			job.waitOnJob();
+			job1.waitOnJob();
+            job2.waitOnJob();
 		} catch (InterruptedException e) {
-			System.out.println("We were inturrpted while waiting on our job, :(");
+			System.out.println("We were interrupted while waiting on our job, :(");
 		}
         
         // Check for exceptions
-        if (job.encounteredException()) {
-            System.out.println("Job failed due to exception: " + (job.getException()).toString());
+        if (job1.encounteredException()) {
+            System.out.println("Job failed due to exception: " + (job1.getException()).toString());
             return;
         }
         
-        // Display the word frequency in alphabetical order
-        TreeMap<String, Integer> words = null;
+        if (job2.encounteredException()) {
+            System.out.println("Job failed due to exception: " + (job2.getException()).toString());
+            return;
+        }
+        
+        // Display the word frequency of common words
+        TreeMap<String, Integer> words1 = null;
+        TreeMap<String, Integer> words2 = null;
 		try {
-			words = job.readFile();
+			words1 = job1.readFile();
+            words2 = job2.readFile();
 		} catch (Exception e) {
 			System.out.println("Failed to read file :(");
 			return;
 		}
         
-        Iterator<String> iter = (words.navigableKeySet()).iterator();
+        Iterator<String> iter = (words1.keySet()).iterator();
         String word;
         String allWords = "";
         FileOutputStream out = null;
+
         try {
-            out = new FileOutputStream(args[1]);
+            out = new FileOutputStream(args[2]);
         } catch (Exception e) {
-            System.err.println("Failed to write to output");
+            System.err.println("Failed to open file for writing");
         }
+        
         while (iter.hasNext()) {
             word = iter.next();
-            allWords = allWords + word + ": " + words.get(word) + "\n";
+            if (words2.containsKey(word)) {
+                allWords = allWords + word + ": " + args[0] + ": " + words1.get(word) + " " + args[1] + ": " + words2.get(word) + "\n";
+            }
         }
         
         try {
