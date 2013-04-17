@@ -87,7 +87,8 @@ public class ParticipantMinionMRR implements Runnable {
                 }
                 in.close();
             } catch (Exception e) {
-                //e.printStackTrace();
+                currentTask.id.err = e;
+                return;
             }
         } else {
             try {
@@ -124,8 +125,13 @@ public class ParticipantMinionMRR implements Runnable {
             }
             
             val = vals.get(0);
-            for (int i = 1; i < vals.size(); i++) {
-                val = config.reduce(val,vals.get(i));
+            try {
+                for (int i = 1; i < vals.size(); i++) {
+                    val = config.reduce(val,vals.get(i));
+                }
+            } catch (Exception e) {
+                currentTask.id.err = e;
+                return;
             }
             
             redOut.put(key,val);
@@ -137,8 +143,13 @@ public class ParticipantMinionMRR implements Runnable {
             vals = redIn2.get(key);
             
             val = vals.get(0);
-            for (int i = 1; i < vals.size(); i++) {
-                val = config.reduce(val,vals.get(i));
+            try {
+                for (int i = 1; i < vals.size(); i++) {
+                    val = config.reduce(val,vals.get(i));
+                }
+            } catch (Exception e) {
+                currentTask.id.err = e;
+                return;
             }
             
             redOut.put(key,val);
