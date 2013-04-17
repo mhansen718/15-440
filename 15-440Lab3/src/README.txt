@@ -43,7 +43,7 @@ HOW TO RUN OUR EXAMPLES:
      (string) and members (hashset). The intersection of two of these records represents
      the common members of both families.
 
-     The second example is a simple reliable wordcount that counts how often individual
-     words occur in the given range and writes all the pairs to the outputfile.
+     The second example is a utility that runs a wordcount on two input files and outputs
+     the frequency of all the words in the record range that were in both inputs
      Sample input sets include the king james bible (bibleOut.txt, recordSize = 22) and
      the complete works of Shakespear (shakespeareOut.txt, recordSize = 37)
