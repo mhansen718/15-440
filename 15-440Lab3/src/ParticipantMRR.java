@@ -180,8 +180,8 @@ public class ParticipantMRR {
                     if (oldFilename.endsWith(".mrr")) {
                         File oldFile = new File(oldFilename);
                         oldFile.delete();
-                        oldFilename = this.junkFiles.poll();
                     }
+                    oldFilename = this.junkFiles.poll();
                 }
             } catch (Exception e) {
                 //Failed to clean up after ourselves properly
