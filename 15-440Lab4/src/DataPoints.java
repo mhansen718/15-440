@@ -62,6 +62,9 @@ public class DataPoints {
 				return;
 			}
 		}
+		
+		
+		/* Sequentially find the cluster for each point */
 	}
 	
 	private static void printUsage() {
