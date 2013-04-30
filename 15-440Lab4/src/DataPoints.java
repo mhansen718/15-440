@@ -1,4 +1,4 @@
-import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -13,11 +13,11 @@ public class DataPoints {
 		int numberClusters;
 		String fileName;
 		String lineIn;
-		LinkedList<Point> points = new LinkedList<Point>();
-		LinkedList<Point> centroids = new LinkedList<Point>();
+		LinkedList<Point2D.Double> points = new LinkedList<Point2D.Double>();
+		LinkedList<CentroidPoint> centroids = new LinkedList<CentroidPoint>();
 		RandomAccessFile inFile = null;
-		Iterator<Point> ptIterator;
-		Iterator<Point> ctIterator;
+		Iterator<Point2D.Double> ptIterator;
+		Iterator<CentroidPoint> ctIterator;
 		
 		/* Get and parse the arguments */
 		if (args.length != 2) {
@@ -50,7 +50,7 @@ public class DataPoints {
 		
 		while (lineIn != null) {
 			try {
-				Point p = new Point();
+				Point2D.Double p = new Point2D.Double();
 				p.setLocation(Double.parseDouble(lineIn.split(",")[0]), Double.parseDouble(lineIn.split(",")[1]));
 				points.add(p);
 			} catch (NumberFormatException excpt) {
@@ -71,7 +71,7 @@ public class DataPoints {
 		/* From points, choose n random centroids */
 		for (int i=0; i < numberClusters; i++) {
 			int x = (new Random()).nextInt(points.size());
-			Point p = new Point(points.get(x));
+			CentroidPoint p = new CentroidPoint((points.get(x)).getX(), (points.get(x)).getY());
 			if (!(centroids.contains(p))) {
 				centroids.add(p);
 			}
@@ -80,7 +80,21 @@ public class DataPoints {
 		/* Sequentially find the cluster for each point */
 		ptIterator = points.iterator();
 		while (ptIterator.hasNext()) {
-			Point p = ptIterator.next();
+			Point2D.Double p = ptIterator.next();
+			ctIterator = centroids.iterator();
+			
+			if (ctIterator.hasNext()) {
+				CentroidPoint ct = ctIterator.next();
+				CentroidPoint ctNearest = ct;
+				double distance = p.distance(ct);
+				while (ctIterator.hasNext()) {
+					ct = ctIterator.next();
+					if (distance < p.distance(ct)) {
+						ctNearest = ct;
+						distance = p.distance(ct);
+					}
+				}
+			}
 			
 		}
 	}
@@ -89,3 +103,4 @@ public class DataPoints {
 		System.out.println(" Usage: java DataPoint [coord file] [# clusters]");
 	}
 }
+
