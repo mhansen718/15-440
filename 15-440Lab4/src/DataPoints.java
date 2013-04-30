@@ -2,7 +2,9 @@ import java.awt.Point;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Random;
 
 
 public class DataPoints {
@@ -12,7 +14,10 @@ public class DataPoints {
 		String fileName;
 		String lineIn;
 		LinkedList<Point> points = new LinkedList<Point>();
+		LinkedList<Point> centroids = new LinkedList<Point>();
 		RandomAccessFile inFile = null;
+		Iterator<Point> ptIterator;
+		Iterator<Point> ctIterator;
 		
 		/* Get and parse the arguments */
 		if (args.length != 2) {
@@ -63,8 +68,21 @@ public class DataPoints {
 			}
 		}
 		
+		/* From points, choose n random centroids */
+		for (int i=0; i < numberClusters; i++) {
+			int x = (new Random()).nextInt(points.size());
+			Point p = new Point(points.get(x));
+			if (!(centroids.contains(p))) {
+				centroids.add(p);
+			}
+		}
 		
 		/* Sequentially find the cluster for each point */
+		ptIterator = points.iterator();
+		while (ptIterator.hasNext()) {
+			Point p = ptIterator.next();
+			
+		}
 	}
 	
 	private static void printUsage() {
