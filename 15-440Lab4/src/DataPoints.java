@@ -11,6 +11,7 @@ public class DataPoints {
 
 	public static void main (String[] args) {
 		int numberClusters;
+		int numberStable;
 		String fileName;
 		String lineIn;
 		LinkedList<Point2D.Double> points = new LinkedList<Point2D.Double>();
@@ -77,27 +78,44 @@ public class DataPoints {
 			}
 		}
 		
-		/* Sequentially find the cluster for each point */
-		ptIterator = points.iterator();
-		while (ptIterator.hasNext()) {
-			Point2D.Double p = ptIterator.next();
-			ctIterator = centroids.iterator();
-			
-			if (ctIterator.hasNext()) {
-				CentroidPoint ct = ctIterator.next();
-				CentroidPoint ctNearest = ct;
-				double distance = p.distance(ct);
-				while (ctIterator.hasNext()) {
-					ct = ctIterator.next();
-					if (distance < p.distance(ct)) {
-						ctNearest = ct;
-						distance = p.distance(ct);
+		numberStable = 0;
+		while (numberStable < numberClusters) {
+			/* Sequentially find the cluster for each point */
+			ptIterator = points.iterator();
+			while (ptIterator.hasNext()) {
+				Point2D.Double p = ptIterator.next();
+				ctIterator = centroids.iterator();
+
+				/* Find the cluster */
+				if (ctIterator.hasNext()) {
+					CentroidPoint ct = ctIterator.next();
+					CentroidPoint ctNearest = ct;
+					double distance = p.distance(ct);
+					while (ctIterator.hasNext()) {
+						ct = ctIterator.next();
+						if (distance < p.distance(ct)) {
+							ctNearest = ct;
+							distance = p.distance(ct);
+						}
 					}
+
+					/* Add point to cluster */
+					ctNearest.addPoint(p);
 				}
 			}
-			
+
+			/* Recompute the centroids */
+			numberStable = 0;
+			ctIterator = centroids.iterator();
+			while (ctIterator.hasNext()) {
+				CentroidPoint ct = ctIterator.next();
+				if (ct.remean()) {
+					numberStable++;
+				}
+			}
 		}
 	}
+		
 	
 	private static void printUsage() {
 		System.out.println(" Usage: java DataPoint [coord file] [# clusters]");
