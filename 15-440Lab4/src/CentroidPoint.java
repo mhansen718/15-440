@@ -37,14 +37,14 @@ public class CentroidPoint extends Point2D.Double {
 		
 		/* Translate the centroid */
 		Point2D.Double old = new Point2D.Double(this.getX(), this.getY());
-		this.setLocation((this.getX() + this.dx), (this.getY() + this.dy));
+		this.setLocation(this.dx, this.dy);
 		
 		/* Reset the cluster */
 		this.dx = 0;
 		this.dy = 0;
 		this.numB = 0;
 		
-		return (this.distance(old) < 0.0001);
+		return (this.distance(old) == 0);
 	}
 
 }

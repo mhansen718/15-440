@@ -7,9 +7,10 @@ import java.util.LinkedList;
 import java.util.Random;
 
 
-public class DataPoints {
+public class DataPointsMPI {
 
 	public static void main (String[] args) {
+		MPI dpMPI = new MPI(args);
 		int numberClusters;
 		int numberStable;
 		String fileName;
