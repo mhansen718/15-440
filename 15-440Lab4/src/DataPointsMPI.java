@@ -25,7 +25,8 @@ public class DataPointsMPI {
 		Iterator<Point2D.Double> ptIterator;
 		Iterator<CentroidPoint> ctIterator;
 		int[] mpiNumberStable = new int[1];
-		LinkedList<CentroidPoint>[] mpiCentroids;
+		CentroidPointList[] mpiCentroids;
+		CentroidPointList[] mpiCentroidsSend;
 		
 		/* Initialize the MPI environment */
 		try {
@@ -36,6 +37,10 @@ public class DataPointsMPI {
 			System.out.println(" Error: failed to initialize mpi environment");
 			return;
 		}
+		
+		/* Initialize the buffers */
+		mpiCentroids = new CentroidPointList[size];
+		mpiCentroidsSend = new CentroidPointList[1];
 		
 		/* Get and parse the arguments */
 		if (args.length != 2) {
@@ -122,6 +127,9 @@ public class DataPointsMPI {
 		}
 		
 		/* Distribute/Get centroids */
+		(mpiCentroids[0]).points = centroids;
+		MPI.COMM_WORLD.Bcast(mpiCentroidsSend, 0, 1, MPI.OBJECT, 0);
+		centroids = (mpiCentroids[0]).points;
 		
 		numberStable = 0;
 		while (numberStable < numberClusters) {
@@ -150,7 +158,10 @@ public class DataPointsMPI {
 			}
 
 			/* Gather all the centroids and merge them */
-			MPI.COMM_WORLD.Gather();
+			(mpiCentroidsSend[0]).points = centroids;
+			MPI.COMM_WORLD.Gather(mpiCentroidsSend, 0, 1, MPI.OBJECT, 
+					mpiCentroids, 0, size, MPI.OBJECT, 0);
+			centroids = recombineCentroids(mpiCentroids);
 			/* Recompute the centroids (if your the root, otherwise get new centroids from root)
 			 * Note: This is a rather simple operation, and the number of centroids is much less
 			 * than the number of points. Thus, the communication overhead is not worth the benefits
@@ -167,11 +178,13 @@ public class DataPointsMPI {
 			}
 			
 			/* Distribute/Get numberStable */
+			mpiNumberStable[0] = numberStable;
 			MPI.COMM_WORLD.Bcast(mpiNumberStable, 0, 1, MPI.INT, 0);
 			numberStable = mpiNumberStable[0];
 			/* Distribute/Get centroids */
-			MPI.COMM_WORLD.Bcast(mpiCentroids, 0, 1, MPI.OBJECT, 0);
-			centroids = recombineCentroids(mpiCentroids);
+			(mpiCentroids[0]).points = centroids;
+			MPI.COMM_WORLD.Bcast(mpiCentroidsSend, 0, 1, MPI.OBJECT, 0);
+			centroids = (mpiCentroids[0]).points;
 		}
 		
 		/* Terminate the MPI environment */
@@ -195,10 +208,10 @@ public class DataPointsMPI {
 		System.out.println(" Usage: java DataPoint [coord file] [# clusters]");
 	}
 	
-	private static LinkedList<CentroidPoint> recombineCentroids(LinkedList<CentroidPoint>[] centroidPoints) {
+	private static LinkedList<CentroidPoint> recombineCentroids(CentroidPointList[] centroidPoints) {
 		LinkedList<CentroidPoint> newCentroids = new LinkedList<CentroidPoint>();
 		for (int i = 0; i < centroidPoints.length; i++) {
-			LinkedList<CentroidPoint> ctPs = centroidPoints[i];
+			LinkedList<CentroidPoint> ctPs = (centroidPoints[i]).points;
 			for (CentroidPoint ct : ctPs) {
 				if (newCentroids.contains(ct)) {
 					newCentroids.get(newCentroids.indexOf(ct)).combine(ct);
