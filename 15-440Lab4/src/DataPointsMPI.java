@@ -149,7 +149,7 @@ public class DataPointsMPI {
 			}
 
 			/* Gather all the centroids and merge them */
-			MPI.COMM_WORLD.
+			MPI.COMM_WORLD.Gather();
 			/* Recompute the centroids (if your the root, otherwise get new centroids from root)
 			 * Note: This is a rather simple operation, and the number of centroids is much less
 			 * than the number of points. Thus, the communication overhead is not worth the benefits
