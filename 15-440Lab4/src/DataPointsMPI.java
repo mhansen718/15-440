@@ -24,6 +24,8 @@ public class DataPointsMPI {
 		RandomAccessFile inFile = null;
 		Iterator<Point2D.Double> ptIterator;
 		Iterator<CentroidPoint> ctIterator;
+		int[] mpiNumberStable = new int[1];
+		LinkedList<CentroidPoint>[] mpiCentroids;
 		
 		/* Initialize the MPI environment */
 		try {
@@ -121,7 +123,6 @@ public class DataPointsMPI {
 		
 		/* Distribute/Get centroids */
 		
-		
 		numberStable = 0;
 		while (numberStable < numberClusters) {
 			/* Sequentially find the cluster for each point */
@@ -166,9 +167,11 @@ public class DataPointsMPI {
 			}
 			
 			/* Distribute/Get numberStable */
-			MPI.COMM_WORLD.Bcast(numberStable, 0, 1, MPI.INT, 0);
+			MPI.COMM_WORLD.Bcast(mpiNumberStable, 0, 1, MPI.INT, 0);
+			numberStable = mpiNumberStable[0];
 			/* Distribute/Get centroids */
-			MPI.COMM_WORLD.Bcast(centroids, 0, 1, MPI.OBJECT, 0);
+			MPI.COMM_WORLD.Bcast(mpiCentroids, 0, 1, MPI.OBJECT, 0);
+			centroids = recombineCentroids(mpiCentroids);
 		}
 		
 		/* Terminate the MPI environment */
@@ -190,6 +193,21 @@ public class DataPointsMPI {
 	
 	private static void printUsage() {
 		System.out.println(" Usage: java DataPoint [coord file] [# clusters]");
+	}
+	
+	private static LinkedList<CentroidPoint> recombineCentroids(LinkedList<CentroidPoint>[] centroidPoints) {
+		LinkedList<CentroidPoint> newCentroids = new LinkedList<CentroidPoint>();
+		for (int i = 0; i < centroidPoints.length; i++) {
+			LinkedList<CentroidPoint> ctPs = centroidPoints[i];
+			for (CentroidPoint ct : ctPs) {
+				if (newCentroids.contains(ct)) {
+					newCentroids.get(newCentroids.indexOf(ct)).combine(ct);
+				} else {
+					newCentroids.add(ct);
+				}
+			}
+		}
+		return newCentroids;
 	}
 }
 

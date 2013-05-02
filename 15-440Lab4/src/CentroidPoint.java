@@ -22,6 +22,18 @@ public class CentroidPoint extends Point2D.Double {
 		this.numB = 0;
 	}
 	
+	public double getDX() {
+		return this.dx;
+	}
+	
+	public double getDY() {
+		return this.dy;
+	}
+	
+	public int getNumB() {
+		return this.numB;
+	}
+	
 	/* Adds a point to the cluster */
 	public void addPoint(Point2D.Double p) {
 		this.dx += p.getX();
@@ -45,6 +57,14 @@ public class CentroidPoint extends Point2D.Double {
 		this.numB = 0;
 		
 		return (this.distance(old) == 0);
+	}
+
+	/* Combines two centroid points */
+	public void combine(CentroidPoint other) {
+		this.dx += other.getDX();
+		this.dy += other.getDY();
+		this.numB += other.getNumB();
+		return;
 	}
 
 }
