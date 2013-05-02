@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.Random;
 import mpi.*;
 
-
+// Usage: mpirun -np 1 -machinefile list2.mpi java DataPointsMPI scripts/input/cluster.csv 2
 public class DataPointsMPI {
 
 	public static void main (String[] args) {
@@ -128,7 +128,12 @@ public class DataPointsMPI {
 		
 		/* Distribute/Get centroids */
 		(mpiCentroids[0]).points = centroids;
-		MPI.COMM_WORLD.Bcast(mpiCentroidsSend, 0, 1, MPI.OBJECT, 0);
+		try {
+			MPI.COMM_WORLD.Bcast(mpiCentroidsSend, 0, 1, MPI.OBJECT, 0);
+		} catch (MPIException excpt) {
+			System.out.println(" Error: problem passing out centroids");
+			return;
+		}
 		centroids = (mpiCentroids[0]).points;
 		
 		numberStable = 0;
@@ -159,8 +164,13 @@ public class DataPointsMPI {
 
 			/* Gather all the centroids and merge them */
 			(mpiCentroidsSend[0]).points = centroids;
-			MPI.COMM_WORLD.Gather(mpiCentroidsSend, 0, 1, MPI.OBJECT, 
-					mpiCentroids, 0, size, MPI.OBJECT, 0);
+			try {
+				MPI.COMM_WORLD.Gather(mpiCentroidsSend, 0, 1, MPI.OBJECT, 
+						mpiCentroids, 0, size, MPI.OBJECT, 0);
+			} catch (MPIException excpt) {
+				System.out.println(" Error: problem collecting centroids");
+				return;
+			}
 			centroids = recombineCentroids(mpiCentroids);
 			/* Recompute the centroids (if your the root, otherwise get new centroids from root)
 			 * Note: This is a rather simple operation, and the number of centroids is much less
@@ -179,11 +189,21 @@ public class DataPointsMPI {
 			
 			/* Distribute/Get numberStable */
 			mpiNumberStable[0] = numberStable;
-			MPI.COMM_WORLD.Bcast(mpiNumberStable, 0, 1, MPI.INT, 0);
+			try {
+				MPI.COMM_WORLD.Bcast(mpiNumberStable, 0, 1, MPI.INT, 0);
+			} catch (MPIException excpt) {
+				System.out.println(" Error: problem passing out centroids");
+				return;
+			}
 			numberStable = mpiNumberStable[0];
 			/* Distribute/Get centroids */
 			(mpiCentroids[0]).points = centroids;
-			MPI.COMM_WORLD.Bcast(mpiCentroidsSend, 0, 1, MPI.OBJECT, 0);
+			try{
+				MPI.COMM_WORLD.Bcast(mpiCentroidsSend, 0, 1, MPI.OBJECT, 0);
+			} catch (MPIException excpt) {
+				System.out.println(" Error: problem passing out centroids");
+				return;
+			}
 			centroids = (mpiCentroids[0]).points;
 		}
 		
