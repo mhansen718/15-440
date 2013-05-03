@@ -17,9 +17,11 @@ public class DataPointsMPI {
 		int currentLine;
 		int rank;
 		int size;
+		Random seed;
 		String fileName;
 		String lineIn;
 		LinkedList<Point2D.Double> points = new LinkedList<Point2D.Double>();
+		LinkedList<Point2D.Double> pickingPoints = new LinkedList<Point2D.Double>();;
 		LinkedList<CentroidPoint> centroids = new LinkedList<CentroidPoint>();
 		RandomAccessFile inFile = null;
 		Iterator<Point2D.Double> ptIterator;
@@ -47,14 +49,18 @@ public class DataPointsMPI {
 		mpiCentroidsSend[0] = new CentroidPointList();
 		
 		/* Get and parse the arguments */
-		if (args.length != 2) {
+		if ((args.length != 2) && (args.length != 3)) {
 			printUsage();
 			return;
 		}
 		
+		seed = new Random();
 		try {
 			fileName = args[0];
 			numberClusters = Integer.parseInt(args[1]);
+			if (args.length == 3) {
+				seed = new Random(Integer.parseInt(args[2]));
+			}
 		} catch (NumberFormatException excpt) {
 			printUsage();
 			return;
@@ -103,6 +109,11 @@ public class DataPointsMPI {
 					p.setLocation(Double.parseDouble(lineIn.split(",")[0]), Double.parseDouble(lineIn.split(",")[1]));
 					points.add(p);
 				}
+				if (rank == 0) {
+					Point2D.Double p = new Point2D.Double();
+					p.setLocation(Double.parseDouble(lineIn.split(",")[0]), Double.parseDouble(lineIn.split(",")[1]));
+					pickingPoints.add(p);
+				}
 			} catch (NumberFormatException excpt) {
 				System.out.println(" Error: failed to parse input file");
 				return;
@@ -122,8 +133,8 @@ public class DataPointsMPI {
 		/* From points, choose n random centroids (if youre the root node, otherwise get them from the root) */
 		if (rank == 0) {
 			for (int i=0; i < numberClusters; i++) {
-				int x = (new Random()).nextInt(points.size());
-				CentroidPoint p = new CentroidPoint((points.get(x)).getX(), (points.get(x)).getY());
+				int x = seed.nextInt(pickingPoints.size());
+				CentroidPoint p = new CentroidPoint((pickingPoints.get(x)).getX(), (pickingPoints.get(x)).getY());
 				if (!(centroids.contains(p))) {
 					centroids.add(p);
 				}
@@ -234,7 +245,7 @@ public class DataPointsMPI {
 		
 	
 	private static void printUsage() {
-		System.out.println(" Usage: java DataPoint [coord file] [# clusters]");
+		System.out.println(" Usage: java DataPoint [coord file] [# clusters] [seed (optional)]");
 	}
 	
 	private static LinkedList<CentroidPoint> recombineCentroids(CentroidPointList[] centroidPoints) {

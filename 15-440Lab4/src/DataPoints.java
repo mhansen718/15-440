@@ -12,6 +12,7 @@ public class DataPoints {
 	public static void main (String[] args) {
 		int numberClusters;
 		int numberStable;
+		Random seed;
 		String fileName;
 		String lineIn;
 		LinkedList<Point2D.Double> points = new LinkedList<Point2D.Double>();
@@ -21,14 +22,18 @@ public class DataPoints {
 		Iterator<CentroidPoint> ctIterator;
 		
 		/* Get and parse the arguments */
-		if (args.length != 2) {
+		if ((args.length != 2) && (args.length != 3)) {
 			printUsage();
 			return;
 		}
 		
+		seed = new Random();
 		try {
 			fileName = args[0];
 			numberClusters = Integer.parseInt(args[1]);
+			if (args.length == 3) {
+				seed = new Random(Integer.parseInt(args[2]));
+			}
 		} catch (NumberFormatException excpt) {
 			printUsage();
 			return;
@@ -71,7 +76,7 @@ public class DataPoints {
 		
 		/* From points, choose n random centroids */
 		for (int i=0; i < numberClusters; i++) {
-			int x = (new Random()).nextInt(points.size());
+			int x = seed.nextInt(points.size());
 			CentroidPoint p = new CentroidPoint((points.get(x)).getX(), (points.get(x)).getY());
 			if (!(centroids.contains(p))) {
 				centroids.add(p);
@@ -125,7 +130,7 @@ public class DataPoints {
 		
 	
 	private static void printUsage() {
-		System.out.println(" Usage: java DataPoint [coord file] [# clusters]");
+		System.out.println(" Usage: java DataPoint [coord file] [# clusters] [seed (optional)]");
 	}
 }
 
