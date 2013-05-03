@@ -92,8 +92,8 @@ public class DataPointsMPI {
 			myMaxLine += mod;
 			myMinLine += mod;
 		} else {
-			myMaxLine += (mod - rank) + 1;
-			myMinLine += mod - rank;
+			myMaxLine += rank + 1;
+			myMinLine += rank;
 		}
 		currentLine = 0;
 		while (lineIn != null) {
@@ -202,17 +202,19 @@ public class DataPointsMPI {
 				return;
 			}
 			numberStable = mpiNumberStable[0];
+			
 			/* Distribute/Get centroids */
-			(mpiCentroids[0]).points = centroids;
+			(mpiCentroidsSend[0]).points = centroids;
 			try{
 				MPI.COMM_WORLD.Bcast(mpiCentroidsSend, 0, 1, MPI.OBJECT, 0);
 			} catch (MPIException excpt) {
 				System.out.println(" Error: problem passing out centroids");
 				return;
 			}
-			centroids = (mpiCentroids[0]).points;
+			centroids = (mpiCentroidsSend[0]).points;
 		}
 		
+		/* Print centroids */
 		if (rank == 0) {
 			ctIterator = centroids.iterator();
 			while (ctIterator.hasNext()) {

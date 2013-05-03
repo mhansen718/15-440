@@ -115,6 +115,7 @@ public class DataPoints {
 			}
 		}
 		
+		/* Print centroids */
 		ctIterator = centroids.iterator();
 		while (ctIterator.hasNext()) {
 			CentroidPoint ct = ctIterator.next();
