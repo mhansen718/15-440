@@ -40,7 +40,11 @@ public class DataPointsMPI {
 		
 		/* Initialize the buffers */
 		mpiCentroids = new CentroidPointList[size];
+		for (int i = 0; i < mpiCentroids.length; i++) {
+			mpiCentroids[i] = new CentroidPointList();
+		}
 		mpiCentroidsSend = new CentroidPointList[1];
+		mpiCentroidsSend[0] = new CentroidPointList();
 		
 		/* Get and parse the arguments */
 		if (args.length != 2) {
@@ -127,14 +131,14 @@ public class DataPointsMPI {
 		}
 		
 		/* Distribute/Get centroids */
-		(mpiCentroids[0]).points = centroids;
+		(mpiCentroidsSend[0]).points = centroids;
 		try {
 			MPI.COMM_WORLD.Bcast(mpiCentroidsSend, 0, 1, MPI.OBJECT, 0);
 		} catch (MPIException excpt) {
 			System.out.println(" Error: problem passing out centroids");
 			return;
 		}
-		centroids = (mpiCentroids[0]).points;
+		centroids = (mpiCentroidsSend[0]).points;
 		
 		numberStable = 0;
 		while (numberStable < numberClusters) {
@@ -162,21 +166,23 @@ public class DataPointsMPI {
 				}
 			}
 
-			/* Gather all the centroids and merge them */
+			/* Gather all the centroids (send them to the root) */
 			(mpiCentroidsSend[0]).points = centroids;
 			try {
 				MPI.COMM_WORLD.Gather(mpiCentroidsSend, 0, 1, MPI.OBJECT, 
-						mpiCentroids, 0, size, MPI.OBJECT, 0);
+						mpiCentroids, 0, 1, MPI.OBJECT, 0);
 			} catch (MPIException excpt) {
 				System.out.println(" Error: problem collecting centroids");
 				return;
 			}
-			centroids = recombineCentroids(mpiCentroids);
+			
 			/* Recompute the centroids (if your the root, otherwise get new centroids from root)
 			 * Note: This is a rather simple operation, and the number of centroids is much less
 			 * than the number of points. Thus, the communication overhead is not worth the benefits
 			 * of distributing this part of the work. */
 			if (rank == 0) {
+				centroids = recombineCentroids(mpiCentroids);
+				
 				numberStable = 0;
 				ctIterator = centroids.iterator();
 				while (ctIterator.hasNext()) {
@@ -207,6 +213,14 @@ public class DataPointsMPI {
 			centroids = (mpiCentroids[0]).points;
 		}
 		
+		if (rank == 0) {
+			ctIterator = centroids.iterator();
+			while (ctIterator.hasNext()) {
+				CentroidPoint ct = ctIterator.next();
+				System.out.println(" Centroid: " + Double.toString(ct.getX()) + ", " + Double.toString(ct.getY()));
+			}
+		}
+		
 		/* Terminate the MPI environment */
 		try {
 			MPI.Finalize();
@@ -214,13 +228,6 @@ public class DataPointsMPI {
 			System.out.println(" Error: failed to close mpi environment");
 			return;
 		}
-		
-		ctIterator = centroids.iterator();
-		while (ctIterator.hasNext()) {
-			CentroidPoint ct = ctIterator.next();
-			System.out.println(" Centroid: " + Double.toString(ct.getX()) + ", " + Double.toString(ct.getY()));
-		}
-		
 	}
 		
 	
