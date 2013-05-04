@@ -61,6 +61,24 @@ public class CentroidDNA implements Serializable {
         return (dist == 0);
     }    
     
+    public String output() {
+        String DNA = "";
+        for (int i = 0; i < this.strand.length; i++) {
+            DNA += "ACGT".charAt(maxIndex(this.strand[i]));
+        }
+        return DNA;
+    }
+    
+    private int max(ArrayList<double> list) {
+        int maxIndex = 0;
+        for (int i = 1; i < list.length; i++) {
+            if (list[i] > list[maxIndex]) {
+                maxIndex = i;
+            }
+        }
+        return maxIndex;
+    }
+    
     private int sum(ArrayList<int> list) {
         int total = 0;
         for (int val : list) {

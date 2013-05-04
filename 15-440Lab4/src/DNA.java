@@ -10,6 +10,9 @@ public class DNA {
         String lineIn;
         LinkedList<String> strands = new LinkedList<String>();
         LinkedList<CentroidDNA> centroids = new LinkedList<CentroidDNA>();
+		RandomAccessFile inFile = null;
+        Iterator<String> ptIterator;
+		Iterator<CentroidDNA> ctIterator;
         
         /* Get and parse the arguments */
 		if ((args.length != 2) && (args.length != 3)) {
@@ -54,7 +57,60 @@ public class DNA {
 			}
 		}
         
+        /* From strands, choose n random centroids */
+        int i = 0
+		while (i < numberClusters) {
+			int x = seed.nextInt(strands.size());
+			CentroidPoint p = new CentroidPoint((points.get(x)).getX(), (points.get(x)).getY());
+			if (!(strands.contains(p))) {
+				strands.add(p);
+                i++;
+			}
+		}
         
+        numberStable = 0;
+		while (numberStable < numberClusters) {
+			/* Sequentially find the cluster for each point */
+			ptIterator = points.iterator();
+			while (ptIterator.hasNext()) {
+				String p = ptIterator.next();
+				ctIterator = centroids.iterator();
+
+				/* Find the cluster */
+				if (ctIterator.hasNext()) {
+					CentroidDNA ct = ctIterator.next();
+					CentroidDNA ctNearest = ct;
+					double distance = p.distance(ct);
+					while (ctIterator.hasNext()) {
+						ct = ctIterator.next();
+						if (distance > p.distance(ct)) {
+							ctNearest = ct;
+							distance = p.distance(ct);
+						}
+					}
+
+					/* Add point to cluster */
+					ctNearest.addPoint(p);
+				}
+			}
+
+			/* Recompute the centroids */
+			numberStable = 0;
+			ctIterator = centroids.iterator();
+			while (ctIterator.hasNext()) {
+				CentroidDNA ct = ctIterator.next();
+				if (ct.remean()) {
+					numberStable++;
+				}
+			}
+		}
+        
+        /* Print centroids */
+		ctIterator = centroids.iterator();
+		while (ctIterator.hasNext()) {
+			CentroidDNA ct = ctIterator.next();
+			System.out.println(" Centroid: " + ct.output());
+		}
     }
     
     private static void printUsage() {
