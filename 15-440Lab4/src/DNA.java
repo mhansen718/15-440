@@ -68,7 +68,7 @@ public class DNA {
         int i = 0;
 		while (i < numberClusters) {
 			int x = seed.nextInt(strands.size());
-			CentroidPoint p = new CentroidPoint((points.get(x)).getX(), (points.get(x)).getY());
+			CentroidDNA p = new CentroidDNA(strands.get(x));
 			if (!(strands.contains(p))) {
 				strands.add(p);
                 i++;
@@ -87,12 +87,12 @@ public class DNA {
 				if (ctIterator.hasNext()) {
 					CentroidDNA ct = ctIterator.next();
 					CentroidDNA ctNearest = ct;
-					double distance = p.distance(ct);
+					double distance = ct.distance(p);
 					while (ctIterator.hasNext()) {
 						ct = ctIterator.next();
-						if (distance > p.distance(ct)) {
+						if (distance > ct.distance(p)) {
 							ctNearest = ct;
-							distance = p.distance(ct);
+							distance = ct.distance(p);
 						}
 					}
 
