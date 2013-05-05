@@ -246,7 +246,7 @@ public class DataPointsMPI {
 		
 	
 	private static void printUsage() {
-		System.out.println(" Usage: java DataPoint [coord file] [# clusters] [seed (optional)]");
+		System.out.println(" Usage: java DataPointsMPI [coord file] [# clusters] [seed (optional)]");
 	}
 	
 	private static LinkedList<CentroidPoint> recombineCentroids(CentroidPointList[] centroidPoints) {
