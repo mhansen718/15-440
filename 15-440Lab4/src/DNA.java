@@ -74,7 +74,7 @@ public class DNA {
                 i++;
 			}
 		}
-        
+
         numberStable = 0;
 		while (numberStable < numberClusters) {
 			/* Sequentially find the cluster for each point */

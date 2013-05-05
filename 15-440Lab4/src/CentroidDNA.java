@@ -47,7 +47,7 @@ public class CentroidDNA implements Serializable {
         int[][] temp;
         for (int i = 0; i < this.strand.length; i++) {
             for (int j = 0; j < 4; j++) {
-                dist += Math.abs(this.strand[i][j] - this.newStrand[i][j]);
+                dist += Math.abs(this.strand[i][j] - (this.newStrand[i][j]/(double) sum(this.newStrand[i])));
             }
         }
         temp = this.newStrand.clone();
