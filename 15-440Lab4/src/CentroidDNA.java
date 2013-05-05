@@ -1,17 +1,22 @@
+import java.io.Serializable;
+import java.util.ArrayList;
+
 
 
 public class CentroidDNA implements Serializable {
 
-    private ArrayList<ArrayList<double>> strand;
-    private ArrayList<ArrayList<int>> newStrand;
-    
-    public CentroidDNA(String DNA) {
+	private static final long serialVersionUID = -6603084775267021628L;
+	
+    private ArrayList<ArrayList<Double>> strand;
+    private ArrayList<ArrayList<Integer>> newStrand;
+
+	public CentroidDNA(String DNA) {
         int base;
         
-        this.strand = new ArrayList<ArrayList<double>>();
+        this.strand = new ArrayList<ArrayList<Double>>();
         
-        for (int i = 0; i < DNA.length; i++) {
-            this.strand.add(new ArrayList<double>());
+        for (int i = 0; i < DNA.length(); i++) {
+            this.strand.add(new ArrayList<Double>());
             base = "ACGT".indexOf(DNA.charAt(i));
             for (int j = 0; j < 4; j++) {
                 if (j == base) {
@@ -26,7 +31,7 @@ public class CentroidDNA implements Serializable {
     public double distance(String other) {
         int base;
         double dist;
-        for (int i = 0; i < other.length; i++) {
+        for (int i = 0; i < other.length(); i++) {
             base = "ACGT".indexOf(other.charAt(i));
             dist += 1 - this.strand[i][base];
         }
@@ -34,7 +39,7 @@ public class CentroidDNA implements Serializable {
     }
     
     public void addPoint(String dna) {
-        for (int i = 0; i < dna.length; i++) {
+        for (int i = 0; i < dna.length(); i++) {
             this.newStrand[i]["ACGT".indexOf(dna.charAt(i))]++;
         }
     }
