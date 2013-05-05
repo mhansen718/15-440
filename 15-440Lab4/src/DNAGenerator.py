@@ -1,12 +1,8 @@
 import os
 import random
 
-def getDesktopPath(filename = ""):
-    homepath = os.getenv('USERPROFILE') or os.getenv('HOME')
-    return homepath + os.sep + "Desktop" + os.sep + filename
-
 def writeFile(filename,text):
-    fileHandler = open(getDesktopPath(filename), "w")
+    fileHandler = open(filename, "w")
     fileHandler.write(text)
     fileHandler.close()
 
