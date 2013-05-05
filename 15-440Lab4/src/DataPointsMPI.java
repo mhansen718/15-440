@@ -132,11 +132,12 @@ public class DataPointsMPI {
 		
 		/* From points, choose n random centroids (if youre the root node, otherwise get them from the root) */
 		if (rank == 0) {
-			for (int i=0; i < numberClusters; i++) {
+			for (int i=0; i < numberClusters;) {
 				int x = seed.nextInt(pickingPoints.size());
 				CentroidPoint p = new CentroidPoint((pickingPoints.get(x)).getX(), (pickingPoints.get(x)).getY());
 				if (!(centroids.contains(p))) {
 					centroids.add(p);
+					i++;
 				}
 			}
 		}

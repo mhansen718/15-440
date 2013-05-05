@@ -75,11 +75,12 @@ public class DataPoints {
 		}
 		
 		/* From points, choose n random centroids */
-		for (int i=0; i < numberClusters; i++) {
+		for (int i=0; i < numberClusters;) {
 			int x = seed.nextInt(points.size());
 			CentroidPoint p = new CentroidPoint((points.get(x)).getX(), (points.get(x)).getY());
 			if (!(centroids.contains(p))) {
 				centroids.add(p);
+				i++;
 			}
 		}
 		
