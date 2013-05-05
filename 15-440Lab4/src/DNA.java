@@ -1,3 +1,10 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Random;
+
 
 
 public class DNA {
@@ -58,7 +65,7 @@ public class DNA {
 		}
         
         /* From strands, choose n random centroids */
-        int i = 0
+        int i = 0;
 		while (i < numberClusters) {
 			int x = seed.nextInt(strands.size());
 			CentroidPoint p = new CentroidPoint((points.get(x)).getX(), (points.get(x)).getY());
