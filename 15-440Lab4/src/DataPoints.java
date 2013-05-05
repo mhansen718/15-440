@@ -131,7 +131,7 @@ public class DataPoints {
 		
 	
 	private static void printUsage() {
-		System.out.println(" Usage: java DataPoint [coord file] [# clusters] [seed (optional)]");
+		System.out.println(" Usage: java DataPoints [coord file] [# clusters] [seed (optional)]");
 	}
 }
 
