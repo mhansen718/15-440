@@ -1,3 +1,11 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Random;
+import mpi.*;
+
 
 
 public class DNAMPI {
