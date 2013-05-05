@@ -71,6 +71,19 @@ public class CentroidDNA implements Serializable {
         return DNA;
     }
     
+    public void combine(CentroidDNA other) {
+        otherNewStrand = other.getNewStrand();
+        for (int i = 0; i < this.newStrand.length; i++) {
+            for (int j = 0; j < 4; j++) {
+                this.newStrand[i][j] += otherNewStrand[i][j];
+            }
+        }
+    }
+    
+    public int[][] getNewStrand() {
+        return this.newStrand();
+    }
+    
     private int max(double[] list) {
         int maxIndex = 0;
         for (int i = 1; i < list.length; i++) {

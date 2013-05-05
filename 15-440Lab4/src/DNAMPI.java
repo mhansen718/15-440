@@ -214,5 +214,38 @@ public class DNAMPI {
 			centroids = (mpiCentroidsSend[0]).strands;
 		}
 		
+        /* Print centroids */
+		ctIterator = centroids.iterator();
+		while (ctIterator.hasNext()) {
+			CentroidDNA ct = ctIterator.next();
+			System.out.println(" Centroid: " + ct.output());
+		}
+        
+        /* Terminate the MPI environment */
+		try {
+			MPI.Finalize();
+		} catch (MPIException excpt) {
+			System.out.println(" Error: failed to close mpi environment");
+			return;
+		}
     }
+    
+    private static void printUsage() {
+		System.out.println(" Usage: java DNAMPI [coord file] [# clusters] [seed (optional)]");
+	}
+	
+	private static LinkedList<CentroidDNA> recombineCentroids(CentroidDNAList[] centroidDNAs) {
+		LinkedList<CentroidDNA> newCentroids = new LinkedList<CentroidDNA>();
+		for (int i = 0; i < centroidDNAs.length; i++) {
+			LinkedList<CentroidDNA> ctPs = (centroidDNAs[i]).strands;
+			for (CentroidDNA ct : ctPs) {
+				if (newCentroids.contains(ct)) {
+					newCentroids.get(newCentroids.indexOf(ct)).combine(ct);
+				} else {
+					newCentroids.add(ct);
+				}
+			}
+		}
+		return newCentroids;
+	}
 }
