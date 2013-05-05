@@ -69,8 +69,8 @@ public class DNA {
 		while (i < numberClusters) {
 			int x = seed.nextInt(strands.size());
 			CentroidDNA p = new CentroidDNA(strands.get(x));
-			if (!(strands.contains(p))) {
-				strands.add(p);
+			if (!(centroids.contains(p))) {
+				centroids.add(p);
                 i++;
 			}
 		}
@@ -78,7 +78,7 @@ public class DNA {
         numberStable = 0;
 		while (numberStable < numberClusters) {
 			/* Sequentially find the cluster for each point */
-			ptIterator = points.iterator();
+			ptIterator = strands.iterator();
 			while (ptIterator.hasNext()) {
 				String p = ptIterator.next();
 				ctIterator = centroids.iterator();

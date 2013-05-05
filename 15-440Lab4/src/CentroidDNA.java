@@ -14,7 +14,7 @@ public class CentroidDNA implements Serializable {
         this.newStrand = new int[DNA.length()][4];
         
         for (int i = 0; i < DNA.length(); i++) {
-            this.newStrand[i] = {0,0,0,0};
+            this.newStrand[i] = new int[] {0,0,0,0};
             base = "ACGT".indexOf(DNA.charAt(i));
             for (int j = 0; j < 4; j++) {
                 if (j == base) {
@@ -28,7 +28,7 @@ public class CentroidDNA implements Serializable {
     
     public double distance(String other) {
         int base;
-        double dist;
+        double dist = 0;
         for (int i = 0; i < other.length(); i++) {
             base = "ACGT".indexOf(other.charAt(i));
             dist += 1 - this.strand[i][base];
@@ -53,10 +53,10 @@ public class CentroidDNA implements Serializable {
         temp = this.newStrand.clone();
         this.newStrand = new int[this.newStrand.length][4];
         double total;
-        for (i = 0; i < this.strand.length; i++) {
-            this.newStrand[i] = {0,0,0,0};
+        for (int i = 0; i < this.strand.length; i++) {
+            this.newStrand[i] = new int[] {0,0,0,0};
             total = (double) sum(temp[i]);
-            for (j = 0; j < 4; j++) {
+            for (int j = 0; j < 4; j++) {
                 this.strand[i][j] = temp[i][j] / total;
             }
         }
