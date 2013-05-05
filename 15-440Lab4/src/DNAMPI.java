@@ -223,12 +223,14 @@ public class DNAMPI {
 		}
 		
         /* Print centroids */
-		ctIterator = centroids.iterator();
-		while (ctIterator.hasNext()) {
-			CentroidDNA ct = ctIterator.next();
-			System.out.println(" Centroid: " + ct.output());
+		if (rank == 0) {
+			ctIterator = centroids.iterator();
+			while (ctIterator.hasNext()) {
+				CentroidDNA ct = ctIterator.next();
+				System.out.println(" Centroid: " + ct.output());
+			}
 		}
-        
+		
         /* Terminate the MPI environment */
 		try {
 			MPI.Finalize();

@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class CentroidDNA implements Serializable {
 
@@ -101,4 +102,22 @@ public class CentroidDNA implements Serializable {
         }
         return total;
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		CentroidDNA other = (CentroidDNA) obj;
+		for (int i = 0; i < this.strand.length; i++) {
+			if (!Arrays.equals(strand[i], other.strand[i]))
+				return false;
+		}
+		return true;
+	}
+    
+    
 }
