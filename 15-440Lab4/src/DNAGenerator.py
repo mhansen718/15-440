@@ -1,6 +1,12 @@
 import os
 import random
 
+# arguments
+numStrands = 10000
+numCentroids = 20
+strandLen = 200
+output = "DNAStrands.txt"
+
 def writeFile(filename,text):
     fileHandler = open(filename, "w")
     fileHandler.write(text)
@@ -69,4 +75,4 @@ def generateDNA(n,c,s):
             i += 1
     return text
     
-writeFile("DNAStrands.txt",generateDNA(10000,20,200))
+writeFile(output,generateDNA(numStrands,numCentroids,strandLen))
